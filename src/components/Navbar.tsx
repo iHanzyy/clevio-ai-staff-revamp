@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 interface NavbarProps {
@@ -7,6 +10,11 @@ interface NavbarProps {
 }
 
 export function Navbar({ className }: NavbarProps) {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+  // Consider /login as the Dashboard active state for now as requested
+  const isDashboard = pathname === "/login" || pathname === "/dashboard";
+
   return (
     <nav
       className={cn(
@@ -44,20 +52,34 @@ export function Navbar({ className }: NavbarProps) {
         <div className="relative flex flex-col items-center justify-center">
           <Link
             href="/"
-            className="text-black text-center font-sans text-[24px] font-bold leading-normal"
+            className={cn(
+              "text-center font-sans text-[24px] leading-normal transition-colors",
+              isHome ? "text-black font-bold" : "text-black/60 font-medium hover:text-black"
+            )}
           >
             Home
           </Link>
-          {/* Active Indicator Line - Absolute to prevent layout shift */}
-          <div className="absolute top-full w-[81px] h-[3px] bg-black mt-1 rounded-[30px]" />
+          {/* Active Indicator Line */}
+          {isHome && (
+            <div className="absolute top-full w-[81px] h-[3px] bg-black mt-1 rounded-[30px]" />
+          )}
         </div>
 
-        <Link
-          href="/dashboard"
-          className="text-black text-center font-sans text-[24px] font-bold leading-normal hover:opacity-70 transition-opacity"
-        >
-          Dashboard
-        </Link>
+        <div className="relative flex flex-col items-center justify-center">
+          <Link
+            href="/login"
+            className={cn(
+              "text-center font-sans text-[24px] leading-normal transition-colors",
+              isDashboard ? "text-black font-bold" : "text-black/60 font-medium hover:text-black"
+            )}
+          >
+            Dashboard
+          </Link>
+          {/* Active Indicator Line */}
+          {isDashboard && (
+            <div className="absolute top-full w-[81px] h-[3px] bg-black mt-1 rounded-[30px]" />
+          )}
+        </div>
       </div>
     </nav>
   );

@@ -1,11 +1,10 @@
 import Image from "next/image";
-import { Navbar } from "@/components/Navbar";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen w-full overflow-hidden">
-      {/* Hero Background */}
-      <div className="absolute inset-0 -z-10">
+    <>
+      {/* Hero Background - Home Only */}
+      <div className="fixed inset-0 -z-10 w-full h-full">
         <Image
           src="/heroBackground.webp"
           alt="Hero Background"
@@ -15,11 +14,6 @@ export default function Home() {
           quality={100}
         />
       </div>
-
-      {/* Content Wrapper */}
-      <div className="relative z-10 flex flex-col items-center pt-0 w-full h-full">
-        <Navbar />
-      </div>
-    </main>
+    </>
   );
 }

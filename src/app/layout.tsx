@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
+import Image from "next/image";
+import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -21,9 +23,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${poppins.variable} antialiased`}
+        className={`${poppins.variable} antialiased relative min-h-screen w-full overflow-hidden`}
       >
-        {children}
+        {/* Persistent Content Wrapper */}
+        <div className="relative z-10 flex flex-col items-center pt-[30px] w-full h-full">
+          {/* Persistent Navbar */}
+          <Navbar />
+          
+          {/* Dynamic Page Content */}
+          <main className="w-full h-full flex-grow">
+            {children}
+          </main>
+        </div>
       </body>
     </html>
   );
