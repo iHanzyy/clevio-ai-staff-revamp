@@ -2,22 +2,18 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  // Check for the session token in cookies
   const sessionToken = request.cookies.get('session_token')
 
-  // Log for debugging (server-side)
-  // console.log(`[Middleware] Path: ${request.nextUrl.pathname}, Token: ${sessionToken ? 'Present' : 'Missing'}`)
-
+  // Block access to protected routes if no session cookie
   if (!sessionToken) {
-    // Redirect to login if no token is found
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Allow request to proceed if authenticated
   return NextResponse.next()
 }
 
-// Ensure middleware only runs on specific paths
+// Only protect dashboard (authenticated users only)
+// Payment is NOT protected here - it handles its own auth logic
 export const config = {
-  matcher: '/payment/:path*',
+  matcher: '/dashboard/:path*',
 }

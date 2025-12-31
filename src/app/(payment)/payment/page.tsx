@@ -11,6 +11,8 @@ export default function PaymentPage() {
     // Handle token from URL (Backend redirects here with ?token=...)
     useEffect(() => {
         const token = searchParams.get('token');
+        const hasCookie = document.cookie.includes('session_token=');
+
         if (token) {
             // Save token to localStorage (for API Calls)
             localStorage.setItem('jwt_token', token);
@@ -20,6 +22,9 @@ export default function PaymentPage() {
 
             // Clean URL (remove query params) - soft redirect
             router.replace('/payment');
+        } else if (!hasCookie) {
+            // No token in URL AND no existing cookie = unauthorized
+            router.replace('/login');
         }
     }, [searchParams, router]);
 

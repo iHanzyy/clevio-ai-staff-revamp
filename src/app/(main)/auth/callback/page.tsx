@@ -20,10 +20,9 @@ export default function AuthCallbackPage() {
             // 3. Save token to Cookie (Native Method for Reliability)
             document.cookie = `session_token=${token}; path=/; max-age=604800; SameSite=Lax`;
 
-            // 4. Redirect to Payment page (Hard Redirect with slight delay)
-            // Delay ensures cookie is persisted before request is sent
+            // 4. Redirect to Dashboard (Active User Flow)
             setTimeout(() => {
-                window.location.href = '/payment';
+                window.location.href = '/dashboard';
             }, 500);
         } else {
             // Redirect back to login on error
