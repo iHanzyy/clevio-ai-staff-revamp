@@ -1,11 +1,10 @@
-import LoginForm from "@/components/LoginForm";
-import LoginBackground from "@/components/LoginBackground";
+import LoginForm from "@/components/features/auth/LoginForm";
 
 export default function LoginPage() {
     return (
         <>
-            {/* Login Background */}
-            <LoginBackground />
+            {/* Dashboard Background - Ivory */}
+            <div className="fixed inset-0 -z-10 w-full h-full bg-[#fffff0]" />
 
             {/* Login Content */}
             <div className="w-full h-full pt-[80px] flex items-center justify-center">

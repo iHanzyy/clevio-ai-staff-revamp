@@ -1,4 +1,4 @@
-import HeroBackground from "@/components/HeroBackground";
+import HeroBackground from "@/components/features/home/HeroBackground";
 
 export default function Home() {
   return (

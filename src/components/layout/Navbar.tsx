@@ -16,6 +16,7 @@ export function Navbar({ className }: NavbarProps) {
     // Consider /login as the Dashboard active state for now as requested
     const isDashboard = pathname === "/login" || pathname === "/dashboard";
 
+
     return (
         <nav
             className={cn(
