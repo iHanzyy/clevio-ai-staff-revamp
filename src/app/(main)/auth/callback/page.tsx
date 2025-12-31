@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 export default function AuthCallbackPage() {
     const router = useRouter();
@@ -13,11 +14,17 @@ export default function AuthCallbackPage() {
         const token = params.get('token');
 
         if (token) {
-            // 2. Save token to localStorage
+            // 2. Save token to localStorage (for API)
             localStorage.setItem('jwt_token', token);
 
-            // 3. Redirect to Payment page (as requested by user)
-            router.push('/payment');
+            // 3. Save token to Cookie (Native Method for Reliability)
+            document.cookie = `session_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+
+            // 4. Redirect to Payment page (Hard Redirect with slight delay)
+            // Delay ensures cookie is persisted before request is sent
+            setTimeout(() => {
+                window.location.href = '/payment';
+            }, 500);
         } else {
             // Redirect back to login on error
             const error = params.get('error');
