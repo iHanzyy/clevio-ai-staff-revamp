@@ -21,15 +21,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${poppins.variable} antialiased relative min-h-screen w-full overflow-hidden`}
       >
         {/* Persistent Content Wrapper */}
         <div className="relative z-10 flex flex-col items-center pt-[30px] w-full h-full">
           {/* Persistent Navbar */}
           <Navbar />
-          
+
           {/* Dynamic Page Content */}
           <main className="w-full h-full flex-grow">
             {children}
