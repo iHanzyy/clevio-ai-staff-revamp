@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const sessionToken = request.cookies.get('session_token')
 
   // Block access to protected routes if no session cookie

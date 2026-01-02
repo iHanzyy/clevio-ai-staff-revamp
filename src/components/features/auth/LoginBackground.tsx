@@ -11,7 +11,7 @@ export default function LoginBackground() {
                 fill
                 priority
                 className="object-cover object-top"
-                quality={70}
+                quality={75}
                 onContextMenu={(e) => e.preventDefault()}
             />
         </div>
