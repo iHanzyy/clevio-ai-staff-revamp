@@ -31,6 +31,17 @@ export default function DashboardPage() {
                         Fitur manajemen Agent dan integrasi akan segera hadir.
                     </p>
                 </div>
+
+                <button
+                    onClick={() => {
+                        localStorage.removeItem('jwt_token');
+                        document.cookie = 'session_token=; path=/; max-age=0';
+                        window.location.href = '/login';
+                    }}
+                    className="mt-8 px-6 py-2.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-600 font-medium transition-all duration-200 border border-red-500/20 hover:border-red-500/30 backdrop-blur-sm"
+                >
+                    Logout
+                </button>
             </div>
         </div>
     );

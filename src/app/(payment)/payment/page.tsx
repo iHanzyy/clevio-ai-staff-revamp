@@ -12,6 +12,7 @@ export default function PaymentPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [isInitializing, setIsInitializing] = useState(true);
     const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
     // Fetch user info from backend API
@@ -22,6 +23,8 @@ export default function PaymentPage() {
         } catch {
             // Token invalid or expired - redirect to login
             router.replace('/login');
+        } finally {
+            setIsInitializing(false);
         }
     }, [router]);
 
@@ -52,7 +55,8 @@ export default function PaymentPage() {
 
     // Check for existing "PRO_M" plan and redirect to Dashboard
     useEffect(() => {
-        if (userInfo?.plan_code === 'PRO_M') {
+        // Enforce ACTIVE status checks. Plan code might be retained even if expired.
+        if (userInfo?.is_active && userInfo?.plan_code === 'PRO_M') {
             router.replace('/dashboard');
         }
     }, [userInfo, router]);
@@ -96,7 +100,7 @@ export default function PaymentPage() {
             const payload: PaymentWebhookPayload = {
                 user_id: userInfo.id,
                 email: userInfo.email,
-                plan_code: 'PRO_M',
+                plan_code: 'PRO_M', 
                 charge: '880000',
                 harga: '880000',
                 order_suffix: paymentService.generateOrderSuffix(),
@@ -151,6 +155,17 @@ export default function PaymentPage() {
         { text: "Dedicated Account Manager", included: true },
         { text: "Custom SLA & Agreement", included: true },
     ];
+
+    if (isInitializing) {
+        return (
+            <div className="flex min-h-screen w-full items-center justify-center bg-[#F9F6EE]">
+                <div className="text-center">
+                    <h2 className="text-xl font-bold font-sans mb-2 text-[#1a1a1a]">Loading Profile...</h2>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen w-full bg-[#F9F6EE] flex flex-col items-center py-10 px-4 overflow-y-auto">

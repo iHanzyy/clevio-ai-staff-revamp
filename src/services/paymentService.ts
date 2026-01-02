@@ -29,9 +29,8 @@ export interface PaymentStatusResponse {
  * Generate unique order suffix for Midtrans
  */
 export const generateOrderSuffix = (): string => {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 8);
-  return `${timestamp}-${random}`;
+  // Max 3 chars to fit Midtrans 50 char limit (SUB + UUID + PRO_M + Suffix = 50)
+  return Math.random().toString(36).substring(2, 5).toUpperCase();
 };
 
 /**
