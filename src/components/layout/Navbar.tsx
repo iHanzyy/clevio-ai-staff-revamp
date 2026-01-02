@@ -95,13 +95,44 @@ export function Navbar({ className }: NavbarProps) {
                 <div className="md:hidden mr-1">
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                        className="p-1.5 rounded-full hover:bg-white/20 transition-colors"
+                        className="p-1.5 rounded-full hover:bg-white/20 transition-colors relative w-10 h-10 flex items-center justify-center outline-none"
+                        aria-label="Toggle Menu"
                     >
-                        {isMobileMenuOpen ? (
-                            <X className="w-6 h-6 text-black/80" />
-                        ) : (
-                            <Menu className="w-6 h-6 text-black/80" />
-                        )}
+                        <div className="relative w-6 h-[18px] transform transition-all duration-500 ease-in-out rotate-0">
+                            {/* Bar 1 - Top */}
+                            <span
+                                className={cn(
+                                    "absolute block h-[2px] w-full bg-black/80 rounded-full opacity-100 left-0 rotate-0 transition-all duration-300 ease-in-out",
+                                    isMobileMenuOpen ? "top-[9px] w-0 left-1/2" : "top-0"
+                                )}
+                            />
+
+                            {/* Bar 2 - Middle (Rotates 45) */}
+                            <span
+                                className={cn(
+                                    "absolute block h-[2px] w-full bg-black/80 rounded-full opacity-100 left-0 rotate-0 transition-all duration-300 ease-in-out",
+                                    "top-[9px]",
+                                    isMobileMenuOpen ? "rotate-45" : ""
+                                )}
+                            />
+
+                            {/* Bar 3 - Middle (Rotates -45) */}
+                            <span
+                                className={cn(
+                                    "absolute block h-[2px] w-full bg-black/80 rounded-full opacity-100 left-0 rotate-0 transition-all duration-300 ease-in-out",
+                                    "top-[9px]",
+                                    isMobileMenuOpen ? "-rotate-45" : ""
+                                )}
+                            />
+
+                            {/* Bar 4 - Bottom */}
+                            <span
+                                className={cn(
+                                    "absolute block h-[2px] w-full bg-black/80 rounded-full opacity-100 left-0 rotate-0 transition-all duration-300 ease-in-out",
+                                    isMobileMenuOpen ? "top-[9px] w-0 left-1/2" : "top-[18px]"
+                                )}
+                            />
+                        </div>
                     </button>
                 </div>
             </nav>
@@ -118,7 +149,7 @@ export function Navbar({ className }: NavbarProps) {
                             stiffness: 350,
                             damping: 25
                         }}
-                        className="fixed left-0 right-0 z-[49] px-6 md:px-8 pointer-events-none"
+                        className="fixed left-0 right-0 z-[49] px-6 md:px-8 pointer-events-none md:hidden"
                         style={{ top: "75px" }} // Positioned just below the navbar (approx 50px + 25px gap)
                     >
                         {/* Card Container */}
