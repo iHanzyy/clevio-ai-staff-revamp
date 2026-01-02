@@ -41,12 +41,46 @@ export default function PaymentPage() {
             router.replace('/payment');
         } else if (!hasCookie) {
             // No token in URL AND no existing cookie = unauthorized
-            router.replace('/login');
+            // router.replace('/login'); // Commented out to avoid loop if middleware is active
+            // Let the authService.getMe() fail naturally if needed, or rely on middleware.
+            fetchUserInfo(); // Try fetching anyway, maybe cookie handles it
         } else {
             // Already has cookie - fetch user info
             fetchUserInfo();
         }
     }, [searchParams, router, fetchUserInfo]);
+
+    // Check for existing "PRO_M" plan and redirect to Dashboard
+    useEffect(() => {
+        if (userInfo?.plan_code === 'PRO_M') {
+            router.replace('/dashboard');
+        }
+    }, [userInfo, router]);
+
+    // Check for Midtrans Return Params (order_id)
+    useEffect(() => {
+        const orderId = searchParams.get('order_id');
+        const transactionStatus = searchParams.get('transaction_status');
+
+        if (orderId && (transactionStatus === 'settlement' || transactionStatus === 'capture')) {
+            setIsLoading(true);
+            // Polling for status or just wait a bit and check profile
+            const checkStatus = async () => {
+                try {
+                    // Slight delay to allow webhook to process
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await fetchUserInfo(); // Update user info to see if plan changed
+                    // If plan changed, the effect above will redirect
+                } catch (error) {
+                    console.error("Error checking status:", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+            checkStatus();
+        }
+    }, [searchParams, fetchUserInfo]);
+
 
     // Handle Pro Monthly Payment via Midtrans
     const handleProPayment = async () => {
@@ -73,13 +107,14 @@ export default function PaymentPage() {
 
             if (response.payment_url || response.redirect_url) {
                 // Redirect to Midtrans payment page
+                // Note: We don't need to do anything here as the user leaves the page
                 window.location.href = response.payment_url || response.redirect_url || '';
             } else {
                 alert('Gagal membuat order pembayaran. Silakan coba lagi.');
+                setIsLoading(false);
             }
         } catch (error) {
             alert('Terjadi kesalahan. Silakan coba lagi.');
-        } finally {
             setIsLoading(false);
         }
     };
