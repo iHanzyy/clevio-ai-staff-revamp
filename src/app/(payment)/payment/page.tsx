@@ -7,6 +7,7 @@ import { paymentService, PaymentWebhookPayload } from "@/services/paymentService
 import { authService, UserInfo } from "@/services/authService";
 
 import Image from "next/image";
+import LoadingScreen from "@/components/ui/LoadingScreen";
 
 export default function PaymentPage() {
     const searchParams = useSearchParams();
@@ -100,7 +101,7 @@ export default function PaymentPage() {
             const payload: PaymentWebhookPayload = {
                 user_id: userInfo.id,
                 email: userInfo.email,
-                plan_code: 'PRO_M', 
+                plan_code: 'PRO_M',
                 charge: '880000',
                 harga: '880000',
                 order_suffix: paymentService.generateOrderSuffix(),
@@ -157,14 +158,7 @@ export default function PaymentPage() {
     ];
 
     if (isInitializing) {
-        return (
-            <div className="flex min-h-screen w-full items-center justify-center bg-[#F9F6EE]">
-                <div className="text-center">
-                    <h2 className="text-xl font-bold font-sans mb-2 text-[#1a1a1a]">Loading Profile...</h2>
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                </div>
-            </div>
-        );
+        return <LoadingScreen text="Memuat..." />;
     }
 
     return (
