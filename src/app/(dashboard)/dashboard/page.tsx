@@ -1,47 +1,30 @@
-"use client";
-
-import { useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import React from "react";
+import ArthurPhone from "@/components/features/dashboard/ArthurPhone";
 
 export default function DashboardPage() {
-    const searchParams = useSearchParams();
-    const router = useRouter();
-
-    // Handle token from URL (in case backend sends token here too)
-    useEffect(() => {
-        const token = searchParams.get('token');
-        if (token) {
-            localStorage.setItem('jwt_token', token);
-            document.cookie = `session_token=${token}; path=/; max-age=604800; SameSite=Lax`;
-            router.replace('/dashboard');
-        }
-    }, [searchParams, router]);
-
     return (
-        <div className="min-h-screen w-full bg-[#F9F6EE] flex flex-col items-center justify-center py-20 px-4">
-            <div className="text-center max-w-2xl">
-                <h1 className="text-4xl md:text-5xl font-bold font-sans text-[#1a1a1a] mb-6 tracking-tight">
-                    Dashboard
-                </h1>
-                <p className="text-lg text-[#1a1a1a]/60 leading-relaxed mb-8">
-                    Selamat datang di Dashboard Clevio AI Staff. Halaman ini sedang dalam pengembangan.
-                </p>
-                <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-2xl p-8 shadow-lg">
-                    <p className="text-[#1a1a1a]/80">
-                        Fitur manajemen Agent dan integrasi akan segera hadir.
-                    </p>
+        <div className="w-full h-full p-6 md:p-8 overflow-hidden">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
+
+                {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
+                <div className="lg:col-span-3 h-full flex flex-col">
+                    <ArthurPhone />
                 </div>
 
-                <button
-                    onClick={() => {
-                        localStorage.removeItem('jwt_token');
-                        document.cookie = 'session_token=; path=/; max-age=0';
-                        window.location.href = '/login';
-                    }}
-                    className="mt-8 px-6 py-2.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-600 font-medium transition-all duration-200 border border-red-500/20 hover:border-red-500/30 backdrop-blur-sm"
-                >
-                    Logout
-                </button>
+                {/* COLUMN 2: Agent Detail (Work Area) - 6 Columns width */}
+                <div className="lg:col-span-6 h-full flex flex-col bg-[#1C1F26] rounded-[3rem] p-6 border border-white/5 shadow-inner">
+                    <div className="flex items-center justify-center h-full text-gray-500 font-sans">
+                        Agent Detail Placeholder
+                    </div>
+                </div>
+
+                {/* COLUMN 3: Created Agents (List) - 3 Columns width */}
+                <div className="lg:col-span-3 h-full flex flex-col bg-[#1C1F26] rounded-[3rem] p-6 border border-white/5 shadow-inner">
+                    <div className="flex items-center justify-center h-full text-gray-500 font-sans">
+                        Created Agents Placeholder
+                    </div>
+                </div>
+
             </div>
         </div>
     );
