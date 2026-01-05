@@ -5,47 +5,41 @@ import Image from "next/image";
 import { SendHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Dummy Chat Data
+// Dummy Chat Data for Simulator
 const MOCK_CHAT = [
     {
         id: 1,
-        sender: "Arthur",
-        message: "Hello! I'm Arthur, your AI Creator. How can I assist you today?",
-        time: "10:05 AM"
+        sender: "Asdos Bot",
+        message: "Hello, Anta. Your nim is assi consectetur adipistnmumiano ullma.",
+        time: "10:00 AM"
     },
     {
         id: 2,
-        sender: "Arthur",
-        message: "I can help generate code, write content, or answer questions.",
-        time: "10:06 AM"
+        sender: "User",
+        message: "Yasi, nici your one of the commod onaor lves:e:an s rastributed on the chat ri've-raggrested in tnit ink alibra concams.",
+        time: "10:00 AM"
     },
     {
         id: 3,
-        sender: "User",
-        message: "Hi Arthur! That sounds great. Can you help me write a prompt for a new web design?",
-        time: "10:06 AM"
+        sender: "Asdos Bot",
+        message: "Dopesill kama, menakkan kemorat proger?",
+        time: "10:00 AM"
     },
     {
         id: 4,
-        sender: "Arthur",
-        message: "I can help generate code, write some design.",
-        time: "10:07 AM"
+        sender: "User",
+        message: "Hey, ham I mengipokan sangxx-ae mengar sanum serensial?",
+        time: "10:00 AM"
     },
     {
         id: 5,
-        sender: "User",
-        message: "I need something modern and minimalist.",
-        time: "10:07 AM"
-    },
-    {
-        id: 6,
-        sender: "Arthur",
-        message: "You get simulate or modern and message.",
-        time: "10:07 AM"
+        sender: "Asdos Bot",
+        message: "Witnr, altar herum .trnyu btrana isk sultem.",
+        time: "10:00 AM"
     }
 ];
 
-export default function ArthurPhone() {
+export default function SimulatorPhone() {
     return (
         <div className={cn(
             "w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-[3rem] overflow-hidden border-[8px] border-[#1C1F26]",
@@ -58,15 +52,15 @@ export default function ArthurPhone() {
                 <div className="flex items-center gap-3">
                     <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
                         <Image
-                            src="/arthurProfile.webp"
-                            alt="Arthur"
+                            src="/simulatorProfile.webp"
+                            alt="Asdos Bot"
                             fill
                             className="object-cover"
                         />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900 text-lg leading-tight">Arthur</h3>
-                        <p className="text-xs text-gray-500 font-medium">AI Creator</p>
+                        <h3 className="font-bold text-gray-900 text-lg leading-tight">Asdos Bot</h3>
+                        <p className="text-xs text-gray-500 font-medium">Simulator</p>
                     </div>
                 </div>
                 <button className="text-sm font-medium text-gray-400 hover:text-red-600 transition-colors cursor-pointer">
@@ -76,15 +70,14 @@ export default function ArthurPhone() {
 
             {/* --- CHAT BODY --- */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide bg-[#F9F9F9]">
-
                 {MOCK_CHAT.map((msg) => {
-                    const isArthur = msg.sender === "Arthur";
+                    const isBot = msg.sender === "Asdos Bot";
                     return (
-                        <div key={msg.id} className={cn("flex flex-col max-w-[85%]", isArthur ? "items-start mr-auto" : "items-end ml-auto")}>
+                        <div key={msg.id} className={cn("flex flex-col max-w-[85%]", isBot ? "items-start mr-auto" : "items-end ml-auto")}>
                             {/* Message Bubble */}
                             <div className={cn(
                                 "px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm relative",
-                                isArthur
+                                isBot
                                     ? "bg-[#2A2E37] text-white rounded-tl-none" // Dark Theme Bubble
                                     : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"
                             )}>
@@ -92,9 +85,9 @@ export default function ArthurPhone() {
                             </div>
 
                             {/* Time & Status */}
-                            <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isArthur ? "ml-1" : "mr-1 justify-end")}>
+                            <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isBot ? "ml-1" : "mr-1 justify-end")}>
                                 {msg.time}
-                                {!isArthur && <span className="text-[#2A2E37] font-bold">✓✓</span>}
+                                {!isBot && <span className="text-[#2A2E37] font-bold">✓✓</span>}
                             </div>
                         </div>
                     );

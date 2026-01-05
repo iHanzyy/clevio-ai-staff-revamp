@@ -1,5 +1,6 @@
 import React from "react";
 import ArthurPhone from "@/components/features/dashboard/ArthurPhone";
+import SimulatorPhone from "@/components/features/dashboard/SimulatorPhone";
 
 export default function DashboardPage() {
     return (
@@ -18,11 +19,9 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* COLUMN 3: Created Agents (List) - 3 Columns width */}
-                <div className="lg:col-span-3 h-full flex flex-col bg-[#1C1F26] rounded-[3rem] p-6 border border-white/5 shadow-inner">
-                    <div className="flex items-center justify-center h-full text-gray-500 font-sans">
-                        Created Agents Placeholder
-                    </div>
+                {/* COLUMN 3: Simulator (Test Bot) - 3 Columns width */}
+                <div className="lg:col-span-3 h-full flex flex-col">
+                    <SimulatorPhone />
                 </div>
 
             </div>
