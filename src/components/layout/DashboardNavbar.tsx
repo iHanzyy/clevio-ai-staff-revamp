@@ -7,7 +7,7 @@ import { Plus, User, Settings, LogOut, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
-export default function DashboardNavbar() {
+export default function DashboardNavbar({ showCreateButton = true }: { showCreateButton?: boolean }) {
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const profileRef = React.useRef<HTMLDivElement>(null);
@@ -50,19 +50,6 @@ export default function DashboardNavbar() {
 
             {/* RIGHT: Actions */}
             <div className="flex items-center gap-4 md:gap-6">
-
-                {/* Button: Buat Agent Baru (Claymorphism) */}
-                <button className={cn(
-                    "hidden md:flex items-center gap-2 px-6 py-2.5 rounded-full font-medium transition-transform active:scale-95 duration-200",
-                    "bg-[#FDFDFD] text-gray-800",
-                    "cursor-pointer",
-                    // Claymorphism: Inner Highlight + Drop Shadow
-                    "shadow-[inset_2px_2px_4px_rgba(255,255,255,1),inset_-2px_-2px_4px_rgba(0,0,0,0.05),0_4px_10px_rgba(0,0,0,0.2)]",
-                    "hover:shadow-[inset_2px_2px_6px_rgba(255,255,255,1),inset_-2px_-2px_6px_rgba(0,0,0,0.05),0_6px_14px_rgba(0,0,0,0.25)]"
-                )}>
-                    <Plus className="w-5 h-5 text-gray-700" />
-                    <span>Buat Agent Baru</span>
-                </button>
 
                 {/* Label: Paket Aktif (Dummy) */}
                 <div className={cn(

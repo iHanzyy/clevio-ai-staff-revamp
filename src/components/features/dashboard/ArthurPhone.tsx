@@ -6,7 +6,7 @@ import { SendHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Dummy Chat Data
-const MOCK_CHAT = [
+const DEFAULT_CHAT = [
     {
         id: 1,
         sender: "Arthur",
@@ -45,7 +45,20 @@ const MOCK_CHAT = [
     }
 ];
 
-export default function ArthurPhone() {
+interface ChatMessage {
+    id: number;
+    sender: "Arthur" | "User";
+    message: string;
+    time: string;
+}
+
+interface ArthurPhoneProps {
+    initialMessages?: ChatMessage[];
+}
+
+export default function ArthurPhone({ initialMessages }: ArthurPhoneProps) {
+    const messages = initialMessages || DEFAULT_CHAT;
+
     return (
         <div className={cn(
             "w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-[2rem] overflow-hidden border-[8px] border-[#1C1F26]",
@@ -77,7 +90,7 @@ export default function ArthurPhone() {
             {/* --- CHAT BODY --- */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-[#F9F9F9]">
 
-                {MOCK_CHAT.map((msg) => {
+                {messages.map((msg) => {
                     const isArthur = msg.sender === "Arthur";
                     return (
                         <div key={msg.id} className={cn("flex flex-col max-w-[85%]", isArthur ? "items-start mr-auto" : "items-end ml-auto")}>
