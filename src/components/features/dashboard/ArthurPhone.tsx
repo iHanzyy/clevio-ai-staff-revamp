@@ -48,7 +48,7 @@ const MOCK_CHAT = [
 export default function ArthurPhone() {
     return (
         <div className={cn(
-            "w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-[3rem] overflow-hidden border-[8px] border-[#1C1F26]",
+            "w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-[2rem] overflow-hidden border-[8px] border-[#1C1F26]",
             "bg-[#F9F9F9]", // Phone Screen Background
             // Device Outer Shadow (Clay-like depth)
             "shadow-[0_20px_50px_rgba(0,0,0,0.3)]"

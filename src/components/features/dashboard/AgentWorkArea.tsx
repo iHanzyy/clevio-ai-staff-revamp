@@ -28,7 +28,7 @@ export default function AgentWorkArea() {
     const hasMoreFiles = KNOWLEDGE_FILES.length > 3;
 
     return (
-        <div className="flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-10">
+        <div className="flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-5">
 
             {/* 1. AGENT SELECTOR CARD */}
             <div className={cn(
@@ -109,12 +109,14 @@ export default function AgentWorkArea() {
                 "bg-[#FDFDFD]",
                 "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]"
             )}>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Standard Capabilities */}
-                    <div>
-                        <h3 className="text-gray-900 font-bold text-lg mb-4">Kemampuan Agen</h3>
-                        <div className="grid grid-cols-4 gap-4">
-                            {/* Icons with Labels */}
+                <h3 className="text-gray-900 font-bold text-lg mb-6">Kemampuan Agen</h3>
+
+                <div className="flex flex-col md:flex-row gap-8 md:items-start">
+
+                    {/* Left: Google Workspace */}
+                    <div className="flex-1">
+                        <h4 className="text-gray-900 font-bold text-sm mb-4">Google Workspace:</h4>
+                        <div className="flex flex-wrap gap-4">
                             <CapabilityIcon src="/gmaiLicon.svg" label="Gmail" />
                             <CapabilityIcon src="/GoogleSheetIcon.svg" label="Sheets" />
                             <CapabilityIcon src="/GoogleDocsIcon.svg" label="Docs" />
@@ -122,14 +124,18 @@ export default function AgentWorkArea() {
                         </div>
                     </div>
 
-                    {/* Additional Capabilities */}
-                    <div>
-                        <h3 className="text-gray-900 font-bold text-lg mb-4">Kemampuan Tambahan</h3>
-                        <div className="grid grid-cols-4 gap-4">
+                    {/* Divider */}
+                    <div className="hidden md:block w-px bg-red-100 self-stretch my-2"></div>
+
+                    {/* Right: Additional Capabilities */}
+                    <div className="flex-1">
+                        <h4 className="text-gray-900 font-bold text-sm mb-4">Kemampuan Tambahan:</h4>
+                        <div className="flex flex-wrap gap-4">
                             <CapabilityIcon src="/webSearchIcon.svg" label="Web Search" />
                             <CapabilityIcon src="/telescopeIcon.svg" label="Deep Research" />
                         </div>
                     </div>
+
                 </div>
             </div>
 
