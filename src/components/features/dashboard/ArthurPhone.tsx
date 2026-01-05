@@ -75,7 +75,7 @@ export default function ArthurPhone() {
             </div>
 
             {/* --- CHAT BODY --- */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide bg-[#F9F9F9]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-[#F9F9F9]">
 
                 {MOCK_CHAT.map((msg) => {
                     const isArthur = msg.sender === "Arthur";
@@ -94,7 +94,7 @@ export default function ArthurPhone() {
                             {/* Time & Status */}
                             <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isArthur ? "ml-1" : "mr-1 justify-end")}>
                                 {msg.time}
-                                {!isArthur && <span className="text-[#2A2E37] font-bold">✓✓</span>}
+                                {!isArthur && <span className="text-[#2A2E37] font-bold">✓</span>}
                             </div>
                         </div>
                     );

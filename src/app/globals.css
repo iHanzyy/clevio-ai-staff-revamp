@@ -49,3 +49,28 @@ body {
   50%   {transform:scaleY(-1) rotate(0deg)}
   100%  {transform:scaleY(-1) rotate(-135deg)}
 }
+
+/* Scrollbar Hide Utility */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Apple Tech Elegant Scrollbar */
+.scrollbar-apple::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.scrollbar-apple::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollbar-apple::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+}
+.scrollbar-apple::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}

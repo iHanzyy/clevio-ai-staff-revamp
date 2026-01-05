@@ -69,7 +69,7 @@ export default function SimulatorPhone() {
             </div>
 
             {/* --- CHAT BODY --- */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-hide bg-[#F9F9F9]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-[#F9F9F9]">
                 {MOCK_CHAT.map((msg) => {
                     const isBot = msg.sender === "Asdos Bot";
                     return (
@@ -87,7 +87,7 @@ export default function SimulatorPhone() {
                             {/* Time & Status */}
                             <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isBot ? "ml-1" : "mr-1 justify-end")}>
                                 {msg.time}
-                                {!isBot && <span className="text-[#2A2E37] font-bold">✓✓</span>}
+                                {!isBot && <span className="text-[#2A2E37] font-bold">✓</span>}
                             </div>
                         </div>
                     );

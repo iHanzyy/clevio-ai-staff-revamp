@@ -12,12 +12,12 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="min-h-screen w-full bg-[#14161B] text-white">
+        <div className="h-screen w-full bg-[#14161B] text-white flex flex-col overflow-hidden">
             {/* Navbar pinned to top */}
             <DashboardNavbar />
 
-            {/* Dashboard Content */}
-            <main className="w-full min-h-[calc(100vh-80px)]">
+            {/* Dashboard Content (Flex-1 to take remaining height, fixed for internal scroll) */}
+            <main className="w-full flex-1 overflow-hidden">
                 {children}
             </main>
         </div>
