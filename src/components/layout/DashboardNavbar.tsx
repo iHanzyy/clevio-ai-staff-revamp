@@ -10,6 +10,19 @@ import { useRouter } from "next/navigation";
 export default function DashboardNavbar() {
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const profileRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+                setIsProfileOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     const handleLogout = () => {
         // Clear tokens
@@ -62,7 +75,7 @@ export default function DashboardNavbar() {
                 </div>
 
                 {/* Profile Dropdown */}
-                <div className="relative">
+                <div className="relative" ref={profileRef}>
                     <button
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
                         className={cn(
