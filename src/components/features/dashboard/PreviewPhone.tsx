@@ -57,7 +57,7 @@ export default function PreviewPhone() {
                         disabled
                         className="text-sm font-medium text-gray-300"
                     >
-                        Reset
+                        Clear
                     </button>
                 </div>
 

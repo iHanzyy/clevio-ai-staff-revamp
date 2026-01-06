@@ -56,7 +56,7 @@ export default function SimulatorPhone({ agentName }: { agentName?: string }) {
                         </div>
                     </div>
                     <button className="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full text-xs font-bold transition-colors cursor-pointer">
-                        Reset
+                        Clear
                     </button>
                 </div>
 

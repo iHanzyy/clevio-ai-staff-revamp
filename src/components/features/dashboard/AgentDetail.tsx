@@ -29,7 +29,7 @@ export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent }: 
 
             {/* 4. GRID: KNOWLEDGE & INTEGRATIONS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <AgentKnowledge />
+                <AgentKnowledge selectedAgent={selectedAgent} />
                 <AgentIntegrations />
             </div>
 

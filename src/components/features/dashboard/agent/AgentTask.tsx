@@ -41,7 +41,7 @@ export default function AgentTask({ selectedAgent }: AgentTaskProps) {
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsPromptModalOpen(false)} />
                     <div className="relative bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl animate-fade-in-up">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">System Prompt</h3>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4">Tugas Agen</h3>
                         <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl whitespace-pre-wrap">
                             {systemPrompt}
                         </div>
