@@ -17,7 +17,7 @@ export default function AgentEmptyState({ onCreateClick }: AgentEmptyStateProps)
                 "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
                 "border border-white/5"
             )}>
-                <h2 className="text-3xl font-bold text-white mb-4">Belum ada Agen</h2>
+                <h2 className="text-3xl font-bold text-white mb-4">Belum ada Agent</h2>
                 <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-xs">
                     Buat agen pertama Anda untuk mulai mengatur tugas, pengetahuan, kemampuan, dan integrasi.
                 </p>

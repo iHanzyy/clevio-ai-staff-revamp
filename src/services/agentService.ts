@@ -24,6 +24,12 @@ export const agentService = {
         return response.data;
     },
 
+    // Create new agent
+    createAgent: async (payload: any): Promise<Agent> => {
+        const response = await api.post<Agent>('/agents', payload);
+        return response.data;
+    },
+
     // Execute Agent (Chat)
     executeAgent: async (agentId: string, message: string, sessionId?: string) => {
         const payload = {

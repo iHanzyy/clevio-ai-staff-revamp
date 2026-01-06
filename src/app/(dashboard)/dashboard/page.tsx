@@ -6,6 +6,7 @@ import SimulatorPhone from "@/components/features/dashboard/SimulatorPhone";
 import PreviewPhone from "@/components/features/dashboard/PreviewPhone";
 import AgentWorkArea from "@/components/features/dashboard/AgentDetail";
 import AgentEmptyState from "@/components/features/dashboard/AgentEmptyState";
+import { useToast } from "@/components/ui/ToastProvider";
 
 import { agentService, Agent } from "@/services/agentService";
 
@@ -14,43 +15,55 @@ export default function DashboardPage() {
     const [agents, setAgents] = useState<Agent[]>([]);
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isArthurActive, setIsArthurActive] = useState(false);
+
+    const { showToast } = useToast();
 
     // Fetch Agents on Mount
-    React.useEffect(() => {
-        const fetchAgents = async () => {
-            try {
-                const fetchedAgents = await agentService.getAgents();
-                setAgents(fetchedAgents);
-                if (fetchedAgents.length > 0) {
-                    setHasAgent(true);
+    const fetchAgents = async () => {
+        try {
+            const fetchedAgents = await agentService.getAgents();
+            setAgents(fetchedAgents);
+            if (fetchedAgents.length > 0) {
+                setHasAgent(true);
+                // Only set selected if none selected
+                if (!selectedAgent) {
                     setSelectedAgent(fetchedAgents[0]);
-                } else {
-                    setHasAgent(false);
                 }
-            } catch (error) {
-                console.error("Failed to fetch agents", error);
-            } finally {
-                setIsLoading(false);
+            } else {
+                setHasAgent(false);
             }
-        };
+        } catch (error) {
+            console.error("Failed to fetch agents", error);
+            showToast("Gagal memuat data agen.", "error"); // Optional: Silent fail on simple fetch
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    React.useEffect(() => {
         fetchAgents();
     }, []);
 
-    // Initial Welcome Message for Empty State
-    const WELCOME_MESSAGES_EMPTY: { id: number; sender: "Arthur" | "User"; message: string; time: string; }[] = [
-        {
-            id: 1,
-            sender: "Arthur",
-            message: "Halo, saya Arthur. Saya akan membantu Anda membuat agent.",
-            time: "10:05 AM"
-        },
-        {
-            id: 2,
-            sender: "Arthur",
-            message: "Klik tombol 'Buat Agent Baru' di tengah untuk memulai wawancara.",
-            time: "10:06 AM"
+    const handleAgentCreated = async (agentData: any) => {
+        // Show loading state or toast
+        const loadingToastId = showToast("Sedang membuat agent...", "info");
+
+        try {
+            const newAgent = await agentService.createAgent(agentData);
+
+            // Refresh list and select new agent
+            setAgents(prev => [newAgent, ...prev]);
+            setSelectedAgent(newAgent);
+            setHasAgent(true);
+            setIsArthurActive(false); // Reset Arthur flow
+
+            showToast("Agent berhasil dibuat!", "success");
+        } catch (error) {
+            console.error("Failed to create agent", error);
+            showToast("Gagal membuat agent. Silakan coba lagi.", "error");
         }
-    ];
+    };
 
     if (isLoading) {
         return null; // Or a loading spinner
@@ -62,15 +75,22 @@ export default function DashboardPage() {
 
                 {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
                 <div className="lg:col-span-3 h-full flex flex-col min-h-0">
-                    <ArthurPhone initialMessages={!hasAgent ? WELCOME_MESSAGES_EMPTY : undefined} />
+                    <ArthurPhone
+                        isActive={isArthurActive}
+                        onAgentCreated={handleAgentCreated}
+                    />
                 </div>
 
                 {/* COLUMN 2: Work Area - 6 Columns width */}
                 <div className="lg:col-span-6 h-full flex flex-col min-h-0">
                     {!hasAgent ? (
-                        <AgentEmptyState onCreateClick={() => { }} />
+                        <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
                     ) : (
-                        <AgentWorkArea agents={agents} selectedAgent={selectedAgent} onSelectAgent={setSelectedAgent} />
+                        <AgentWorkArea
+                            agents={agents}
+                            selectedAgent={selectedAgent}
+                            onSelectAgent={setSelectedAgent}
+                        />
                     )}
                 </div>
 
