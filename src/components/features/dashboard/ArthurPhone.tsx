@@ -128,8 +128,9 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !isSending) {
-            handleSend();
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            if (!isSending) handleSend();
         }
     };
 
@@ -215,25 +216,30 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
                 )}
 
                 <div className={cn(
-                    "flex items-center gap-2 pl-4 pr-1.5 py-1.5 rounded-full",
+                    "flex items-end gap-2 pl-4 pr-1.5 py-1.5 rounded-[24px]",
                     "bg-white",
                     "shadow-[inset_2px_2px_6px_rgba(0,0,0,0.05),0_4px_10px_rgba(0,0,0,0.05)]",
                     "border border-gray-100",
                     !isActive && "opacity-50"
                 )}>
-                    <input
-                        type="text"
+                    <textarea
+                        rows={1}
                         placeholder={isActive ? "Jawab pertanyaan Arthur..." : "Buat Agent Baru dulu..."}
                         value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        onChange={(e) => {
+                            setInput(e.target.value);
+                            e.target.style.height = 'auto';
+                            e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+                        }}
                         onKeyDown={handleKeyDown}
-                        disabled={!isActive || isSending}
-                        className="flex-grow bg-transparent outline-none text-gray-700 placeholder:text-gray-400 text-sm h-10 disabled:cursor-not-allowed"
+                        disabled={!isActive}
+                        className="flex-grow bg-transparent outline-none text-gray-700 placeholder:text-gray-400 text-sm min-h-[40px] max-h-[120px] py-2.5 resize-none scrollbar-hide"
+                        style={{ height: '40px' }}
                     />
                     <button
                         onClick={handleSend}
                         disabled={!isActive || isSending || !input.trim()}
-                        className="w-10 h-10 bg-[#2A2E37] hover:bg-[#353A45] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-10 h-10 mb-0.5 bg-[#2A2E37] hover:bg-[#353A45] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                     >
                         <SendHorizontal className="w-5 h-5 ml-0.5" />
                     </button>
