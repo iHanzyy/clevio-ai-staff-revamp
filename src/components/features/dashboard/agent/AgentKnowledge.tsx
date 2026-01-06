@@ -5,6 +5,8 @@ import { Trash2, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent } from "@/services/agentService";
 import { knowledgeService, KnowledgeDocument } from "@/services/knowledgeService";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
+import { useToast } from "@/components/ui/ToastProvider";
 
 interface AgentKnowledgeProps {
     selectedAgent: Agent | null;
@@ -14,6 +16,9 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
     const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
     const [isFilesModalOpen, setIsFilesModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null); // For Confirmation Modal
+
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (selectedAgent) {
@@ -32,22 +37,29 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
             setDocuments(docs.filter(d => !d.is_deleted));
         } catch (error) {
             console.error("Failed to fetch documents", error);
+            showToast("Gagal mengambil dokumen.", "error");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleDelete = async (docId: string, event: React.MouseEvent) => {
+    const handleDeleteClick = (docId: string, event: React.MouseEvent) => {
         event.stopPropagation(); // Prevent modal toggle interactions if any
-        if (!selectedAgent) return;
-        if (!confirm("Are you sure you want to delete this file?")) return;
+        setDeleteId(docId);
+    };
+
+    const confirmDelete = async () => {
+        if (!selectedAgent || !deleteId) return;
 
         try {
-            await knowledgeService.deleteDocument(selectedAgent.id, docId);
-            setDocuments(prev => prev.filter(d => d.id !== docId));
+            await knowledgeService.deleteDocument(selectedAgent.id, deleteId);
+            setDocuments(prev => prev.filter(d => d.id !== deleteId));
+            showToast("Dokumen berhasil dihapus!", "success");
         } catch (error) {
             console.error("Failed to delete document", error);
-            alert("Failed to delete document");
+            showToast("Gagal menghapus dokumen.", "error");
+        } finally {
+            setDeleteId(null);
         }
     };
 
@@ -83,7 +95,7 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
                                     </div>
                                 </div>
                                 <button
-                                    onClick={(e) => handleDelete(file.id, e)}
+                                    onClick={(e) => handleDeleteClick(file.id, e)}
                                     className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer p-1"
                                 >
                                     <Trash2 className="w-4 h-4" />
@@ -123,7 +135,7 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
                                         </div>
                                     </div>
                                     <button
-                                        onClick={(e) => handleDelete(file.id, e)}
+                                        onClick={(e) => handleDeleteClick(file.id, e)}
                                         className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full cursor-pointer shrink-0"
                                     >
                                         <Trash2 className="w-4 h-4" />
@@ -142,6 +154,18 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
                     </div>
                 </div>
             )}
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={!!deleteId}
+                onClose={() => setDeleteId(null)}
+                onConfirm={confirmDelete}
+                title="Hapus Dokumen?"
+                message="Apakah Anda yakin ingin menghapus dokumen ini? Tindakan ini tidak dapat dibatalkan."
+                confirmText="Hapus"
+                cancelText="Batal"
+                type="danger"
+            />
         </>
     );
 }

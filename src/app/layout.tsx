@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/ToastProvider";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -26,7 +27,9 @@ export default function RootLayout({
       >
         {/* Persistent Content Wrapper */}
         <div className="relative z-10 flex flex-col items-center w-full h-full">
-          {children}
+          <ToastProvider>
+            {children}
+          </ToastProvider>
         </div>
       </body>
     </html>
