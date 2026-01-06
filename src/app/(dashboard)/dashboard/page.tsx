@@ -7,8 +7,28 @@ import PreviewPhone from "@/components/features/dashboard/PreviewPhone";
 import AgentWorkArea from "@/components/features/dashboard/AgentDetail";
 import AgentEmptyState from "@/components/features/dashboard/AgentEmptyState";
 
+import { agentService, Agent } from "@/services/agentService";
+
 export default function DashboardPage() {
     const [hasAgent, setHasAgent] = useState(false);
+    const [agents, setAgents] = useState<Agent[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Fetch Agents on Mount
+    React.useEffect(() => {
+        const fetchAgents = async () => {
+            try {
+                const fetchedAgents = await agentService.getAgents();
+                setAgents(fetchedAgents);
+                setHasAgent(fetchedAgents.length > 0);
+            } catch (error) {
+                console.error("Failed to fetch agents", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchAgents();
+    }, []);
 
     // Initial Welcome Message for Empty State
     const WELCOME_MESSAGES_EMPTY: { id: number; sender: "Arthur" | "User"; message: string; time: string; }[] = [
@@ -26,6 +46,10 @@ export default function DashboardPage() {
         }
     ];
 
+    if (isLoading) {
+        return null; // Or a loading spinner
+    }
+
     return (
         <div className="w-full h-full p-6 md:p-8 overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
@@ -38,7 +62,7 @@ export default function DashboardPage() {
                 {/* COLUMN 2: Work Area - 6 Columns width */}
                 <div className="lg:col-span-6 h-full flex flex-col min-h-0">
                     {!hasAgent ? (
-                        <AgentEmptyState onCreateClick={() => setHasAgent(true)} />
+                        <AgentEmptyState onCreateClick={() => { }} />
                     ) : (
                         <AgentWorkArea />
                     )}
@@ -49,7 +73,7 @@ export default function DashboardPage() {
                     {!hasAgent ? (
                         <PreviewPhone />
                     ) : (
-                        <SimulatorPhone />
+                        <SimulatorPhone agentName={agents[0]?.name || "Asdos Bot"} />
                     )}
                 </div>
 

@@ -1,21 +1,26 @@
-import api from '@/lib/api';
+import api from './api';
 
-export interface UserInfo {
+export interface User {
     id: string;
     email: string;
     is_active: boolean;
+    plan_code: string;
     created_at: string;
-    access_token?: string;
-    plan_code?: string;
 }
 
 export const authService = {
-    getMe: async (): Promise<UserInfo> => {
-        const response = await api.get<UserInfo>('/auth/me');
+    // Get Current User Profile
+    getMe: async (): Promise<User> => {
+        const response = await api.get<User>('/auth/me');
         return response.data;
     },
-    getGoogleLoginUrl: async () => {
-        const response = await api.get('/auth/google/login');
-        return response.data;
-    },
+
+    // Logout Helper
+    logout: () => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('jwt_token');
+            document.cookie = 'session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            window.location.href = '/login';
+        }
+    }
 };

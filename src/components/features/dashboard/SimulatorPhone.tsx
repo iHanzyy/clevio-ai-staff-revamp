@@ -5,41 +5,8 @@ import Image from "next/image";
 import { SendHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Dummy Chat Data for Simulator
-const MOCK_CHAT = [
-    {
-        id: 1,
-        sender: "Asdos Bot",
-        message: "Hello, Anta. Your nim is assi consectetur adipistnmumiano ullma.",
-        time: "10:00 AM"
-    },
-    {
-        id: 2,
-        sender: "User",
-        message: "Yasi, nici your one of the commod onaor lves:e:an s rastributed on the chat ri've-raggrested in tnit ink alibra concams.",
-        time: "10:00 AM"
-    },
-    {
-        id: 3,
-        sender: "Asdos Bot",
-        message: "Dopesill kama, menakkan kemorat proger?",
-        time: "10:00 AM"
-    },
-    {
-        id: 4,
-        sender: "User",
-        message: "Hey, ham I mengipokan sangxx-ae mengar sanum serensial?",
-        time: "10:00 AM"
-    },
-    {
-        id: 5,
-        sender: "Asdos Bot",
-        message: "Witnr, altar herum .trnyu btrana isk sultem.",
-        time: "10:00 AM"
-    }
-];
 
-export default function SimulatorPhone() {
+export default function SimulatorPhone({ agentName }: { agentName?: string }) {
     return (
         <div className="relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col items-center justify-center">
 
@@ -84,7 +51,7 @@ export default function SimulatorPhone() {
                             />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900 text-base leading-tight">Asdos Bot</h3>
+                            <h3 className="font-bold text-gray-900 text-base leading-tight">{agentName}</h3>
                             <p className="text-[10px] text-gray-500 font-medium">Simulator</p>
                         </div>
                     </div>
@@ -95,8 +62,9 @@ export default function SimulatorPhone() {
 
                 {/* --- CHAT BODY --- */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-[#F9F9F9]">
-                    {MOCK_CHAT.map((msg) => {
-                        const isBot = msg.sender === "Asdos Bot";
+                    {/* Real Messages will come here */}
+                    {[].map((msg: any) => {
+                        const isBot = msg.sender === (agentName || "Bot");
                         return (
                             <div key={msg.id} className={cn("flex flex-col max-w-[85%]", isBot ? "items-start mr-auto" : "items-end ml-auto")}>
                                 {/* Message Bubble */}

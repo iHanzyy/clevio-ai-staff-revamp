@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { agentService, Agent } from "@/services/agentService";
 
 export default function AgentSelector() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [agents, setAgents] = useState<Agent[]>([]);
+    const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
@@ -18,6 +21,22 @@ export default function AgentSelector() {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
+    }, []);
+
+    // Fetch Agents
+    useEffect(() => {
+        const fetchAgents = async () => {
+            try {
+                const data = await agentService.getAgents();
+                setAgents(data);
+                if (data.length > 0) {
+                    setSelectedAgent(data[0]);
+                }
+            } catch (error) {
+                console.error("Failed to fetch agents", error);
+            }
+        };
+        fetchAgents();
     }, []);
 
     return (
@@ -38,26 +57,29 @@ export default function AgentSelector() {
                                 "shadow-sm hover:border-gray-300 transition-colors cursor-pointer"
                             )}
                         >
-                            <span>Asdos Bot</span>
+                            <span>{selectedAgent?.name || "Pilih Agent"}</span>
                             <ChevronDown className={cn("w-5 h-5 text-gray-400 transition-transform duration-200", isDropdownOpen && "rotate-180")} />
                         </button>
 
                         {/* Dropdown Menu (Click-based) */}
                         {isDropdownOpen && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-50 animate-fade-in-up">
-                                <div
-                                    onClick={() => setIsDropdownOpen(false)}
-                                    className="px-4 py-2 text-sm text-gray-900 font-bold bg-gray-50 rounded-lg cursor-pointer flex justify-between items-center"
-                                >
-                                    Asdos Bot
-                                    <div className="w-2 h-2 rounded-full bg-[#2A2E37]"></div>
-                                </div>
-                                <div
-                                    onClick={() => setIsDropdownOpen(false)}
-                                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg cursor-pointer"
-                                >
-                                    Marketing Agent
-                                </div>
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-50 animate-fade-in-up max-h-60 overflow-y-auto">
+                                {agents.map((agent) => (
+                                    <div
+                                        key={agent.id}
+                                        onClick={() => {
+                                            setSelectedAgent(agent);
+                                            setIsDropdownOpen(false);
+                                        }}
+                                        className="px-4 py-2 text-sm text-gray-900 font-bold hover:bg-gray-50 rounded-lg cursor-pointer flex justify-between items-center"
+                                    >
+                                        {agent.name}
+                                        {selectedAgent?.id === agent.id && (
+                                            <div className="w-2 h-2 rounded-full bg-[#2A2E37]"></div>
+                                        )}
+                                    </div>
+                                ))}
+
                                 <div className="h-px bg-gray-100 my-1"></div>
                                 <div
                                     onClick={() => setIsDropdownOpen(false)}

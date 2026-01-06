@@ -5,59 +5,12 @@ import Image from "next/image";
 import { SendHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Dummy Chat Data
-const DEFAULT_CHAT = [
-    {
-        id: 1,
-        sender: "Arthur",
-        message: "Hello! I'm Arthur, your AI Creator. How can I assist you today?",
-        time: "10:05 AM"
-    },
-    {
-        id: 2,
-        sender: "Arthur",
-        message: "I can help generate code, write content, or answer questions.",
-        time: "10:06 AM"
-    },
-    {
-        id: 3,
-        sender: "User",
-        message: "Hi Arthur! That sounds great. Can you help me write a prompt for a new web design?",
-        time: "10:06 AM"
-    },
-    {
-        id: 4,
-        sender: "Arthur",
-        message: "I can help generate code, write some design.",
-        time: "10:07 AM"
-    },
-    {
-        id: 5,
-        sender: "User",
-        message: "I need something modern and minimalist.",
-        time: "10:07 AM"
-    },
-    {
-        id: 6,
-        sender: "Arthur",
-        message: "You get simulate or modern and message.",
-        time: "10:07 AM"
-    }
-];
-
-interface ChatMessage {
-    id: number;
-    sender: "Arthur" | "User";
-    message: string;
-    time: string;
-}
-
 interface ArthurPhoneProps {
     initialMessages?: ChatMessage[];
 }
 
 export default function ArthurPhone({ initialMessages }: ArthurPhoneProps) {
-    const messages = initialMessages || DEFAULT_CHAT;
+    const messages = initialMessages || [];
 
     return (
         <div className={cn(
