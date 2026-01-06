@@ -83,7 +83,7 @@ export default function ArthurPhone({ initialMessages }: ArthurPhoneProps) {
                     </div>
                 </div>
                 <button className="text-sm font-medium text-gray-400 hover:text-red-600 transition-colors cursor-pointer">
-                    Reset
+                    Clear
                 </button>
             </div>
 

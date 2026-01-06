@@ -1,4 +1,4 @@
-"use client"; // Komponen ini berjalan di client
+"use client";
 
 import Image from "next/image";
 
