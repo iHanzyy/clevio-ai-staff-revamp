@@ -13,6 +13,7 @@ export default function AgentTask({ selectedAgent }: AgentTaskProps) {
 
     const systemPrompt = selectedAgent?.config?.system_prompt || "Agent ini belum memiliki instruksi tugas (System Prompt).";
     const hasPrompt = !!selectedAgent?.config?.system_prompt;
+    const isTruncated = systemPrompt.length > 150;
 
     return (
         <>
@@ -22,15 +23,17 @@ export default function AgentTask({ selectedAgent }: AgentTaskProps) {
                 "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]"
             )}>
                 <h3 className="text-gray-900 font-bold text-lg mb-3">Tugas Agen</h3>
-                <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
+                <p className={cn("text-gray-600 text-sm leading-relaxed", isTruncated && "line-clamp-3")}>
                     {systemPrompt}
                 </p>
-                <button
-                    onClick={() => setIsPromptModalOpen(true)}
-                    className="mt-2 text-[#2A2E37] font-bold text-sm hover:underline cursor-pointer"
-                >
-                    Baca Selengkapnya...
-                </button>
+                {isTruncated && (
+                    <button
+                        onClick={() => setIsPromptModalOpen(true)}
+                        className="mt-2 text-[#2A2E37] font-bold text-sm hover:underline cursor-pointer"
+                    >
+                        Baca Selengkapnya...
+                    </button>
+                )}
             </div>
 
             {/* Prompt Modal */}
