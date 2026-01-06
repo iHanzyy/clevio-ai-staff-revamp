@@ -15,6 +15,12 @@ export const authService = {
         return response.data;
     },
 
+    // Get Google Login URL
+    getGoogleLoginUrl: async (): Promise<{ auth_url: string } | string> => {
+        const response = await api.get<{ auth_url: string } | string>('/auth/google/login');
+        return response.data;
+    },
+
     // Logout Helper
     logout: () => {
         if (typeof window !== 'undefined') {
