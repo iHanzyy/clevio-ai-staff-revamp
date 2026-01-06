@@ -79,7 +79,7 @@ export default function DashboardPage() {
                     {!hasAgent ? (
                         <PreviewPhone />
                     ) : (
-                        <SimulatorPhone agentName={selectedAgent?.name} />
+                        <SimulatorPhone selectedAgent={selectedAgent} />
                     )}
                 </div>
 
