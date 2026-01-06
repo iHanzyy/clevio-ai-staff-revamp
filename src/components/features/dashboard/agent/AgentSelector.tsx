@@ -1,14 +1,18 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { agentService, Agent } from "@/services/agentService";
+import { Agent } from "@/services/agentService";
 
-export default function AgentSelector() {
+interface AgentSelectorProps {
+    agents: Agent[];
+    selectedAgent: Agent | null;
+    onSelectAgent: (agent: Agent) => void;
+}
+
+export default function AgentSelector({ agents, selectedAgent, onSelectAgent }: AgentSelectorProps) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const [agents, setAgents] = useState<Agent[]>([]);
-    const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
@@ -21,22 +25,6 @@ export default function AgentSelector() {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, []);
-
-    // Fetch Agents
-    useEffect(() => {
-        const fetchAgents = async () => {
-            try {
-                const data = await agentService.getAgents();
-                setAgents(data);
-                if (data.length > 0) {
-                    setSelectedAgent(data[0]);
-                }
-            } catch (error) {
-                console.error("Failed to fetch agents", error);
-            }
-        };
-        fetchAgents();
     }, []);
 
     return (
@@ -68,7 +56,7 @@ export default function AgentSelector() {
                                     <div
                                         key={agent.id}
                                         onClick={() => {
-                                            setSelectedAgent(agent);
+                                            onSelectAgent(agent);
                                             setIsDropdownOpen(false);
                                         }}
                                         className="px-4 py-2 text-sm text-gray-900 font-bold hover:bg-gray-50 rounded-lg cursor-pointer flex justify-between items-center"

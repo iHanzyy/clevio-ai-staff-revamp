@@ -3,6 +3,7 @@ import api from './api';
 export interface AgentConfig {
     llm_model: string;
     max_tokens: number;
+    system_prompt?: string;
     // Add other relevant config fields
 }
 

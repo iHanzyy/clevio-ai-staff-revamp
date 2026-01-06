@@ -2,11 +2,17 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
+import { Agent } from "@/services/agentService";
 
-const SYSTEM_PROMPT = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
+interface AgentTaskProps {
+    selectedAgent: Agent | null;
+}
 
-export default function AgentTask() {
+export default function AgentTask({ selectedAgent }: AgentTaskProps) {
     const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+
+    const systemPrompt = selectedAgent?.config?.system_prompt || "Agent ini belum memiliki instruksi tugas (System Prompt).";
+    const hasPrompt = !!selectedAgent?.config?.system_prompt;
 
     return (
         <>
@@ -17,7 +23,7 @@ export default function AgentTask() {
             )}>
                 <h3 className="text-gray-900 font-bold text-lg mb-3">Tugas Agen</h3>
                 <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                    {SYSTEM_PROMPT}
+                    {systemPrompt}
                 </p>
                 <button
                     onClick={() => setIsPromptModalOpen(true)}
@@ -33,12 +39,8 @@ export default function AgentTask() {
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsPromptModalOpen(false)} />
                     <div className="relative bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl animate-fade-in-up">
                         <h3 className="text-2xl font-bold text-gray-900 mb-4">System Prompt</h3>
-                        <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl">
-                            {SYSTEM_PROMPT}
-                            <br /><br />
-                            {SYSTEM_PROMPT}
-                            <br /><br />
-                            (Dummy Extended Content)
+                        <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl whitespace-pre-wrap">
+                            {systemPrompt}
                         </div>
                         <div className="mt-6 flex justify-end">
                             <button

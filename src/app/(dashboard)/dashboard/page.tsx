@@ -12,6 +12,7 @@ import { agentService, Agent } from "@/services/agentService";
 export default function DashboardPage() {
     const [hasAgent, setHasAgent] = useState(false);
     const [agents, setAgents] = useState<Agent[]>([]);
+    const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     // Fetch Agents on Mount
@@ -20,7 +21,12 @@ export default function DashboardPage() {
             try {
                 const fetchedAgents = await agentService.getAgents();
                 setAgents(fetchedAgents);
-                setHasAgent(fetchedAgents.length > 0);
+                if (fetchedAgents.length > 0) {
+                    setHasAgent(true);
+                    setSelectedAgent(fetchedAgents[0]);
+                } else {
+                    setHasAgent(false);
+                }
             } catch (error) {
                 console.error("Failed to fetch agents", error);
             } finally {
@@ -64,7 +70,7 @@ export default function DashboardPage() {
                     {!hasAgent ? (
                         <AgentEmptyState onCreateClick={() => { }} />
                     ) : (
-                        <AgentWorkArea />
+                        <AgentWorkArea agents={agents} selectedAgent={selectedAgent} onSelectAgent={setSelectedAgent} />
                     )}
                 </div>
 
@@ -73,7 +79,7 @@ export default function DashboardPage() {
                     {!hasAgent ? (
                         <PreviewPhone />
                     ) : (
-                        <SimulatorPhone agentName={agents[0]?.name || "Asdos Bot"} />
+                        <SimulatorPhone agentName={selectedAgent?.name} />
                     )}
                 </div>
 

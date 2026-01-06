@@ -45,7 +45,7 @@ export default function SimulatorPhone({ agentName }: { agentName?: string }) {
                         <div className="relative w-10 h-10 rounded-full overflow-hidden border border-gray-200 shadow-sm">
                             <Image
                                 src="/simulatorProfile.webp"
-                                alt="Asdos Bot"
+                                alt="Simulator Profile"
                                 fill
                                 className="object-cover"
                             />
