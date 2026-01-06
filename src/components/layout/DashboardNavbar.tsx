@@ -80,7 +80,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
 
                     {/* Dropdown Menu */}
                     {isProfileOpen && (
-                        <div className="absolute right-0 mt-3 w-48 bg-[#1C1F26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50 animate-fade-in-down origin-top-right">
+                        <div className="absolute right-0 mt-3 w-48 bg-[#1C1F26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-[100] animate-fade-in-down origin-top-right">
                             <div className="py-1">
                                 <button className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors cursor-pointer">
                                     <Settings className="w-4 h-4" />

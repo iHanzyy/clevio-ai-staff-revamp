@@ -63,7 +63,7 @@ export default function SimulatorPhone() {
             )}>
 
                 {/* NOTCH (Dynamic Island style) */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[25px] bg-[#1C1F26] rounded-b-3xl z-50 flex items-center justify-center">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[25px] bg-[#1C1F26] rounded-b-3xl z-30 flex items-center justify-center">
                     {/* Camera/Sensor dots */}
                     <div className="flex gap-2">
                         <div className="w-12 h-1.5 bg-[#0f1115] rounded-full opacity-60"></div>
@@ -73,7 +73,7 @@ export default function SimulatorPhone() {
 
                 {/* --- HEADER --- */}
                 {/* Added pt-9 to push content below notch */}
-                <div className="flex items-center justify-between px-6 py-4 pt-9 bg-white/80 backdrop-blur-md border-b border-gray-100 z-40">
+                <div className="flex items-center justify-between px-6 py-4 pt-9 bg-white/80 backdrop-blur-md border-b border-gray-100 z-20">
                     <div className="flex items-center gap-3">
                         <div className="relative w-10 h-10 rounded-full overflow-hidden border border-gray-200 shadow-sm">
                             <Image
@@ -103,7 +103,7 @@ export default function SimulatorPhone() {
                                 <div className={cn(
                                     "px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm relative",
                                     isBot
-                                        ? "bg-[#3B82F6] text-white rounded-tl-none" // iMessage Blue style (as per screenshot roughly)
+                                        ? "bg-[#2A2E37] text-white rounded-tl-none" // Dark Theme Bubble
                                         : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"
                                 )}>
                                     {msg.message}
@@ -112,7 +112,7 @@ export default function SimulatorPhone() {
                                 {/* Time & Status */}
                                 <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isBot ? "ml-1" : "mr-1 justify-end")}>
                                     {msg.time}
-                                    {!isBot && <span className="text-[#3B82F6] font-bold">✓</span>}
+                                    {!isBot && <span className="text-[#2A2E37] font-bold">✓</span>}
                                 </div>
                             </div>
                         );
@@ -120,7 +120,7 @@ export default function SimulatorPhone() {
                 </div>
 
                 {/* --- INPUT AREA --- */}
-                <div className="p-4 pb-8 bg-white border-t border-gray-100 z-40"> {/* pb-8 to account for home indicator area */}
+                <div className="p-4 pb-8 bg-white border-t border-gray-100 z-20"> {/* pb-8 to account for home indicator area */}
                     <div className={cn(
                         "flex items-center gap-2 pl-4 pr-1.5 py-1.5 rounded-full",
                         "bg-white",
@@ -132,14 +132,14 @@ export default function SimulatorPhone() {
                             placeholder="Type a message..."
                             className="flex-grow bg-transparent outline-none text-gray-700 placeholder:text-gray-400 text-sm h-10"
                         />
-                        <button className="w-10 h-10 bg-[#3B82F6] hover:bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer">
+                        <button className="w-10 h-10 bg-[#2A2E37] hover:bg-[#353A45] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer">
                             <SendHorizontal className="w-5 h-5 ml-0.5" />
                         </button>
                     </div>
                 </div>
 
                 {/* HOME INDICATOR */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full z-50"></div>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full z-30"></div>
             </div>
         </div>
     );

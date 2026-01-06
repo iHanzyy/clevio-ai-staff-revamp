@@ -29,7 +29,7 @@ export default function PreviewPhone() {
             )}>
 
                 {/* NOTCH (Dynamic Island style) */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[25px] bg-[#1C1F26] rounded-b-3xl z-50 flex items-center justify-center">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[25px] bg-[#1C1F26] rounded-b-3xl z-30 flex items-center justify-center">
                     {/* Camera/Sensor dots */}
                     <div className="flex gap-2">
                         <div className="w-12 h-1.5 bg-[#0f1115] rounded-full opacity-60"></div>
@@ -38,7 +38,7 @@ export default function PreviewPhone() {
                 </div>
 
                 {/* --- HEADER --- */}
-                <div className="flex items-center justify-between px-6 py-5 pt-9 bg-white/80 backdrop-blur-md border-b border-gray-100 z-10">
+                <div className="flex items-center justify-between px-6 py-5 pt-9 bg-white/80 backdrop-blur-md border-b border-gray-100 z-20">
                     <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
                             <Image
@@ -72,12 +72,12 @@ export default function PreviewPhone() {
                 </div>
 
                 {/* --- DUMMY INPUT AREA (Visual Only) --- */}
-                <div className="p-4 pb-8 bg-white border-t border-gray-100 opacity-50 z-40">
+                <div className="p-4 pb-8 bg-white border-t border-gray-100 opacity-50 z-20">
                     <div className="w-full h-12 bg-gray-100 rounded-full" />
                 </div>
 
                 {/* HOME INDICATOR */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full z-50"></div>
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full z-30"></div>
             </div>
         </div>
     );
