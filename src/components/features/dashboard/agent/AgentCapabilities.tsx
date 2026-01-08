@@ -61,11 +61,22 @@ interface AgentCapabilitiesProps {
 
 export default function AgentCapabilities({ selectedAgent, onAgentUpdate }: AgentCapabilitiesProps) {
     const [activeModal, setActiveModal] = useState<keyof typeof TOOL_CATEGORIES | null>(null);
+    const [confirmationState, setConfirmationState] = useState<{ type: 'activate' | 'deactivate', toolId: string, label: string } | null>(null);
     const { showToast } = useToast();
 
     const handleIconClick = (category: keyof typeof TOOL_CATEGORIES) => {
         if (!selectedAgent) return;
         setActiveModal(category);
+    };
+
+    const handleAdditionalToolClick = (toolId: string, label: string) => {
+        if (!selectedAgent) return;
+        const isActive = selectedAgent.mcp_tools?.includes(toolId);
+        setConfirmationState({
+            type: isActive ? 'deactivate' : 'activate',
+            toolId,
+            label
+        });
     };
 
     const isCategoryActive = (category: keyof typeof TOOL_CATEGORIES) => {
@@ -107,8 +118,18 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate }: Agen
                 <div className="flex-1">
                     <h4 className="text-gray-900 font-bold text-sm mb-4">Kemampuan Tambahan:</h4>
                     <div className="flex flex-wrap gap-4">
-                        <CapabilityIcon src="/webSearchIcon.svg" label="Web Search" isActive={selectedAgent?.mcp_tools?.includes('web_search')} />
-                        <CapabilityIcon src="/telescopeIcon.svg" label="Deep Research" isActive={selectedAgent?.mcp_tools?.includes('deep_research')} />
+                        <CapabilityIcon
+                            src="/webSearchIcon.svg"
+                            label="Web Search"
+                            isActive={selectedAgent?.mcp_tools?.includes('web_search')}
+                            onClick={() => handleAdditionalToolClick('web_search', 'Web Search')}
+                        />
+                        <CapabilityIcon
+                            src="/telescopeIcon.svg"
+                            label="Deep Research"
+                            isActive={selectedAgent?.mcp_tools?.includes('deep_research')}
+                            onClick={() => handleAdditionalToolClick('deep_research', 'Deep Research')}
+                        />
                     </div>
                 </div>
             </div>
@@ -128,6 +149,19 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate }: Agen
                     }}
                 />
             )}
+            {/* ADDITIONAL TOOL CONFIRMATION MODAL */}
+            {confirmationState && selectedAgent && (
+                <AdditionalToolModal
+                    state={confirmationState}
+                    onClose={() => setConfirmationState(null)}
+                    agentId={selectedAgent.id}
+                    agentData={selectedAgent}
+                    onUpdate={() => {
+                        setConfirmationState(null);
+                        onAgentUpdate?.();
+                    }}
+                />
+            )}
         </div>
     );
 }
@@ -139,13 +173,13 @@ function CapabilityIcon({ src, label, isActive, onClick }: { src: string, label:
                 "w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-2xl p-2.5 transition-all duration-300",
                 "bg-white shadow-sm border border-gray-100",
                 onClick && "cursor-pointer hover:scale-105 hover:shadow-md",
-                isActive && "border-blue-500 ring-2 ring-blue-100"
+                isActive && "border-lime-500 ring-2 ring-lime-100"
             )}>
                 <div className="relative w-full h-full">
                     <Image src={src} alt={label} fill className="object-contain" />
                 </div>
             </div>
-            <span className={cn("text-xs font-bold transition-colors", isActive ? "text-blue-600" : "text-gray-700")}>{label}</span>
+            <span className={cn("text-xs font-bold transition-colors", isActive ? "text-lime-600" : "text-gray-700")}>{label}</span>
         </div>
     );
 }
@@ -244,14 +278,14 @@ function GoogleToolsModal({ categoryKey, config, currentTools, onClose, agentId,
                                 className={cn(
                                     "flex items-center justify-between p-4 rounded-2xl cursor-pointer transition-all duration-200 border",
                                     isChecked
-                                        ? "bg-blue-50/50 border-blue-200 shadow-sm"
+                                        ? "bg-lime-50/50 border-lime-200 shadow-sm"
                                         : "bg-white border-gray-100 hover:bg-gray-50"
                                 )}
                             >
-                                <span className={cn("font-bold text-sm", isChecked ? "text-blue-700" : "text-gray-700")}>{label}</span>
+                                <span className={cn("font-bold text-sm", isChecked ? "text-lime-700" : "text-gray-700")}>{label}</span>
                                 <div className={cn(
                                     "w-6 h-6 rounded-lg flex items-center justify-center transition-colors",
-                                    isChecked ? "bg-blue-500 text-white" : "bg-gray-200 text-transparent"
+                                    isChecked ? "bg-lime-500 text-white" : "bg-gray-200 text-transparent"
                                 )}>
                                     <Check className="w-4 h-4" />
                                 </div>
@@ -274,12 +308,104 @@ function GoogleToolsModal({ categoryKey, config, currentTools, onClose, agentId,
                         className={cn(
                             "px-6 py-2.5 rounded-xl font-bold text-sm text-white flex items-center gap-2 transition-all shadow-lg",
                             hasChanges && !isUpdating
-                                ? "bg-[#5080FF] hover:bg-[#3b66d6] hover:scale-105 cursor-pointer shadow-blue-500/20"
+                                ? "bg-[#65a30d] hover:bg-[#4d7c0f] hover:scale-105 cursor-pointer shadow-lime-500/20"
                                 : "bg-gray-300 cursor-not-allowed text-gray-500 shadow-none"
                         )}
                     >
                         {isUpdating && <Loader2 className="w-4 h-4 animate-spin" />}
                         Perbarui Kemampuan
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    );
+}
+
+interface AdditionalModalProps {
+    state: { type: 'activate' | 'deactivate', toolId: string, label: string };
+    onClose: () => void;
+    agentId: string;
+    agentData: Agent;
+    onUpdate: () => void;
+}
+
+function AdditionalToolModal({ state, onClose, agentId, agentData, onUpdate }: AdditionalModalProps) {
+    const { showToast } = useToast();
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    const handleConfirm = async () => {
+        setIsUpdating(true);
+        try {
+            const currentMcpTools = agentData.mcp_tools || [];
+            let newMcpTools;
+
+            if (state.type === 'activate') {
+                newMcpTools = [...new Set([...currentMcpTools, state.toolId])];
+            } else {
+                newMcpTools = currentMcpTools.filter(t => t !== state.toolId);
+            }
+
+            const payload = {
+                name: agentData.name,
+                config: agentData.config,
+                mcp_tools: newMcpTools,
+                google_tools: agentData.google_tools || []
+            };
+
+            await agentService.updateAgent(agentId, payload);
+            showToast(`Kemampuan ${state.label} berhasil ${state.type === 'activate' ? 'diaktifkan' : 'dinonaktifkan'}!`, "success");
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+            showToast("Gagal memperbarui kemampuan.", "error");
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+
+            <div className="relative w-full max-w-sm bg-[#FDFDFD] rounded-[2rem] p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50 text-center">
+
+                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
+                    <Image
+                        src={state.toolId === 'web_search' ? '/webSearchIcon.svg' : '/telescopeIcon.svg'}
+                        alt={state.label}
+                        width={32}
+                        height={32}
+                    />
+                </div>
+
+                <h3 className="font-bold text-gray-900 text-lg mb-2">
+                    {state.type === 'activate' ? `Aktifkan ${state.label}?` : `Matikan ${state.label}?`}
+                </h3>
+                <p className="text-gray-500 text-xs mb-6 px-4 leading-relaxed">
+                    {state.type === 'activate'
+                        ? `Apakah Anda yakin ingin menambahkan kemampuan ${state.label} untuk agen ini?`
+                        : `Apakah Anda yakin ingin menghapus kemampuan ${state.label}? Agen tidak akan bisa menggunakannya lagi.`}
+                </p>
+
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onClose}
+                        className="flex-1 py-3 text-gray-500 font-bold text-sm bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors cursor-pointer"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        onClick={handleConfirm}
+                        disabled={isUpdating}
+                        className={cn(
+                            "flex-1 py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer",
+                            state.type === 'activate'
+                                ? "bg-gradient-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
+                                : "bg-red-500 hover:bg-red-600 hover:scale-105 shadow-red-500/20"
+                        )}
+                    >
+                        {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : (state.type === 'activate' ? 'Ya, Aktifkan' : 'Ya, Matikan')}
                     </button>
                 </div>
 

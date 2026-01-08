@@ -88,6 +88,19 @@ export default function DashboardPage() {
         }
     };
 
+    const refreshAgents = async () => {
+        try {
+            const fetched = await agentService.getAgents();
+            setAgents(fetched);
+            if (selectedAgent) {
+                const updated = fetched.find(a => a.id === selectedAgent.id);
+                if (updated) setSelectedAgent(updated);
+            }
+        } catch (error) {
+            console.error("Failed to refresh agents", error);
+        }
+    };
+
     if (isLoading) {
         return null; // Or a loading spinner
     }
@@ -113,6 +126,7 @@ export default function DashboardPage() {
                             agents={agents}
                             selectedAgent={selectedAgent}
                             onSelectAgent={setSelectedAgent}
+                            onAgentUpdate={refreshAgents}
                         />
                     )}
                 </div>
