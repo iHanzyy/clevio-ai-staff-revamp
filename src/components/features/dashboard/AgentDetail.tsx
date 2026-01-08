@@ -23,7 +23,7 @@ export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, on
             <AgentSelector agents={agents} selectedAgent={selectedAgent} onSelectAgent={onSelectAgent} />
 
             {/* 2. SYSTEM PROMPT (TUGAS AGEN) */}
-            <AgentTask selectedAgent={selectedAgent} />
+            <AgentTask selectedAgent={selectedAgent} onAgentUpdate={onAgentUpdate} />
 
             {/* 3. CAPABILITIES (KEMAMPUAN AGEN) */}
             <AgentCapabilities selectedAgent={selectedAgent} onAgentUpdate={onAgentUpdate} />
