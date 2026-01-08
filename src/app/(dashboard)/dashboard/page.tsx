@@ -45,12 +45,35 @@ export default function DashboardPage() {
         fetchAgents();
     }, []);
 
-    const handleAgentCreated = async (agentData: any) => {
+    const handleAgentCreated = async (rawAgentData: any) => {
         // Show loading state or toast
-        const loadingToastId = showToast("Sedang membuat agent...", "info");
+        showToast("Sedang membuat agent...", "info");
 
         try {
-            const newAgent = await agentService.createAgent(agentData);
+            console.log("Agent Created Data (Raw):", rawAgentData);
+
+            const agentPayload = {
+                name: rawAgentData.name,
+
+                // Top Level Fields
+                google_tools: rawAgentData.google_tools || [],
+                mcp_tools: rawAgentData.mcp_tools || [],
+
+                config: {
+                    system_prompt: rawAgentData.system_prompt || rawAgentData.config?.system_prompt,
+                    llm_model: rawAgentData.llm_model || 'gpt-4.1-mini',
+                    temperature: 0.1,
+                },
+
+                mcp_servers: rawAgentData.mcp_servers || {
+                    "calculator_sse": {
+                        "transport": "sse",
+                        "url": "http://0.0.0.0:8190/sse"
+                    }
+                }
+            };
+
+            const newAgent = await agentService.createAgent(agentPayload);
 
             // Refresh list and select new agent
             setAgents(prev => [newAgent, ...prev]);

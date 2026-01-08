@@ -25,8 +25,9 @@ export const agentService = {
     },
 
     // Create new agent
+    // Create new agent
     createAgent: async (payload: any): Promise<Agent> => {
-        const response = await api.post<Agent>('/agents', payload);
+        const response = await api.post<Agent>('/agents/', payload);
         return response.data;
     },
 
