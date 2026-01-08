@@ -14,7 +14,8 @@ export interface Agent {
     status: string;
     config: AgentConfig;
     created_at: string;
-    // mcp_tools, etc.
+    mcp_tools?: string[];
+    google_tools?: string[];
 }
 
 export const agentService = {
@@ -25,9 +26,14 @@ export const agentService = {
     },
 
     // Create new agent
-    // Create new agent
     createAgent: async (payload: any): Promise<Agent> => {
         const response = await api.post<Agent>('/agents/', payload);
+        return response.data;
+    },
+
+    // Update agent
+    updateAgent: async (agentId: string, payload: any): Promise<Agent> => {
+        const response = await api.put<Agent>(`/agents/${agentId}`, payload);
         return response.data;
     },
 

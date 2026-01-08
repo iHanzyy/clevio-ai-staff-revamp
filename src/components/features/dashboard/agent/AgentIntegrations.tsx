@@ -16,7 +16,7 @@ export default function AgentIntegrations() {
                 <IntegrationCard src="/iconWhatsapp.svg" label="WhatsApp" status="inactive" />
                 <IntegrationCard src="/iconTelegram.svg" label="Telegram" status="coming_soon" />
                 <IntegrationCard src="/iconInstagram.svg" label="Instagram" status="coming_soon" />
-                <IntegrationCard src="/iconEmbed.svg" label="Embed" status="active" />
+                <IntegrationCard src="/iconEmbed.svg" label="Embed" status="inactive" />
             </div>
         </div>
     );
