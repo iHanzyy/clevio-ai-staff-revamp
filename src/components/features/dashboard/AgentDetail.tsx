@@ -20,7 +20,7 @@ export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, on
         <div className="flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-5">
 
             {/* 1. AGENT SELECTOR */}
-            <AgentSelector agents={agents} selectedAgent={selectedAgent} onSelectAgent={onSelectAgent} />
+            <AgentSelector agents={agents} selectedAgent={selectedAgent} onSelectAgent={onSelectAgent} onAgentUpdate={onAgentUpdate} />
 
             {/* 2. SYSTEM PROMPT (TUGAS AGEN) */}
             <AgentTask selectedAgent={selectedAgent} onAgentUpdate={onAgentUpdate} />

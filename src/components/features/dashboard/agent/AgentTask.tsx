@@ -116,10 +116,12 @@ interface EditModalProps {
     onUpdate?: () => void;
 }
 
+
 function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }: EditModalProps) {
     const { showToast } = useToast();
     const [prompt, setPrompt] = useState(initialPrompt);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const hasChanges = prompt !== initialPrompt;
 
@@ -185,7 +187,7 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
                         Batal
                     </button>
                     <button
-                        onClick={handleSave}
+                        onClick={() => setShowConfirm(true)}
                         disabled={!hasChanges || isUpdating}
                         className={cn(
                             "px-6 py-2.5 rounded-xl font-bold text-sm text-white flex items-center gap-2 transition-all shadow-lg",
@@ -198,6 +200,45 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
                         Simpan Perubahan
                     </button>
                 </div>
+
+                {/* Confirmation Overlay */}
+                {showConfirm && (
+                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-[2rem] flex items-center justify-center p-4 animate-fade-in">
+                        <div className="w-full max-w-sm text-center">
+
+                            {/* Icon Container - Matching AdditionalToolModal */}
+                            <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
+                                <span className="text-3xl">⚠️</span>
+                            </div>
+
+                            <h3 className="font-bold text-gray-900 text-lg mb-2">
+                                Simpan Perubahan?
+                            </h3>
+                            <p className="text-gray-500 text-xs mb-6 px-4 leading-relaxed">
+                                Apakah Anda yakin ingin memperbarui tugas agen ini? Perubahan akan langsung diterapkan pada perilaku agen.
+                            </p>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => setShowConfirm(false)}
+                                    className="flex-1 py-3 text-gray-500 font-bold text-sm bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors cursor-pointer"
+                                >
+                                    Batal
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={isUpdating}
+                                    className={cn(
+                                        "flex-1 py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer",
+                                        "bg-gradient-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
+                                    )}
+                                >
+                                    {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ya, Simpan"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </div>
         </div>
