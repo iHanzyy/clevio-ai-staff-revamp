@@ -24,6 +24,23 @@ export const knowledgeService = {
         return response.data.uploads;
     },
 
+    // Upload a File
+    uploadDocument: async (agentId: string, file: File): Promise<void> => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Optional params with defaults as per API Guide
+        formData.append('chunk_size', '400');
+        formData.append('chunk_overlap', '80');
+        formData.append('batch_size', '50');
+
+        await api.post(`/agents/${agentId}/documents`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+    },
+
     // Delete an Uploaded File
     deleteDocument: async (agentId: string, uploadId: string): Promise<void> => {
         await api.delete(`/agents/${agentId}/documents/${uploadId}`);
