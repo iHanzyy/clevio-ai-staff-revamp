@@ -5,7 +5,7 @@ const PENDING_PAYLOADS = new Map<string, any>();
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        console.log("[Webhook: Arthur] Received Payload:", JSON.stringify(body, null, 2));
+
 
         // 1. Parsing Payload from N8N (Flat structure based on user screenshot)
         // Payload: { name, system_prompt, mcp_tools, google_tools, session_id }
@@ -33,11 +33,11 @@ export async function POST(req: Request) {
             "mcp_tools": mcp_tools || [],
         };
 
-        console.log("[Webhook: Arthur] Mapped Agent Payload:", JSON.stringify(agentPayload, null, 2));
+
 
         // 3. Save to In-Memory Store for Frontend Retrieval
         if (session_id) {
-            console.log(`[Webhook: Arthur] Storing payload for session: ${session_id}`);
+
             PENDING_PAYLOADS.set(session_id, agentPayload);
         }
 
@@ -64,7 +64,7 @@ export async function GET(req: Request) {
     const data = PENDING_PAYLOADS.get(sessionId);
 
     if (data) {
-        console.log(`[Webhook: Arthur] Retrieving & clearing payload for session: ${sessionId}`);
+
         PENDING_PAYLOADS.delete(sessionId);
         return NextResponse.json(data);
     }

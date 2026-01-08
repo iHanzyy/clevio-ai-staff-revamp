@@ -111,7 +111,7 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
     };
 
     const handleArthurResponse = async (response: any) => {
-        console.log("[ArthurPhone] Response received:", response);
+
 
         const responseText = response.output || response.message || JSON.stringify(response);
 
@@ -127,14 +127,14 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
         // 1. Detect Agent Completion (Direct Payload from N8N)
         const agentData = response.agentData || response;
         if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
-            console.log("[ArthurPhone] Direct Agent Data found, triggering creation:", agentData);
+
             onAgentCreated(agentData);
             return;
         }
 
         // 2. Fallback: Check Webhook Buffer (Bridge for Separate N8N Flows)
         if (onAgentCreated && sessionId) {
-            console.log("[ArthurPhone] No direct data. Checking Webhook Buffer for session:", sessionId);
+
             try {
                 // Short delay to allow N8N to finish writing to webhook buffer
                 await new Promise(r => setTimeout(r, 1500));
@@ -143,10 +143,10 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
                 if (res.ok) {
                     const bufferedData = await res.json();
                     if (bufferedData.name) {
-                        console.log("[ArthurPhone] BUFFERED Data found! Triggering creation:", bufferedData);
+
                         onAgentCreated(bufferedData);
                     } else {
-                        console.log("[ArthurPhone] Buffer empty.");
+
                     }
                 }
             } catch (err) {

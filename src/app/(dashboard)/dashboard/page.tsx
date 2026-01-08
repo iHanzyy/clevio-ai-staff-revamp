@@ -50,7 +50,7 @@ export default function DashboardPage() {
         showToast("Sedang membuat agent...", "info");
 
         try {
-            console.log("Agent Created Data (Raw):", rawAgentData);
+
 
             const agentPayload = {
                 name: rawAgentData.name,
