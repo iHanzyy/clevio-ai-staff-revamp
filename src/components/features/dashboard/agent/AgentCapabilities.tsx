@@ -57,20 +57,21 @@ const TOOL_CATEGORIES = {
 interface AgentCapabilitiesProps {
     selectedAgent: Agent | null;
     onAgentUpdate?: () => void;
+    isAutoMode?: boolean;
 }
 
-export default function AgentCapabilities({ selectedAgent, onAgentUpdate }: AgentCapabilitiesProps) {
+export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAutoMode = false }: AgentCapabilitiesProps) {
     const [activeModal, setActiveModal] = useState<keyof typeof TOOL_CATEGORIES | null>(null);
     const [confirmationState, setConfirmationState] = useState<{ type: 'activate' | 'deactivate', toolId: string, label: string } | null>(null);
     const { showToast } = useToast();
 
     const handleIconClick = (category: keyof typeof TOOL_CATEGORIES) => {
-        if (!selectedAgent) return;
+        if (!selectedAgent || isAutoMode) return;
         setActiveModal(category);
     };
 
     const handleAdditionalToolClick = (toolId: string, label: string) => {
-        if (!selectedAgent) return;
+        if (!selectedAgent || isAutoMode) return;
         const isActive = selectedAgent.mcp_tools?.includes(toolId);
         setConfirmationState({
             type: isActive ? 'deactivate' : 'activate',

@@ -10,12 +10,15 @@ import { useToast } from "@/components/ui/ToastProvider";
 
 import { agentService, Agent } from "@/services/agentService";
 
+import AgentModeToggle from "@/components/features/dashboard/agent/AgentModeToggle";
+
 export default function DashboardPage() {
     const [hasAgent, setHasAgent] = useState(false);
     const [agents, setAgents] = useState<Agent[]>([]);
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isArthurActive, setIsArthurActive] = useState(false);
+    const [isAutoMode, setIsAutoMode] = useState(false); // Hoisted state
 
     const { showToast } = useToast();
 
@@ -106,7 +109,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="w-full h-full p-6 md:p-8 overflow-hidden">
+        <div className="w-full h-full p-6 md:p-10 overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
 
                 {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
@@ -118,7 +121,17 @@ export default function DashboardPage() {
                 </div>
 
                 {/* COLUMN 2: Work Area - 6 Columns width */}
-                <div className="lg:col-span-6 h-full flex flex-col min-h-0">
+                <div className="lg:col-span-6 h-full flex flex-col min-h-0 relative">
+
+                    {/* Toggle Switch (Floating Top-Right) */}
+                    {hasAgent && (
+                        <AgentModeToggle
+                            isAutoMode={isAutoMode}
+                            onToggle={setIsAutoMode}
+                            className="absolute -top-8.75 right-0 z-50"
+                        />
+                    )}
+
                     {!hasAgent ? (
                         <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
                     ) : (
@@ -127,6 +140,8 @@ export default function DashboardPage() {
                             selectedAgent={selectedAgent}
                             onSelectAgent={setSelectedAgent}
                             onAgentUpdate={refreshAgents}
+                            isAutoMode={isAutoMode}
+                            onToggleMode={setIsAutoMode}
                         />
                     )}
                 </div>

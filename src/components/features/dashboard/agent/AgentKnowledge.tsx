@@ -10,9 +10,11 @@ import { useToast } from "@/components/ui/ToastProvider";
 
 interface AgentKnowledgeProps {
     selectedAgent: Agent | null;
+    onAgentUpdate?: () => void;
+    isAutoMode?: boolean;
 }
 
-export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
+export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMode = false }: AgentKnowledgeProps) {
     const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
@@ -20,10 +22,12 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
     const [isFilesModalOpen, setIsFilesModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [deleteId, setDeleteId] = useState<string | null>(null); // For Confirmation Modal
+    const [deleteId, setDeleteId] = useState<string | null>(null);
 
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const { showToast } = useToast();
+    // ... rest of imports/state is same context ...
+
 
     useEffect(() => {
         if (selectedAgent) {
@@ -230,12 +234,14 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
                                                 <p className="text-[10px] text-gray-400 mt-0.5">Ditambahkan: {new Date(file.created_at).toLocaleDateString()}</p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={(e) => handleDeleteClick(file.id, e)}
-                                            className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer p-1"
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
+                                        {!isAutoMode && (
+                                            <button
+                                                onClick={(e) => handleDeleteClick(file.id, e)}
+                                                className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer p-1"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        )}
                                     </div>
                                 ))}
                             </div>
@@ -250,14 +256,16 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
                             </button>
                         )}
 
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={!selectedAgent || isLoading || isUploading}
-                            className="w-full py-3 bg-gradient-to-br from-[#65a30d] to-[#84cc16] text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_0_rgba(101,163,13,0.39)] outline-none"
-                            style={{ marginTop: documents.length > 0 ? "1rem" : "0" }}
-                        >
-                            {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Pilih Dokumen"}
-                        </button>
+                        {!isAutoMode && (
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={!selectedAgent || isLoading || isUploading}
+                                className="w-full py-3 bg-gradient-to-br from-[#65a30d] to-[#84cc16] text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_0_rgba(101,163,13,0.39)] outline-none"
+                                style={{ marginTop: documents.length > 0 ? "1rem" : "0" }}
+                            >
+                                {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Pilih Dokumen"}
+                            </button>
+                        )}
                     </>
                 )}
             </div>
@@ -281,12 +289,14 @@ export default function AgentKnowledge({ selectedAgent }: AgentKnowledgeProps) {
                                             <p className="text-[10px] text-gray-400 mt-0.5">Ditambahkan: {new Date(file.created_at).toLocaleDateString()}</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={(e) => handleDeleteClick(file.id, e)}
-                                        className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full cursor-pointer shrink-0"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
+                                    {!isAutoMode && (
+                                        <button
+                                            onClick={(e) => handleDeleteClick(file.id, e)}
+                                            className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-full cursor-pointer shrink-0"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    )}
                                 </div>
                             ))}
                         </div>

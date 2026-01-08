@@ -10,9 +10,10 @@ import { useToast } from "@/components/ui/ToastProvider";
 interface AgentTaskProps {
     selectedAgent: Agent | null;
     onAgentUpdate?: () => void;
+    isAutoMode?: boolean;
 }
 
-export default function AgentTask({ selectedAgent, onAgentUpdate }: AgentTaskProps) {
+export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = false }: AgentTaskProps) {
     const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { showToast } = useToast();
@@ -50,13 +51,15 @@ export default function AgentTask({ selectedAgent, onAgentUpdate }: AgentTaskPro
                             <Copy className="w-4 h-4" />
                         </button>
                         {/* Edit Button */}
-                        <button
-                            onClick={() => setIsEditModalOpen(true)}
-                            className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-lime-600 hover:border-lime-200 transition-colors shadow-sm cursor-pointer"
-                            title="Edit Tugas"
-                        >
-                            <Pencil className="w-4 h-4" />
-                        </button>
+                        {!isAutoMode && (
+                            <button
+                                onClick={() => setIsEditModalOpen(true)}
+                                className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 text-gray-500 hover:text-lime-600 hover:border-lime-200 transition-colors shadow-sm cursor-pointer"
+                                title="Edit Tugas"
+                            >
+                                <Pencil className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
                 </div>
 

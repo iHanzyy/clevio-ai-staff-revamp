@@ -5,15 +5,20 @@ import { ChevronDown, Pencil, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
+import AgentModeToggle from "./AgentModeToggle";
+
 
 interface AgentSelectorProps {
     agents: Agent[];
     selectedAgent: Agent | null;
     onSelectAgent: (agent: Agent) => void;
     onAgentUpdate?: () => void;
+    isAutoMode?: boolean;
+    onToggleMode?: (isAuto: boolean) => void;
 }
 
-export default function AgentSelector({ agents, selectedAgent, onSelectAgent, onAgentUpdate }: AgentSelectorProps) {
+export default function AgentSelector({ agents, selectedAgent, onSelectAgent, onAgentUpdate, isAutoMode = false, onToggleMode }: AgentSelectorProps) {
+
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -31,7 +36,8 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
     }, []);
 
     return (
-        <>
+        <div className="relative">
+
             <div className={cn(
                 "w-full px-6 py-4 rounded-[1rem]",
                 "bg-[#FDFDFD]", // White Clay
@@ -84,8 +90,8 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
                                 )}
                             </div>
 
-                            {/* Edit Name Button */}
-                            {selectedAgent && (
+                            {/* Edit Name Button - Conditional Render */}
+                            {selectedAgent && !isAutoMode && (
                                 <button
                                     onClick={() => setIsEditModalOpen(true)}
                                     className="w-10 h-[46px] flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-lime-600 hover:border-lime-200 transition-colors shadow-sm cursor-pointer"
@@ -96,7 +102,9 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
                             )}
                         </div>
                     </div>
-                    <div className="text-right text-sm font-semibold text-gray-900">
+
+                    {/* Right Side: Toggle + Tokens */}
+                    <div className="text-right text-sm font-semibold text-gray-900 md:self-center">
                         Sisa token chat Agent: <span className="text-gray-900">200 Pesan</span>
                     </div>
                 </div>
@@ -112,7 +120,7 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
                     onUpdate={onAgentUpdate}
                 />
             )}
-        </>
+        </div>
     );
 }
 
