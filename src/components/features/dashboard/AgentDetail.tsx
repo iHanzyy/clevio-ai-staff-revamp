@@ -49,7 +49,7 @@ export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, on
             {/* 4. GRID: KNOWLEDGE & INTEGRATIONS */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <AgentKnowledge selectedAgent={selectedAgent} isAutoMode={isAutoMode} />
-                <AgentIntegrations />
+                <AgentIntegrations selectedAgent={selectedAgent} />
             </div>
 
         </div>
