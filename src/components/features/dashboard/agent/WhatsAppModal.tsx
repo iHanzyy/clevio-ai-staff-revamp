@@ -190,9 +190,26 @@ export default function WhatsAppModal({
 
                 {/* Content Switching */}
                 {view === "LOADING" && (
-                    <div className="py-8">
-                        <div className="loader w-8 h-8 border-4 border-gray-200 border-t-lime-500 rounded-full animate-spin mx-auto" />
-                        <p className="text-gray-400 text-sm mt-4">Memuat...</p>
+                    <div className="py-8 flex flex-col items-center justify-center">
+                        <div className="relative w-20 h-20 mb-6">
+                            <div className="absolute inset-0 bg-green-400/30 rounded-full blur-xl animate-pulse" />
+                            <div className="relative w-full h-full bg-white/50 backdrop-blur-sm rounded-full shadow-lg border border-white/60 flex items-center justify-center">
+                                <Image
+                                    src="/iconWhatsapp.svg"
+                                    alt="Loading"
+                                    width={40}
+                                    height={40}
+                                    className="object-contain animate-pulse"
+                                />
+                            </div>
+                            {/* Circular Spinner Ring */}
+                            <svg className="absolute inset-0 w-full h-full animate-spin text-green-500" viewBox="0 0 100 100">
+                                <circle className="opacity-25" cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="4" fill="none" />
+                                <circle className="opacity-75" cx="50" cy="50" r="45" stroke="currentColor" strokeWidth="4" fill="none" strokeDasharray="100" strokeDashoffset="50" strokeLinecap="round" />
+                            </svg>
+                        </div>
+                        <p className="text-gray-600 font-semibold text-base animate-pulse">Menghubungkan...</p>
+                        <p className="text-gray-400 text-xs mt-1">Mohon tunggu sebentar</p>
                     </div>
                 )}
 
