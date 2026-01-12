@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { ChevronDown, Pencil, Loader2, X } from "lucide-react";
+import { ChevronDown, MoreHorizontal, Pencil, Trash2, Loader2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
+import { useRouter } from "next/navigation";
 import AgentModeToggle from "./AgentModeToggle";
 
 
@@ -18,15 +19,24 @@ interface AgentSelectorProps {
 }
 
 export default function AgentSelector({ agents, selectedAgent, onSelectAgent, onAgentUpdate, isAutoMode = false, onToggleMode }: AgentSelectorProps) {
+    const router = useRouter();
+    const { showToast } = useToast();
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isActionsMenuOpen, setIsActionsMenuOpen] = useState(false);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const dropdownRef = React.useRef<HTMLDivElement>(null);
+    const actionsMenuRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsDropdownOpen(false);
+            }
+            if (actionsMenuRef.current && !actionsMenuRef.current.contains(event.target as Node)) {
+                setIsActionsMenuOpen(false);
             }
         }
         document.addEventListener("mousedown", handleClickOutside);
@@ -47,17 +57,19 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
                     <div className="flex flex-col gap-1 w-full md:w-auto">
                         <label className="text-gray-900 font-bold text-lg">Pilih Agen</label>
                         <div className="flex items-center gap-2">
+                            {/* Dropdown for selecting agent */}
                             <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                                     className={cn(
-                                        "flex items-center justify-between w-full md:w-64 px-4 py-2.5 rounded-xl text-left",
-                                        "bg-white border border-gray-200 text-gray-900 font-bold", // Active: Bold Dark
+                                        "flex items-center gap-3 w-full md:w-64 px-4 py-2.5 rounded-xl text-left",
+                                        "bg-white border border-gray-200 text-gray-900 font-bold",
                                         "shadow-sm hover:border-gray-300 transition-colors cursor-pointer"
                                     )}
                                 >
-                                    <span>{selectedAgent?.name || "Pilih Agent"}</span>
-                                    <ChevronDown className={cn("w-5 h-5 text-gray-400 transition-transform duration-200", isDropdownOpen && "rotate-180")} />
+                                    {/* Chevron on LEFT */}
+                                    <ChevronDown className={cn("w-5 h-5 text-gray-400 transition-transform duration-200 shrink-0", isDropdownOpen && "rotate-180")} />
+                                    <span className="flex-1 truncate">{selectedAgent?.name || "Pilih Agent"}</span>
                                 </button>
 
                                 {/* Dropdown Menu (Click-based) */}
@@ -90,15 +102,47 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
                                 )}
                             </div>
 
-                            {/* Edit Name Button - Conditional Render */}
+                            {/* Three-Dot Menu on RIGHT - Hidden in Auto Mode */}
                             {selectedAgent && !isAutoMode && (
-                                <button
-                                    onClick={() => setIsEditModalOpen(true)}
-                                    className="w-10 h-[46px] flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-lime-600 hover:border-lime-200 transition-colors shadow-sm cursor-pointer"
-                                    title="Edit Nama Agen"
-                                >
-                                    <Pencil className="w-4 h-4" />
-                                </button>
+                                <div className="relative" ref={actionsMenuRef}>
+                                    <button
+                                        onClick={() => setIsActionsMenuOpen(!isActionsMenuOpen)}
+                                        className={cn(
+                                            "w-10 h-[46px] flex items-center justify-center rounded-xl",
+                                            "bg-white border border-gray-200 text-gray-500",
+                                            "hover:bg-gray-50 hover:border-gray-300 transition-colors cursor-pointer shadow-sm"
+                                        )}
+                                        title="Opsi Agen"
+                                    >
+                                        <MoreHorizontal className="w-5 h-5" />
+                                    </button>
+
+                                    {/* Actions Dropdown */}
+                                    {isActionsMenuOpen && (
+                                        <div className="absolute top-full right-0 mt-2 w-44 bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 z-50 animate-fade-in-up">
+                                            <button
+                                                onClick={() => {
+                                                    setIsActionsMenuOpen(false);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 font-medium hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                                            >
+                                                <Pencil className="w-4 h-4 text-gray-400" />
+                                                Ganti nama
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setIsActionsMenuOpen(false);
+                                                    setIsDeleteConfirmOpen(true);
+                                                }}
+                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 font-medium hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
                             )}
                         </div>
                     </div>
@@ -118,6 +162,41 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
                     agentId={selectedAgent.id}
                     agentData={selectedAgent}
                     onUpdate={onAgentUpdate}
+                />
+            )}
+
+            {/* Delete Confirmation Modal */}
+            {isDeleteConfirmOpen && selectedAgent && (
+                <DeleteConfirmModal
+                    agentName={selectedAgent.name}
+                    isDeleting={isDeleting}
+                    onClose={() => setIsDeleteConfirmOpen(false)}
+                    onConfirm={async () => {
+                        setIsDeleting(true);
+                        try {
+                            await agentService.deleteAgent(selectedAgent.id);
+                            showToast("Agen berhasil dihapus!", "success");
+
+                            // Filter out the deleted agent from the current list
+                            const remainingAgents = agents.filter(a => a.id !== selectedAgent.id);
+
+                            if (remainingAgents.length > 0) {
+                                // Select the first available agent
+                                onSelectAgent(remainingAgents[0]);
+                            } else {
+                                // No agents left, redirect to create page
+                                router.push("/dashboard/agents/create");
+                            }
+
+                            // Refresh the agent list
+                            onAgentUpdate?.();
+                        } catch (error) {
+                            showToast("Gagal menghapus agen.", "error");
+                        } finally {
+                            setIsDeleting(false);
+                            setIsDeleteConfirmOpen(false);
+                        }
+                    }}
                 />
             )}
         </div>
@@ -255,6 +334,51 @@ function EditNameModal({ initialName, onClose, agentId, agentData, onUpdate }: E
                     </div>
                 )}
 
+            </div>
+        </div>
+    );
+}
+
+// Delete Confirmation Modal Component
+interface DeleteConfirmModalProps {
+    agentName: string;
+    isDeleting: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+}
+
+function DeleteConfirmModal({ agentName, isDeleting, onClose, onConfirm }: DeleteConfirmModalProps) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+
+            <div className="relative w-full max-w-sm bg-[#FDFDFD] rounded-[2rem] p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50 text-center">
+                {/* Icon */}
+                <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-100">
+                    <Trash2 className="w-8 h-8 text-red-500" />
+                </div>
+
+                <h3 className="font-bold text-gray-900 text-lg mb-2">Hapus Agen?</h3>
+                <p className="text-gray-500 text-sm mb-6 px-2 leading-relaxed">
+                    Apakah Anda yakin ingin menghapus <span className="font-bold text-gray-700">{agentName}</span>? Tindakan ini tidak dapat dibatalkan.
+                </p>
+
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onClose}
+                        disabled={isDeleting}
+                        className="flex-1 py-3 text-gray-500 font-bold text-sm bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                        Batal
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={isDeleting}
+                        className="flex-1 py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all cursor-pointer bg-red-500 hover:bg-red-600 disabled:opacity-50"
+                    >
+                        {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ya, Hapus"}
+                    </button>
+                </div>
             </div>
         </div>
     );

@@ -45,5 +45,10 @@ export const agentService = {
         };
         const response = await api.post(`/agents/${agentId}/execute`, payload);
         return response.data;
+    },
+
+    // Delete Agent
+    deleteAgent: async (agentId: string): Promise<void> => {
+        await api.delete(`/agents/${agentId}`);
     }
 };
