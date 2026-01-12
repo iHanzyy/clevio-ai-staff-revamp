@@ -71,6 +71,13 @@ export default function SettingsModal({ isOpen, onClose, user }: SettingsModalPr
                             <div className="flex items-center gap-2">
                                 <p className="text-lg font-bold text-[#2A2E37]">{user.plan_code}</p>
                             </div>
+                            {user.api_expires_at && (
+                                <p className="text-xs text-gray-500 mt-1.5">
+                                    Tersisa: <span className="font-bold text-lime-600">
+                                        {Math.max(0, Math.ceil((new Date(user.api_expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} hari
+                                    </span>
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>

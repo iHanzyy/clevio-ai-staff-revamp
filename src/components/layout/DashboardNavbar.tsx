@@ -13,7 +13,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [user, setUser] = useState<{ id: string; email: string; plan_code: string; created_at: string } | null>(null);
+    const [user, setUser] = useState<{ id: string; email: string; plan_code: string; api_expires_at?: string; created_at: string } | null>(null);
     const profileRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
@@ -74,7 +74,10 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                         "shadow-inner",
                         "select-none"
                     )}>
-                        Paket aktif tersisa: 30 Hari
+                        Paket aktif tersisa: {user?.api_expires_at
+                            ? `${Math.max(0, Math.ceil((new Date(user.api_expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} Hari`
+                            : "-- Hari"
+                        }
                     </div>
 
                     {/* Profile Dropdown */}

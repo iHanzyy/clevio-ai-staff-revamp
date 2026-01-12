@@ -5,6 +5,7 @@ export interface User {
     email: string;
     is_active: boolean;
     plan_code: string;
+    api_expires_at: string; // ISO timestamp for subscription expiry
     created_at: string;
 }
 
