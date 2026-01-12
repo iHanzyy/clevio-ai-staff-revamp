@@ -16,12 +16,22 @@ export interface Agent {
     created_at: string;
     mcp_tools?: string[];
     google_tools?: string[];
+    // Google Workspace OAuth
+    auth_required: boolean;
+    auth_url: string | null;
+    auth_state: string | null;
 }
 
 export const agentService = {
     // List all agents
     getAgents: async (): Promise<Agent[]> => {
         const response = await api.get<Agent[]>('/agents/');
+        return response.data;
+    },
+
+    // Get single agent details
+    getAgent: async (agentId: string): Promise<Agent> => {
+        const response = await api.get<Agent>(`/agents/${agentId}`);
         return response.data;
     },
 

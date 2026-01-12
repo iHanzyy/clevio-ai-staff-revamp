@@ -29,16 +29,17 @@ export default function DashboardPage() {
             setAgents(fetchedAgents);
             if (fetchedAgents.length > 0) {
                 setHasAgent(true);
-                // Only set selected if none selected
+                // Only set selected if none selected - fetch full details
                 if (!selectedAgent) {
-                    setSelectedAgent(fetchedAgents[0]);
+                    const fullAgentData = await agentService.getAgent(fetchedAgents[0].id);
+                    setSelectedAgent(fullAgentData);
                 }
             } else {
                 setHasAgent(false);
             }
         } catch (error) {
             console.error("Failed to fetch agents", error);
-            showToast("Gagal memuat data agen.", "error"); // Optional: Silent fail on simple fetch
+            showToast("Gagal memuat data agen.", "error");
         } finally {
             setIsLoading(false);
         }
@@ -78,9 +79,12 @@ export default function DashboardPage() {
 
             const newAgent = await agentService.createAgent(agentPayload);
 
+            // Fetch full details (including auth_required)
+            const fullAgentData = await agentService.getAgent(newAgent.id);
+
             // Refresh list and select new agent
-            setAgents(prev => [newAgent, ...prev]);
-            setSelectedAgent(newAgent);
+            setAgents(prev => [fullAgentData, ...prev]);
+            setSelectedAgent(fullAgentData);
             setHasAgent(true);
             setIsArthurActive(false); // Reset Arthur flow
 
@@ -91,13 +95,27 @@ export default function DashboardPage() {
         }
     };
 
+    // Handle agent selection with full data fetch
+    const handleSelectAgent = async (agent: Agent) => {
+        try {
+            // Fetch full agent details including auth_required
+            const fullAgentData = await agentService.getAgent(agent.id);
+            setSelectedAgent(fullAgentData);
+        } catch (error) {
+            console.error("Failed to fetch agent details", error);
+            // Fallback to basic agent data
+            setSelectedAgent(agent);
+        }
+    };
+
     const refreshAgents = async () => {
         try {
             const fetched = await agentService.getAgents();
             setAgents(fetched);
             if (selectedAgent) {
-                const updated = fetched.find(a => a.id === selectedAgent.id);
-                if (updated) setSelectedAgent(updated);
+                // Fetch full details to get auth_required, etc.
+                const fullAgentData = await agentService.getAgent(selectedAgent.id);
+                setSelectedAgent(fullAgentData);
             }
         } catch (error) {
             console.error("Failed to refresh agents", error);
@@ -138,7 +156,7 @@ export default function DashboardPage() {
                         <AgentWorkArea
                             agents={agents}
                             selectedAgent={selectedAgent}
-                            onSelectAgent={setSelectedAgent}
+                            onSelectAgent={handleSelectAgent}
                             onAgentUpdate={refreshAgents}
                             isAutoMode={isAutoMode}
                             onToggleMode={setIsAutoMode}
