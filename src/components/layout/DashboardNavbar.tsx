@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, User, Settings, LogOut, ChevronDown } from "lucide-react";
+import { Plus, User, Settings, LogOut, ChevronDown, Puzzle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/authService";
@@ -110,6 +110,16 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                                     >
                                         <Settings className="w-4 h-4" />
                                         Settings
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            // TODO: Add-Ons action will be implemented
+                                            setIsProfileOpen(false);
+                                        }}
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
+                                    >
+                                        <Puzzle className="w-4 h-4" />
+                                        Add-Ons
                                     </button>
                                     <div className="h-px bg-white/10 mx-2" />
                                     <button
