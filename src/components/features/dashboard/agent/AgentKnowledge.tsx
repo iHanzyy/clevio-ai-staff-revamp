@@ -64,6 +64,11 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
             return true;
         });
 
+        // Show toast for each selected file
+        newFiles.forEach(file => {
+            showToast(`Dokumen '${file.name}' siap diunggah`, "info");
+        });
+
         setSelectedFiles(prev => [...prev, ...newFiles]);
         if (fileInputRef.current) fileInputRef.current.value = "";
     };

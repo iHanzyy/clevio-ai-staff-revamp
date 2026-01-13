@@ -17,20 +17,42 @@ interface Message {
 
 interface SimulatorPhoneProps {
     selectedAgent: Agent | null;
+    onMessagesRemainingUpdate?: (remaining: number) => void;
+    agentVersion?: number; // Increment this to trigger session reset
 }
 
-export default function SimulatorPhone({ selectedAgent }: SimulatorPhoneProps) {
+export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdate, agentVersion = 0 }: SimulatorPhoneProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
+    const [sessionId, setSessionId] = useState<string>("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { showToast } = useToast();
 
-    // Reset chat when agent changes
+    // Generate new session ID
+    const generateSessionId = () => {
+        return `sim-session-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    };
+
+    // Initialize session on mount
+    useEffect(() => {
+        setSessionId(generateSessionId());
+    }, []);
+
+    // Reset chat AND session when agent changes
     useEffect(() => {
         setMessages([]);
         setInput("");
+        setSessionId(generateSessionId());
     }, [selectedAgent?.id]);
+
+    // Reset session when agent is updated (agentVersion changes)
+    useEffect(() => {
+        if (agentVersion > 0) {
+            setMessages([]);
+            setSessionId(generateSessionId());
+        }
+    }, [agentVersion]);
 
     // Format current time
     const getCurrentTime = () => {
@@ -61,10 +83,7 @@ export default function SimulatorPhone({ selectedAgent }: SimulatorPhoneProps) {
         setIsSending(true);
 
         try {
-            const response = await agentService.executeAgent(selectedAgent.id, userMsg.message);
-            // Assuming response has an 'output' or 'response' field. 
-            // Based on API Guide: "response payload includes a response field"
-            // Let's fallback to JSON stringify if object, or just text.
+            const response = await agentService.executeAgent(selectedAgent.id, userMsg.message, sessionId);
             const botText = response.response || response.output || JSON.stringify(response);
 
             const botMsg: Message = {
@@ -76,11 +95,15 @@ export default function SimulatorPhone({ selectedAgent }: SimulatorPhoneProps) {
             };
             setMessages(prev => [...prev, botMsg]);
 
+            // Update messages_remaining if returned by backend
+            if (response.messages_remaining !== undefined && onMessagesRemainingUpdate) {
+                onMessagesRemainingUpdate(response.messages_remaining);
+            }
+
         } catch (error) {
             console.error("Agent execution failed", error);
             showToast("Gagal memproses pesan agen.", "error");
 
-            // Optional: Add error message to chat
             const errorMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 sender: "System",
@@ -103,6 +126,7 @@ export default function SimulatorPhone({ selectedAgent }: SimulatorPhoneProps) {
 
     const handleClear = () => {
         setMessages([]);
+        setSessionId(generateSessionId()); // New session on clear
     };
 
     const agentName = selectedAgent?.name || "Agent";

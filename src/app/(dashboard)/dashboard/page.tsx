@@ -21,6 +21,8 @@ export default function DashboardPage() {
     const [isAutoMode, setIsAutoMode] = useState(false);
     // Section selection for AUTO mode (Arthur context)
     const [selectedSection, setSelectedSection] = useState<'name' | 'system_prompt' | 'capabilities' | null>(null);
+    // Agent version to trigger simulator session reset on updates
+    const [agentVersion, setAgentVersion] = useState(0);
 
     const { showToast } = useToast();
 
@@ -131,9 +133,18 @@ export default function DashboardPage() {
                 // Fetch full details to get auth_required, etc.
                 const fullAgentData = await agentService.getAgent(selectedAgent.id);
                 setSelectedAgent(fullAgentData);
+                // Increment version to trigger simulator session reset
+                setAgentVersion(prev => prev + 1);
             }
         } catch (error) {
             console.error("Failed to refresh agents", error);
+        }
+    };
+
+    // Update messages_remaining in selectedAgent (called after chat)
+    const handleMessagesRemainingUpdate = (remaining: number) => {
+        if (selectedAgent) {
+            setSelectedAgent(prev => prev ? { ...prev, messages_remaining: remaining } : null);
         }
     };
 
@@ -191,7 +202,11 @@ export default function DashboardPage() {
                     {!hasAgent ? (
                         <PreviewPhone />
                     ) : (
-                        <SimulatorPhone selectedAgent={selectedAgent} />
+                        <SimulatorPhone
+                            selectedAgent={selectedAgent}
+                            onMessagesRemainingUpdate={handleMessagesRemainingUpdate}
+                            agentVersion={agentVersion}
+                        />
                     )}
                 </div>
 
