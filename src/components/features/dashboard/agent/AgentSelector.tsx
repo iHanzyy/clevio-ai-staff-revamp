@@ -148,8 +148,8 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
                     </div>
 
                     {/* Right Side: Toggle + Tokens */}
-                    <div className="text-right text-sm font-semibold text-gray-900 md:self-center">
-                        Sisa token chat Agent: <span className="text-gray-900">200 Pesan</span>
+                    <div className="text-right text-sm font-normal text-gray-900 md:self-center">
+                        Sisa pesan Agent: <span className="text-gray-700 font-semibold">{selectedAgent?.messages_remaining ?? 0}</span> Pesan
                     </div>
                 </div>
             </div>

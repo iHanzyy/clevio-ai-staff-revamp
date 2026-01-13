@@ -31,7 +31,16 @@ export default function DashboardPage() {
                 setHasAgent(true);
                 // Only set selected if none selected - fetch full details
                 if (!selectedAgent) {
-                    const fullAgentData = await agentService.getAgent(fetchedAgents[0].id);
+                    // Check localStorage for persisted agent ID (restored after OAuth redirect)
+                    const persistedAgentId = typeof window !== 'undefined'
+                        ? localStorage.getItem('selected_agent_id')
+                        : null;
+
+                    const targetAgentId = persistedAgentId && fetchedAgents.find(a => a.id === persistedAgentId)
+                        ? persistedAgentId
+                        : fetchedAgents[0].id;
+
+                    const fullAgentData = await agentService.getAgent(targetAgentId);
                     setSelectedAgent(fullAgentData);
                 }
             } else {
@@ -101,6 +110,10 @@ export default function DashboardPage() {
             // Fetch full agent details including auth_required
             const fullAgentData = await agentService.getAgent(agent.id);
             setSelectedAgent(fullAgentData);
+            // Persist to localStorage for OAuth redirect restore
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('selected_agent_id', agent.id);
+            }
         } catch (error) {
             console.error("Failed to fetch agent details", error);
             // Fallback to basic agent data

@@ -20,6 +20,8 @@ export interface Agent {
     auth_required: boolean;
     auth_url: string | null;
     auth_state: string | null;
+    // Token/Messages quota
+    messages_remaining: number;
 }
 
 export const agentService = {
