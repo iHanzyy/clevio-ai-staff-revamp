@@ -11,9 +11,11 @@ interface AgentTaskProps {
     selectedAgent: Agent | null;
     onAgentUpdate?: () => void;
     isAutoMode?: boolean;
+    isSelected?: boolean;
+    onSectionClick?: () => void;
 }
 
-export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = false }: AgentTaskProps) {
+export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = false, isSelected = false, onSectionClick }: AgentTaskProps) {
     const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const { showToast } = useToast();
@@ -34,11 +36,17 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
 
     return (
         <>
-            <div className={cn(
-                "w-full px-6 py-6 rounded-[1rem]",
-                "bg-[#FDFDFD]",
-                "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]"
-            )}>
+            <div
+                onClick={() => isAutoMode && onSectionClick?.()}
+                className={cn(
+                    "w-full px-6 py-6 rounded-[1rem] transition-all duration-200",
+                    "bg-[#FDFDFD]",
+                    "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
+                    // Clickable cursor in AUTO mode
+                    isAutoMode && "cursor-pointer hover:shadow-[0_6px_14px_rgba(0,0,0,0.08)]",
+                    // Lime glow when selected
+                    isSelected && "ring-2 ring-[#84cc16] shadow-[0_0_20px_rgba(132,204,22,0.3)]"
+                )}>
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-gray-900 font-bold text-lg">Tugas Agen</h3>
                     <div className="flex items-center gap-2">

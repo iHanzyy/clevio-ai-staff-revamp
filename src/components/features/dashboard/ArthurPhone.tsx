@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { SendHorizontal, Lock } from "lucide-react";
+import { SendHorizontal, Lock, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { arthurService } from "@/services/arthurService";
 import { useToast } from "@/components/ui/ToastProvider";
+import { Agent } from "@/services/agentService";
 
 interface Message {
     id: string;
@@ -14,9 +15,16 @@ interface Message {
     time: string;
 }
 
+type SectionType = 'name' | 'system_prompt' | 'capabilities' | null;
+
 interface ArthurPhoneProps {
     isActive?: boolean;
     onAgentCreated?: (agentData: any) => void;
+    hasAgent?: boolean;
+    isAutoMode?: boolean;
+    selectedSection?: SectionType;
+    selectedAgent?: Agent | null;
+    onSectionReset?: () => void;
 }
 
 const WELCOME_MESSAGES: Message[] = [
@@ -34,7 +42,36 @@ const WELCOME_MESSAGES: Message[] = [
     }
 ];
 
-export default function ArthurPhone({ isActive = false, onAgentCreated }: ArthurPhoneProps) {
+const AUTO_MODE_WELCOME: Message[] = [
+    {
+        id: "auto-1",
+        sender: "Arthur",
+        message: "Hai! Saya siap membantu mengedit agent Anda.",
+        time: "10:05 AM"
+    },
+    {
+        id: "auto-2",
+        sender: "Arthur",
+        message: "Pilih section yang ingin Anda edit, lalu sampaikan perubahan yang diinginkan.",
+        time: "10:06 AM"
+    }
+];
+
+const SECTION_LABELS: Record<string, string> = {
+    'name': 'Nama Agen',
+    'system_prompt': 'Tugas Agen',
+    'capabilities': 'Kemampuan Agen'
+};
+
+export default function ArthurPhone({
+    isActive = false,
+    onAgentCreated,
+    hasAgent = false,
+    isAutoMode = false,
+    selectedSection = null,
+    selectedAgent = null,
+    onSectionReset
+}: ArthurPhoneProps) {
     const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
@@ -44,6 +81,11 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const { showToast } = useToast();
 
+    // Determine Arthur's active state
+    const isCreateMode = !hasAgent && isActive;
+    const isEditMode = hasAgent && isAutoMode && selectedSection !== null;
+    const isArthurFullyActive = isCreateMode || isEditMode;
+
     useEffect(() => {
         setSessionId(`arthur-session-${Math.random().toString(36).substring(7)}`);
     }, []);
@@ -52,12 +94,23 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
+    // Reset messages when switching modes
     useEffect(() => {
-        if (isActive && !hasStarted && sessionId) {
+        if (hasAgent && isAutoMode) {
+            setMessages(AUTO_MODE_WELCOME);
+            setHasStarted(false);
+        } else if (!hasAgent) {
+            setMessages(WELCOME_MESSAGES);
+            setHasStarted(false);
+        }
+    }, [hasAgent, isAutoMode]);
+
+    useEffect(() => {
+        if (isCreateMode && !hasStarted && sessionId) {
             setHasStarted(true);
             handleAutoStart();
         }
-    }, [isActive, hasStarted, sessionId]);
+    }, [isCreateMode, hasStarted, sessionId]);
 
     const getCurrentTime = () => {
         return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -86,7 +139,7 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
     };
 
     const handleSend = async () => {
-        if (!input.trim() || isSending) return;
+        if (!input.trim() || isSending || !isArthurFullyActive) return;
 
         const msgText = input;
         const userMsg: Message = {
@@ -101,7 +154,19 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
         setIsSending(true);
 
         try {
-            const response = await arthurService.sendMessage(sessionId, msgText);
+            const response = await arthurService.sendMessageWithContext(
+                sessionId,
+                msgText,
+                isEditMode && selectedAgent ? {
+                    userId: selectedAgent.user_id,
+                    agentId: selectedAgent.id,
+                    konteks: selectedSection || '',
+                    name: selectedAgent.name,
+                    system_prompt: selectedAgent.config?.system_prompt || '',
+                    mcp_tools: selectedAgent.mcp_tools || [],
+                    google_tools: selectedAgent.google_tools || []
+                } : undefined
+            );
             handleArthurResponse(response);
         } catch (error) {
             console.error("Failed to send message:", error);
@@ -111,8 +176,6 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
     };
 
     const handleArthurResponse = async (response: any) => {
-
-
         const responseText = response.output || response.message || JSON.stringify(response);
 
         const botMsg: Message = {
@@ -124,33 +187,37 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
         setMessages(prev => [...prev, botMsg]);
         setIsSending(false);
 
-        // 1. Detect Agent Completion (Direct Payload from N8N)
-        const agentData = response.agentData || response;
-        if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
+        // Only handle agent creation in Create Mode
+        if (isCreateMode) {
+            const agentData = response.agentData || response;
+            if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
+                onAgentCreated(agentData);
+                return;
+            }
 
-            onAgentCreated(agentData);
-            return;
+            // Fallback: Check Webhook Buffer
+            if (onAgentCreated && sessionId) {
+                try {
+                    await new Promise(r => setTimeout(r, 1500));
+                    const res = await fetch(`/api/webhooks/arthur/agent-created?session_id=${sessionId}`);
+                    if (res.ok) {
+                        const bufferedData = await res.json();
+                        if (bufferedData.name) {
+                            onAgentCreated(bufferedData);
+                        }
+                    }
+                } catch (err) {
+                    console.error("[ArthurPhone] Buffer check error:", err);
+                }
+            }
         }
 
-        // 2. Fallback: Check Webhook Buffer (Bridge for Separate N8N Flows)
-        if (onAgentCreated && sessionId) {
-
-            try {
-                // Short delay to allow N8N to finish writing to webhook buffer
-                await new Promise(r => setTimeout(r, 1500));
-
-                const res = await fetch(`/api/webhooks/arthur/agent-created?session_id=${sessionId}`);
-                if (res.ok) {
-                    const bufferedData = await res.json();
-                    if (bufferedData.name) {
-
-                        onAgentCreated(bufferedData);
-                    } else {
-
-                    }
-                }
-            } catch (err) {
-                console.error("[ArthurPhone] Buffer check error:", err);
+        // Edit Mode: Reset section after successful response
+        if (isEditMode && onSectionReset) {
+            // Check if response indicates success (you might want to parse this differently)
+            if (response.success !== false) {
+                onSectionReset();
+                showToast("Perubahan berhasil diterapkan!", "success");
             }
         }
     };
@@ -158,15 +225,49 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            if (!isSending) handleSend();
+            if (!isSending && isArthurFullyActive) handleSend();
         }
     };
 
     const handleClear = () => {
-        setMessages(WELCOME_MESSAGES);
+        if (hasAgent && isAutoMode) {
+            setMessages(AUTO_MODE_WELCOME);
+        } else {
+            setMessages(WELCOME_MESSAGES);
+        }
         setHasStarted(false);
         setSessionId(`arthur-session-${Math.random().toString(36).substring(7)}`);
     };
+
+    // Dynamic placeholder based on state
+    const getPlaceholder = () => {
+        if (!hasAgent) {
+            return isActive ? "Jawab pertanyaan Arthur..." : "Buat Agent Baru dulu...";
+        }
+        if (!isAutoMode) {
+            return "Aktifkan AUTO untuk menggunakan Arthur";
+        }
+        if (!selectedSection) {
+            return "Pilih section terlebih dahulu";
+        }
+        return `Edit ${SECTION_LABELS[selectedSection]}...`;
+    };
+
+    // Dynamic overlay message
+    const getOverlayMessage = () => {
+        if (!hasAgent && !isActive) {
+            return "Terkunci";
+        }
+        if (hasAgent && !isAutoMode) {
+            return "Aktifkan mode AUTO untuk menggunakan Arthur";
+        }
+        if (hasAgent && isAutoMode && !selectedSection) {
+            return "Pilih section terlebih dahulu";
+        }
+        return null;
+    };
+
+    const overlayMessage = getOverlayMessage();
 
     return (
         <div className={cn(
@@ -187,7 +288,9 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900 text-lg leading-tight">Arthur</h3>
-                        <p className="text-xs text-gray-500 font-medium">{isSending ? "Mengetik..." : "AI Creator"}</p>
+                        <p className="text-xs text-gray-500 font-medium">
+                            {isSending ? "Mengetik..." : (isEditMode ? "AI Editor" : "AI Creator")}
+                        </p>
                     </div>
                 </div>
                 <button
@@ -233,13 +336,27 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
             {/* --- INPUT AREA --- */}
             <div className="p-4 bg-white border-t border-gray-100 relative">
 
-                {/* INACTIVE STATE OVERLAY */}
-                {!isActive && (
+                {/* OVERLAY: Show when Arthur is not fully active */}
+                {overlayMessage && (
                     <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center animate-fade-in-down">
                         <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100 flex items-center gap-2 px-4">
-                            <Lock className="w-4 h-4 text-gray-400" />
-                            <span className="text-xs font-semibold text-gray-500">Terkunci</span>
+                            {hasAgent && isAutoMode && !selectedSection ? (
+                                <Sparkles className="w-4 h-4 text-lime-500" />
+                            ) : (
+                                <Lock className="w-4 h-4 text-gray-400" />
+                            )}
+                            <span className="text-xs font-semibold text-gray-500">{overlayMessage}</span>
                         </div>
+                    </div>
+                )}
+
+                {/* Selected Section Badge */}
+                {selectedSection && isAutoMode && hasAgent && (
+                    <div className="mb-2 flex items-center gap-2">
+                        <span className="text-xs font-medium text-gray-500">Mengedit:</span>
+                        <span className="px-3 py-1 bg-lime-100 text-lime-700 text-xs font-bold rounded-full">
+                            {SECTION_LABELS[selectedSection]}
+                        </span>
                     </div>
                 )}
 
@@ -248,11 +365,11 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
                     "bg-white",
                     "shadow-[inset_2px_2px_6px_rgba(0,0,0,0.05),0_4px_10px_rgba(0,0,0,0.05)]",
                     "border border-gray-100",
-                    !isActive && "opacity-50"
+                    !isArthurFullyActive && "opacity-50"
                 )}>
                     <textarea
                         rows={1}
-                        placeholder={isActive ? "Jawab pertanyaan Arthur..." : "Buat Agent Baru dulu..."}
+                        placeholder={getPlaceholder()}
                         value={input}
                         onChange={(e) => {
                             setInput(e.target.value);
@@ -260,13 +377,13 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
                             e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
                         }}
                         onKeyDown={handleKeyDown}
-                        disabled={!isActive}
+                        disabled={!isArthurFullyActive}
                         className="flex-grow bg-transparent outline-none text-gray-700 placeholder:text-gray-400 text-sm min-h-[40px] max-h-[120px] py-2.5 resize-none scrollbar-hide"
                         style={{ height: '40px' }}
                     />
                     <button
                         onClick={handleSend}
-                        disabled={!isActive || isSending || !input.trim()}
+                        disabled={!isArthurFullyActive || isSending || !input.trim()}
                         className="w-10 h-10 mb-0.5 bg-[#2A2E37] hover:bg-[#353A45] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                     >
                         <SendHorizontal className="w-5 h-5 ml-0.5" />
@@ -276,3 +393,4 @@ export default function ArthurPhone({ isActive = false, onAgentCreated }: Arthur
         </div>
     );
 }
+

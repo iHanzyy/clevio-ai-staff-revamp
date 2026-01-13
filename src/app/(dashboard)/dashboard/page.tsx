@@ -18,7 +18,9 @@ export default function DashboardPage() {
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isArthurActive, setIsArthurActive] = useState(false);
-    const [isAutoMode, setIsAutoMode] = useState(false); // Hoisted state
+    const [isAutoMode, setIsAutoMode] = useState(false);
+    // Section selection for AUTO mode (Arthur context)
+    const [selectedSection, setSelectedSection] = useState<'name' | 'system_prompt' | 'capabilities' | null>(null);
 
     const { showToast } = useToast();
 
@@ -148,6 +150,11 @@ export default function DashboardPage() {
                     <ArthurPhone
                         isActive={isArthurActive}
                         onAgentCreated={handleAgentCreated}
+                        hasAgent={hasAgent}
+                        isAutoMode={isAutoMode}
+                        selectedSection={selectedSection}
+                        selectedAgent={selectedAgent}
+                        onSectionReset={() => setSelectedSection(null)}
                     />
                 </div>
 
@@ -173,6 +180,8 @@ export default function DashboardPage() {
                             onAgentUpdate={refreshAgents}
                             isAutoMode={isAutoMode}
                             onToggleMode={setIsAutoMode}
+                            selectedSection={selectedSection}
+                            onSelectSection={setSelectedSection}
                         />
                     )}
                 </div>

@@ -58,9 +58,11 @@ interface AgentCapabilitiesProps {
     selectedAgent: Agent | null;
     onAgentUpdate?: () => void;
     isAutoMode?: boolean;
+    isSelected?: boolean;
+    onSectionClick?: () => void;
 }
 
-export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAutoMode = false }: AgentCapabilitiesProps) {
+export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAutoMode = false, isSelected = false, onSectionClick }: AgentCapabilitiesProps) {
     const [activeModal, setActiveModal] = useState<keyof typeof TOOL_CATEGORIES | null>(null);
     const [confirmationState, setConfirmationState] = useState<{ type: 'activate' | 'deactivate', toolId: string, label: string } | null>(null);
     const { showToast } = useToast();
@@ -87,11 +89,17 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAuto
     };
 
     return (
-        <div className={cn(
-            "w-full px-6 py-6 rounded-[1rem] flex flex-col h-full",
-            "bg-[#FDFDFD]",
-            "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]"
-        )}>
+        <div
+            onClick={() => isAutoMode && onSectionClick?.()}
+            className={cn(
+                "w-full px-6 py-6 rounded-[1rem] flex flex-col h-full transition-all duration-200",
+                "bg-[#FDFDFD]",
+                "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
+                // Clickable cursor in AUTO mode
+                isAutoMode && "cursor-pointer hover:shadow-[0_6px_14px_rgba(0,0,0,0.08)]",
+                // Lime glow when selected
+                isSelected && "ring-2 ring-[#84cc16] shadow-[0_0_20px_rgba(132,204,22,0.3)]"
+            )}>
             <h3 className="text-gray-900 font-bold text-lg mb-6">Kemampuan Agen</h3>
 
             <div className="flex flex-col md:flex-row gap-8 md:items-start">

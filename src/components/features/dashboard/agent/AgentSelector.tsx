@@ -16,9 +16,11 @@ interface AgentSelectorProps {
     onAgentUpdate?: () => void;
     isAutoMode?: boolean;
     onToggleMode?: (isAuto: boolean) => void;
+    isSelected?: boolean;
+    onSectionClick?: () => void;
 }
 
-export default function AgentSelector({ agents, selectedAgent, onSelectAgent, onAgentUpdate, isAutoMode = false, onToggleMode }: AgentSelectorProps) {
+export default function AgentSelector({ agents, selectedAgent, onSelectAgent, onAgentUpdate, isAutoMode = false, onToggleMode, isSelected = false, onSectionClick }: AgentSelectorProps) {
     const router = useRouter();
     const { showToast } = useToast();
 
@@ -48,11 +50,17 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
     return (
         <div className="relative">
 
-            <div className={cn(
-                "w-full px-6 py-4 rounded-[1rem]",
-                "bg-[#FDFDFD]", // White Clay
-                "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]"
-            )}>
+            <div
+                onClick={() => isAutoMode && onSectionClick?.()}
+                className={cn(
+                    "w-full px-6 py-4 rounded-[1rem] transition-all duration-200",
+                    "bg-[#FDFDFD]",
+                    "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
+                    // Clickable cursor in AUTO mode
+                    isAutoMode && "cursor-pointer hover:shadow-[0_6px_14px_rgba(0,0,0,0.08)]",
+                    // Lime glow when selected
+                    isSelected && "ring-2 ring-[#84cc16] shadow-[0_0_20px_rgba(132,204,22,0.3)]"
+                )}>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex flex-col gap-1 w-full md:w-auto">
                         <label className="text-gray-900 font-bold text-lg">Pilih Agen</label>
