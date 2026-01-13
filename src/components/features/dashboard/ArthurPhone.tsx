@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { arthurService } from "@/services/arthurService";
 import { useToast } from "@/components/ui/ToastProvider";
 import { Agent } from "@/services/agentService";
+import MarkdownRenderer from "@/components/ui/MarkdownRenderer";
 
 interface Message {
     id: string;
@@ -313,7 +314,7 @@ export default function ArthurPhone({
                                     ? "bg-[#2A2E37] text-white rounded-tl-none"
                                     : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"
                             )}>
-                                {msg.message}
+                                <MarkdownRenderer content={msg.message} isBot={isArthur} />
                             </div>
                             <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isArthur ? "ml-1" : "mr-1 justify-end")}>
                                 {msg.time}

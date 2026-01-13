@@ -6,6 +6,7 @@ import { SendHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
+import MarkdownRenderer from "@/components/ui/MarkdownRenderer";
 
 interface Message {
     id: string;
@@ -199,7 +200,7 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                                     ? "bg-[#2A2E37] text-white rounded-tl-none"
                                     : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"
                             )}>
-                                {msg.message}
+                                <MarkdownRenderer content={msg.message} isBot={msg.isBot} />
                             </div>
 
                             {/* Time & Status */}
