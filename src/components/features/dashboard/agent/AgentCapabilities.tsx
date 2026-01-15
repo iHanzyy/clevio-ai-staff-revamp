@@ -226,7 +226,7 @@ function CapabilityIcon({ src, label, isActive, onClick }: { src: string, label:
 
 interface ModalProps {
     categoryKey: string;
-    config: typeof TOOL_CATEGORIES["Gmail"];
+    config: typeof TOOL_CATEGORIES[keyof typeof TOOL_CATEGORIES];
     currentTools: string[];
     onClose: () => void;
     agentId: string;

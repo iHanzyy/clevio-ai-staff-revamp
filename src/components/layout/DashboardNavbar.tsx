@@ -3,17 +3,18 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Plus, User, Settings, LogOut, ChevronDown, Puzzle } from "lucide-react";
+import { Plus, User as UserIcon, Settings, LogOut, ChevronDown, Puzzle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { authService } from "@/services/authService";
+import type { User } from "@/services/authService";
 import SettingsModal from "@/components/features/dashboard/SettingsModal";
 
 export default function DashboardNavbar({ showCreateButton = true }: { showCreateButton?: boolean }) {
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [user, setUser] = useState<{ id: string; email: string; plan_code: string; api_expires_at?: string; created_at: string } | null>(null);
+    const [user, setUser] = useState<User | null>(null);
     const profileRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
@@ -94,7 +95,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                                 "cursor-pointer"
                             )}
                         >
-                            <User className="w-5 h-5 md:w-6 md:h-6" />
+                            <UserIcon className="w-5 h-5 md:w-6 md:h-6" />
                         </button>
 
                         {/* Dropdown Menu */}

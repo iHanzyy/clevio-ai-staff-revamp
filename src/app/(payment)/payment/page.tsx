@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import PricingCard, { PricingFeature } from "@/components/features/payment/PricingCard";
 import { paymentService, PaymentWebhookPayload } from "@/services/paymentService";
-import { authService, UserInfo } from "@/services/authService";
+import { authService, User } from "@/services/authService";
 
 import Image from "next/image";
 import LoadingScreen from "@/components/ui/LoadingScreen";
@@ -14,7 +14,7 @@ export default function PaymentPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [isInitializing, setIsInitializing] = useState(true);
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+    const [userInfo, setUserInfo] = useState<User | null>(null);
 
     // Fetch user info from backend API
     const fetchUserInfo = useCallback(async () => {
