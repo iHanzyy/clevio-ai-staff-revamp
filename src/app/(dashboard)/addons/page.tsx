@@ -8,6 +8,8 @@ import { Agent, agentService } from "@/services/agentService";
 import AddOnsTabs from "@/components/features/addons/AddOnsTabs";
 import CapabilitiesSection from "@/components/features/addons/CapabilitiesSection";
 
+import HistorySection from "@/components/features/addons/HistorySection";
+
 type TabType = 'overview' | 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
 
 export default function AddOnsPage() {
@@ -44,10 +46,11 @@ export default function AddOnsPage() {
                         onSelectAgent={setSelectedAgent}
                     />
                 );
+            case 'riwayat':
+                return <HistorySection />;
             case 'overview':
             case 'limit-pesan':
             case 'slot-agent':
-            case 'riwayat':
             default:
                 return null;
         }
