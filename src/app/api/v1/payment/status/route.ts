@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// In-memory store for payment status
+// In-memory store for payment data (status + token)
 // In production, use Redis or a database
-const paymentStatusStore: Map<string, string> = new Map();
+interface PaymentData {
+  status: string;
+  access_token?: string;
+  plan_code?: string;
+}
+const paymentDataStore: Map<string, PaymentData> = new Map();
 
 /**
  * GET /api/v1/payment/status?order_id=xxx
  * Poll payment status (called by frontend)
+ * Returns status, and access_token if available (after N8N sets it)
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -19,22 +25,25 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const status = paymentStatusStore.get(orderId) || 'pending';
+  const data = paymentDataStore.get(orderId);
 
   return NextResponse.json({
-    status,
+    status: data?.status || 'pending',
     order_id: orderId,
+    access_token: data?.access_token,
+    plan_code: data?.plan_code,
   });
 }
 
 /**
  * POST /api/v1/payment/status
  * Set payment status (called by n8n after Midtrans callback)
+ * Receives: order_id, status, access_token, plan_code from N8N
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { order_id, status } = body;
+    const { order_id, status, access_token, plan_code } = body;
 
     if (!order_id || !status) {
       return NextResponse.json(
@@ -43,12 +52,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    paymentStatusStore.set(order_id, status);
+    // Store all payment data including access_token from N8N
+    paymentDataStore.set(order_id, {
+      status,
+      access_token,
+      plan_code,
+    });
 
     return NextResponse.json({
       success: true,
       order_id,
       status,
+      access_token: access_token ? 'received' : undefined,
+      plan_code,
     });
   } catch {
     return NextResponse.json(

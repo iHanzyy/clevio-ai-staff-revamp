@@ -191,6 +191,25 @@ export default function ArthurPhone({
         // Only handle agent creation in Create Mode
         if (isCreateMode) {
             const agentData = response.agentData || response;
+
+            // FIX: SANITIZE TOOL NAMES HERE (Frontend Middleware)
+            // N8N sometimes hallucinates tool names (e.g. google_sheets_read instead of google_sheets_get_values)
+            // We fix them here before passing to backend.
+            const VALID_GOOGLE_TOOLS_MAP: Record<string, string> = {
+                'google_sheets_read': 'google_sheets_get_values',
+                'google_sheets_write': 'google_sheets_update_values',
+                'gmail_read': 'gmail_read_messages',
+                'gmail_send': 'gmail_send_message',
+            };
+
+            if (agentData.google_tools && Array.isArray(agentData.google_tools)) {
+                agentData.google_tools = agentData.google_tools.map((t: string) => {
+                    const valid = VALID_GOOGLE_TOOLS_MAP[t];
+                    if (valid) console.log(`[ArthurPhone] Sanitizing tool: ${t} -> ${valid}`);
+                    return valid || t;
+                });
+            }
+
             if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
                 onAgentCreated(agentData);
                 return;
@@ -204,6 +223,10 @@ export default function ArthurPhone({
                     if (res.ok) {
                         const bufferedData = await res.json();
                         if (bufferedData.name) {
+                            // Apply same sanitization for buffered data just in case
+                            if (bufferedData.google_tools && Array.isArray(bufferedData.google_tools)) {
+                                bufferedData.google_tools = bufferedData.google_tools.map((t: string) => VALID_GOOGLE_TOOLS_MAP[t] || t);
+                            }
                             onAgentCreated(bufferedData);
                         }
                     }

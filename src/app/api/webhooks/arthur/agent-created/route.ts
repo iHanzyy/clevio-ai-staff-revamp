@@ -64,10 +64,13 @@ export async function GET(req: Request) {
     const data = PENDING_PAYLOADS.get(sessionId);
 
     if (data) {
-
+        console.log(`[Webhook: Arthur] Retrieving payload for session: ${sessionId}`);
         PENDING_PAYLOADS.delete(sessionId);
         return NextResponse.json(data);
     }
+
+    // Debugging: Log available keys to see if mismatch exists
+    console.log(`[Webhook: Arthur] Session not found: ${sessionId}. Available: ${Array.from(PENDING_PAYLOADS.keys())}`);
 
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
 }

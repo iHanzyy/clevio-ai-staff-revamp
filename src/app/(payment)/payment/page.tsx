@@ -21,6 +21,12 @@ export default function PaymentPage() {
         try {
             const data = await authService.getMe();
             setUserInfo(data);
+
+            // If backend returns a new access_token (after payment activation), save it!
+            if (data.access_token) {
+                localStorage.setItem('jwt_token', data.access_token);
+                document.cookie = `session_token=${data.access_token}; path=/; max-age=604800; SameSite=Lax`;
+            }
         } catch {
             // Token invalid or expired - redirect to login
             router.replace('/login');
@@ -69,22 +75,48 @@ export default function PaymentPage() {
 
         if (orderId && (transactionStatus === 'settlement' || transactionStatus === 'capture')) {
             setIsLoading(true);
-            // Polling for status or just wait a bit and check profile
-            const checkStatus = async () => {
+
+            // Poll for payment status and access_token from N8N
+            const pollForToken = async (attempts = 0): Promise<void> => {
                 try {
-                    // Slight delay to allow webhook to process
+                    // Wait a bit for N8N to process and send data
                     await new Promise(resolve => setTimeout(resolve, 2000));
-                    await fetchUserInfo(); // Update user info to see if plan changed
-                    // If plan changed, the effect above will redirect
+
+                    // Fetch payment status from our API (which has data from N8N)
+                    const response = await fetch(`/api/v1/payment/status?order_id=${orderId}`);
+                    const data = await response.json();
+
+                    if (data.status === 'settlement' && data.access_token) {
+                        // N8N has sent the new token! Save it.
+                        localStorage.setItem('jwt_token', data.access_token);
+                        document.cookie = `session_token=${data.access_token}; path=/; max-age=604800; SameSite=Lax`;
+
+                        // Redirect to dashboard
+                        router.replace('/dashboard');
+                        return;
+                    }
+
+                    // If no token yet and we haven't tried too many times, retry
+                    if (attempts < 5) {
+                        await pollForToken(attempts + 1);
+                    } else {
+                        // Fallback: try fetching user info with existing token
+                        await fetchUserInfo();
+                    }
                 } catch (error) {
-                    console.error("Error checking status:", error);
+                    console.error("Error polling for token:", error);
+                    // Fallback: try fetching user info with existing token
+                    await fetchUserInfo();
                 } finally {
-                    setIsLoading(false);
+                    if (attempts >= 5 || attempts === 0) {
+                        setIsLoading(false);
+                    }
                 }
             };
-            checkStatus();
+
+            pollForToken();
         }
-    }, [searchParams, fetchUserInfo]);
+    }, [searchParams, fetchUserInfo, router]);
 
 
     // Handle Pro Monthly Payment via Midtrans

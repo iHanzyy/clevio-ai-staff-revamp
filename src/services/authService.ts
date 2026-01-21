@@ -7,6 +7,7 @@ export interface User {
     plan_code: string;
     api_expires_at: string; // ISO timestamp for subscription expiry
     created_at: string;
+    access_token?: string; // Backend returns new access_token after payment activation
 }
 
 export const authService = {

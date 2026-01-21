@@ -9,6 +9,8 @@ import AddOnsTabs from "@/components/features/addons/AddOnsTabs";
 import CapabilitiesSection from "@/components/features/addons/CapabilitiesSection";
 
 import HistorySection from "@/components/features/addons/HistorySection";
+import MessageLimitSection from "@/components/features/addons/MessageLimitSection";
+import AgentSlotSection from "@/components/features/addons/AgentSlotSection";
 
 type TabType = 'overview' | 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
 
@@ -46,11 +48,25 @@ export default function AddOnsPage() {
                         onSelectAgent={setSelectedAgent}
                     />
                 );
+            case 'limit-pesan':
+                return (
+                    <MessageLimitSection
+                        agents={agents}
+                        selectedAgent={selectedAgent}
+                        onSelectAgent={setSelectedAgent}
+                    />
+                );
+            case 'slot-agent':
+                return (
+                    <AgentSlotSection
+                        agents={agents}
+                        selectedAgent={selectedAgent}
+                        onSelectAgent={setSelectedAgent}
+                    />
+                );
             case 'riwayat':
                 return <HistorySection />;
             case 'overview':
-            case 'limit-pesan':
-            case 'slot-agent':
             default:
                 return null;
         }
