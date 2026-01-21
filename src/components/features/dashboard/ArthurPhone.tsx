@@ -232,22 +232,60 @@ export default function ArthurPhone({
             const agentData = response.agentData || response;
 
             // FIX: SANITIZE TOOL NAMES HERE (Frontend Middleware)
-            // N8N sometimes hallucinates tool names (e.g. google_sheets_read instead of google_sheets_get_values)
+            // N8N sometimes hallucinates tool names or puts MCP tools in google_tools
             // We fix them here before passing to backend.
+
+            // Valid Google tool name mappings (fix hallucinated names)
             const VALID_GOOGLE_TOOLS_MAP: Record<string, string> = {
                 'google_sheets_read': 'google_sheets_get_values',
                 'google_sheets_write': 'google_sheets_update_values',
+                'google_sheets_update': 'google_sheets_update_values',
                 'gmail_read': 'gmail_read_messages',
                 'gmail_send': 'gmail_send_message',
+                'google_calendar_create': 'google_calendar_create_event',
+                'google_docs_create': 'google_docs_create_document',
             };
 
-            if (agentData.google_tools && Array.isArray(agentData.google_tools)) {
-                agentData.google_tools = agentData.google_tools.map((t: string) => {
-                    const valid = VALID_GOOGLE_TOOLS_MAP[t];
-                    if (valid) console.log(`[ArthurPhone] Sanitizing tool: ${t} -> ${valid}`);
-                    return valid || t;
-                });
+            // These are MCP tools that N8N sometimes puts in google_tools by mistake
+            const MCP_TOOLS_SET = new Set([
+                'web_search',
+                'deep_research'
+            ]);
+
+            // Initialize mcp_tools if not present
+            if (!agentData.mcp_tools) {
+                agentData.mcp_tools = [];
             }
+
+            if (agentData.google_tools && Array.isArray(agentData.google_tools)) {
+                const cleanGoogleTools: string[] = [];
+
+                agentData.google_tools.forEach((t: string) => {
+                    // Check if this is actually an MCP tool that was misplaced
+                    if (MCP_TOOLS_SET.has(t)) {
+                        console.log(`[ArthurPhone] Moving MCP tool from google_tools to mcp_tools: ${t}`);
+                        if (!agentData.mcp_tools.includes(t)) {
+                            agentData.mcp_tools.push(t);
+                        }
+                        return; // Don't add to google_tools
+                    }
+
+                    // Sanitize the tool name if needed
+                    const sanitized = VALID_GOOGLE_TOOLS_MAP[t] || t;
+                    if (sanitized !== t) {
+                        console.log(`[ArthurPhone] Sanitizing tool: ${t} -> ${sanitized}`);
+                    }
+                    cleanGoogleTools.push(sanitized);
+                });
+
+                agentData.google_tools = cleanGoogleTools;
+            }
+
+            console.log('[ArthurPhone] Sanitized agentData:', {
+                name: agentData.name,
+                google_tools: agentData.google_tools,
+                mcp_tools: agentData.mcp_tools
+            });
 
             if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
                 onAgentCreated(agentData);
