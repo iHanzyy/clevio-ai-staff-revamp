@@ -78,8 +78,12 @@ export default function ArthurPhone({
     const [isSending, setIsSending] = useState(false);
     const [sessionId, setSessionId] = useState("");
     const [hasStarted, setHasStarted] = useState(false);
+    const [showLongWaitMessage, setShowLongWaitMessage] = useState(false);
+    const [showInfoInsteadOfDots, setShowInfoInsteadOfDots] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const longWaitTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const toggleIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const { showToast } = useToast();
 
     // Determine Arthur's active state
@@ -94,6 +98,41 @@ export default function ArthurPhone({
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
+
+    // Long wait timer: show alternating message after 10 seconds of typing
+    useEffect(() => {
+        if (isSending) {
+            // Start timer when sending begins - after 10s, start alternating
+            longWaitTimerRef.current = setTimeout(() => {
+                setShowLongWaitMessage(true);
+                // Start alternating between dots and info every 3 seconds
+                toggleIntervalRef.current = setInterval(() => {
+                    setShowInfoInsteadOfDots(prev => !prev);
+                }, 3000);
+            }, 10000); // 10 seconds
+        } else {
+            // Reset everything when sending completes
+            if (longWaitTimerRef.current) {
+                clearTimeout(longWaitTimerRef.current);
+                longWaitTimerRef.current = null;
+            }
+            if (toggleIntervalRef.current) {
+                clearInterval(toggleIntervalRef.current);
+                toggleIntervalRef.current = null;
+            }
+            setShowLongWaitMessage(false);
+            setShowInfoInsteadOfDots(false);
+        }
+
+        return () => {
+            if (longWaitTimerRef.current) {
+                clearTimeout(longWaitTimerRef.current);
+            }
+            if (toggleIntervalRef.current) {
+                clearInterval(toggleIntervalRef.current);
+            }
+        };
+    }, [isSending]);
 
     // Reset messages when switching modes
     useEffect(() => {
@@ -347,10 +386,19 @@ export default function ArthurPhone({
                 })}
                 {isSending && (
                     <div className="flex flex-col max-w-[85%] items-start mr-auto animate-fade-in-up">
-                        <div className="px-5 py-4 rounded-2xl rounded-tl-none bg-[#2A2E37] text-white shadow-sm flex gap-1 items-center">
-                            <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-                            <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-                            <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce"></div>
+                        <div className="px-5 py-4 rounded-2xl rounded-tl-none bg-[#2A2E37] text-white shadow-sm flex gap-1 items-center min-h-[48px] transition-opacity duration-500">
+                            {/* Show dots OR info message (alternating after 10s) */}
+                            {(!showLongWaitMessage || !showInfoInsteadOfDots) ? (
+                                // Typing dots
+                                <>
+                                    <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                    <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                    <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce"></div>
+                                </>
+                            ) : (
+                                // Info message
+                                <span className="text-sm animate-fade-in">⏳ Mohon menunggu sekitar 1-2 menit...</span>
+                            )}
                         </div>
                     </div>
                 )}
