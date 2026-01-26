@@ -5,6 +5,8 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent } from "@/services/agentService";
 import CapabilityCard from "@/components/features/addons/CapabilityCard";
+import { useCart, CartItem } from "@/contexts/CartContext";
+import { useToast } from "@/components/ui/ToastProvider";
 
 // Hardcoded capabilities data
 const CAPABILITIES = [
@@ -44,9 +46,32 @@ export default function CapabilitiesSection({ agents, selectedAgent, onSelectAge
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const { addItem } = useCart();
+    const { showToast } = useToast();
+
     const handleAddCapability = (capabilityId: string) => {
-        console.log(`Adding capability ${capabilityId} to agent ${selectedAgent?.id}`);
-        // TODO: Implement add to cart logic
+        const capability = CAPABILITIES.find(c => c.id === capabilityId);
+        if (!capability) return;
+
+        // Parse price to number (remove "Rp " and dots)
+        const priceValue = parseInt(capability.price.replace(/[^0-9]/g, ''));
+
+        const cartItem: CartItem = {
+            id: `capability-${capabilityId}-${selectedAgent?.id || 'no-agent'}`,
+            name: capability.title,
+            price: capability.price,
+            priceValue,
+            type: 'capability',
+            agentId: selectedAgent?.id,
+            agentName: selectedAgent?.name
+        };
+
+        const added = addItem(cartItem);
+        if (added) {
+            showToast(`${capability.title} ditambahkan ke keranjang`, 'success');
+        } else {
+            showToast('Item sudah ada di keranjang', 'info');
+        }
     };
 
     const handleBuyCapability = (capabilityId: string) => {

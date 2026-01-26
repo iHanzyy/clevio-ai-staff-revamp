@@ -7,10 +7,12 @@ import { cn } from "@/lib/utils";
 import { Agent, agentService } from "@/services/agentService";
 import AddOnsTabs from "@/components/features/addons/AddOnsTabs";
 import CapabilitiesSection from "@/components/features/addons/CapabilitiesSection";
-
 import HistorySection from "@/components/features/addons/HistorySection";
 import MessageLimitSection from "@/components/features/addons/MessageLimitSection";
 import AgentSlotSection from "@/components/features/addons/AgentSlotSection";
+import CartPanel from "@/components/features/addons/CartPanel";
+import CartFAB from "@/components/features/addons/CartFAB";
+import { CartProvider } from "@/contexts/CartContext";
 
 type TabType = 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
 
@@ -72,34 +74,41 @@ export default function AddOnsPage() {
     };
 
     return (
-        <div className="w-full h-full p-6 md:px-12 md:py-8 overflow-y-auto">
-            {/* Back to Dashboard Link - Compact */}
-            <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-1 text-gray-400 hover:text-white text-sm font-medium mb-2 transition-colors"
-            >
-                <ChevronLeft className="w-4 h-4" />
-                Kembali ke Dashboard
-            </Link>
+        <CartProvider>
+            <div className="w-full h-full p-6 md:px-12 md:py-8 overflow-y-auto">
+                {/* Back to Dashboard Link - Compact */}
+                <Link
+                    href="/dashboard"
+                    className="inline-flex items-center gap-1 text-gray-400 hover:text-white text-sm font-medium mb-2 transition-colors"
+                >
+                    <ChevronLeft className="w-4 h-4" />
+                    Kembali ke Dashboard
+                </Link>
 
-            {/* Page Title - Compact margin */}
-            <h1 className="text-white font-bold text-3xl md:text-4xl mb-6">
-                Add-Ons
-            </h1>
+                {/* Page Title - Compact margin */}
+                <h1 className="text-white font-bold text-3xl md:text-4xl mb-6">
+                    Add-Ons
+                </h1>
 
-            {/* Tabs Navigation - Compact margin */}
-            <AddOnsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                {/* Tabs Navigation - Compact margin */}
+                <AddOnsTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-            {/* Tab Content - Reduced top margin */}
-            <div className="mt-6">
-                {isLoading ? (
-                    <div className="flex items-center justify-center h-40">
-                        <div className="w-8 h-8 border-4 border-lime-500 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                ) : (
-                    renderTabContent()
-                )}
+                {/* Tab Content - Reduced top margin */}
+                <div className="mt-6">
+                    {isLoading ? (
+                        <div className="flex items-center justify-center h-40">
+                            <div className="w-8 h-8 border-4 border-lime-500 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                    ) : (
+                        renderTabContent()
+                    )}
+                </div>
             </div>
-        </div>
+            {/* Cart FAB - Floating button at bottom right */}
+            <CartFAB />
+
+            {/* Cart Panel - Slides in from right when opened */}
+            <CartPanel />
+        </CartProvider>
     );
 }

@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, MessageSquare, Zap, TrendingUp, Crown, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent } from "@/services/agentService";
+import { useCart, CartItem } from "@/contexts/CartContext";
+import { useToast } from "@/components/ui/ToastProvider";
 
 // Hardcoded packages - prices not final
 const MESSAGE_PACKAGES = [
@@ -60,9 +62,32 @@ export default function MessageLimitSection({ agents, selectedAgent, onSelectAge
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const { addItem } = useCart();
+    const { showToast } = useToast();
+
     const handleAddPackage = (packageId: string) => {
-        console.log(`Adding package ${packageId} to cart for agent ${selectedAgent?.id}`);
-        // TODO: Implement add to cart logic
+        const pkg = MESSAGE_PACKAGES.find(p => p.id === packageId);
+        if (!pkg) return;
+
+        // Parse price to number (remove "Rp " and dots)
+        const priceValue = parseInt(pkg.price.replace(/[^0-9]/g, ''));
+
+        const cartItem: CartItem = {
+            id: `message-limit-${packageId}-${selectedAgent?.id || 'no-agent'}`,
+            name: `${pkg.name} (${pkg.messages.toLocaleString()} pesan)`,
+            price: pkg.price,
+            priceValue,
+            type: 'message-limit',
+            agentId: selectedAgent?.id,
+            agentName: selectedAgent?.name
+        };
+
+        const added = addItem(cartItem);
+        if (added) {
+            showToast(`Paket ${pkg.name} ditambahkan ke keranjang`, 'success');
+        } else {
+            showToast('Item sudah ada di keranjang', 'info');
+        }
     };
 
     const handlePurchase = (packageId: string) => {
