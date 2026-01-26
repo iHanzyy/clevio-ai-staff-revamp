@@ -6,9 +6,11 @@ export default function MainLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="flex flex-col items-center pt-[20px] w-full h-full">
-            {/* Persistent Navbar for Main Routes */}
-            <Navbar />
+        <div className="relative flex flex-col items-center w-full min-h-screen bg-[#FFFAF2]">
+            {/* Persistent Navbar for Main Routes - Absolute positioning to float over hero */}
+            <div className="absolute top-5 z-50 w-full flex justify-center">
+                <Navbar />
+            </div>
 
             {/* Dynamic Page Content */}
             <main className="w-full h-full flex-grow">

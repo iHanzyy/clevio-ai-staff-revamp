@@ -21,6 +21,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght,wdth@8..144,100..1000,25..151&display=swap"
+        />
+      </head>
       <body
         suppressHydrationWarning
         className={`${poppins.variable} antialiased relative min-h-screen w-full overflow-hidden`}
