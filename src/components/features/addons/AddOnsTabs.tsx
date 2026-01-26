@@ -3,7 +3,7 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
-type TabType = 'overview' | 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
+type TabType = 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
 
 interface Tab {
     id: TabType;
@@ -11,7 +11,6 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-    { id: 'overview', label: 'Overview' },
     { id: 'kemampuan-tambahan', label: 'Kemampuan Tambahan' },
     { id: 'limit-pesan', label: 'Tambah Limit Pesan' },
     { id: 'slot-agent', label: 'Tambah Slot Agent' },

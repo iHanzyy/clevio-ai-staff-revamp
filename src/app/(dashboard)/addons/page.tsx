@@ -12,10 +12,10 @@ import HistorySection from "@/components/features/addons/HistorySection";
 import MessageLimitSection from "@/components/features/addons/MessageLimitSection";
 import AgentSlotSection from "@/components/features/addons/AgentSlotSection";
 
-type TabType = 'overview' | 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
+type TabType = 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
 
 export default function AddOnsPage() {
-    const [activeTab, setActiveTab] = useState<TabType>('overview');
+    const [activeTab, setActiveTab] = useState<TabType>('kemampuan-tambahan');
     const [agents, setAgents] = useState<Agent[]>([]);
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +66,6 @@ export default function AddOnsPage() {
                 );
             case 'riwayat':
                 return <HistorySection />;
-            case 'overview':
             default:
                 return null;
         }
