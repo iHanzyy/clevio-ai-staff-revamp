@@ -46,6 +46,12 @@ export default function CapabilitiesSection({ agents, selectedAgent, onSelectAge
 
     const handleAddCapability = (capabilityId: string) => {
         console.log(`Adding capability ${capabilityId} to agent ${selectedAgent?.id}`);
+        // TODO: Implement add to cart logic
+    };
+
+    const handleBuyCapability = (capabilityId: string) => {
+        console.log(`Buying capability ${capabilityId} for agent ${selectedAgent?.id}`);
+        // TODO: Implement payment redirect logic
     };
 
     return (
@@ -124,6 +130,7 @@ export default function CapabilitiesSection({ agents, selectedAgent, onSelectAge
                         description={cap.description}
                         price={cap.price}
                         onAdd={() => handleAddCapability(cap.id)}
+                        onBuy={() => handleBuyCapability(cap.id)}
                     />
                 ))}
             </div>

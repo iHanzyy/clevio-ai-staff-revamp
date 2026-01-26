@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, MessageSquare, Zap, TrendingUp, Crown } from "lucide-react";
+import { ChevronDown, MessageSquare, Zap, TrendingUp, Crown, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent } from "@/services/agentService";
 
@@ -60,9 +60,14 @@ export default function MessageLimitSection({ agents, selectedAgent, onSelectAge
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    const handleAddPackage = (packageId: string) => {
+        console.log(`Adding package ${packageId} to cart for agent ${selectedAgent?.id}`);
+        // TODO: Implement add to cart logic
+    };
+
     const handlePurchase = (packageId: string) => {
         console.log(`Purchasing package ${packageId} for agent ${selectedAgent?.id}`);
-        // TODO: Implement payment logic
+        // TODO: Implement payment redirect logic
     };
 
     return (
@@ -232,17 +237,30 @@ export default function MessageLimitSection({ agents, selectedAgent, onSelectAge
                                     {pkg.price}
                                 </div>
 
-                                <button
-                                    onClick={() => handlePurchase(pkg.id)}
-                                    className={cn(
-                                        "w-full py-3 rounded-xl font-bold text-sm transition-all cursor-pointer",
-                                        pkg.popular
-                                            ? "bg-lime-500 text-white hover:bg-lime-600 shadow-lg shadow-lime-500/20"
-                                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                                    )}
-                                >
-                                    Beli Sekarang
-                                </button>
+                                {/* Action Buttons */}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleAddPackage(pkg.id)}
+                                        className={cn(
+                                            "p-3 rounded-xl transition-all cursor-pointer",
+                                            "border-2 border-lime-500 text-lime-600",
+                                            "bg-transparent hover:bg-lime-50",
+                                            "flex items-center justify-center"
+                                        )}
+                                    >
+                                        <ShoppingCart className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => handlePurchase(pkg.id)}
+                                        className={cn(
+                                            "flex-1 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer",
+                                            "bg-gradient-to-br from-[#65a30d] to-[#84cc16] text-white",
+                                            "hover:opacity-90 shadow-lg shadow-lime-500/20"
+                                        )}
+                                    >
+                                        Beli Sekarang
+                                    </button>
+                                </div>
                             </div>
                         );
                     })}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import { ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CapabilityCardProps {
@@ -10,9 +11,10 @@ interface CapabilityCardProps {
     description: string;
     price: string;
     onAdd?: () => void;
+    onBuy?: () => void;
 }
 
-export default function CapabilityCard({ icon, title, description, price, onAdd }: CapabilityCardProps) {
+export default function CapabilityCard({ icon, title, description, price, onAdd, onBuy }: CapabilityCardProps) {
     return (
         <div className={cn(
             "flex flex-col rounded-2xl overflow-hidden",
@@ -53,19 +55,33 @@ export default function CapabilityCard({ icon, title, description, price, onAdd 
                     {price}
                 </p>
 
-                {/* Add Button */}
-                <button
-                    onClick={onAdd}
-                    className={cn(
-                        "w-full py-2.5 px-4 rounded-lg font-semibold text-sm text-white",
-                        "bg-gradient-to-br from-[#65a30d] to-[#84cc16]",
-                        "hover:opacity-90 active:scale-[0.98]",
-                        "transition-all duration-200",
-                        "cursor-pointer"
-                    )}
-                >
-                    Tambahkan
-                </button>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={onAdd}
+                        className={cn(
+                            "p-2.5 rounded-lg",
+                            "border-2 border-lime-500 text-lime-600",
+                            "bg-transparent hover:bg-lime-50",
+                            "active:scale-[0.98] transition-all duration-200",
+                            "cursor-pointer flex items-center justify-center"
+                        )}
+                    >
+                        <ShoppingCart className="w-5 h-5" />
+                    </button>
+                    <button
+                        onClick={onBuy}
+                        className={cn(
+                            "flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm text-white",
+                            "bg-gradient-to-br from-[#65a30d] to-[#84cc16]",
+                            "hover:opacity-90 active:scale-[0.98]",
+                            "transition-all duration-200",
+                            "cursor-pointer"
+                        )}
+                    >
+                        Beli Sekarang
+                    </button>
+                </div>
             </div>
         </div>
     );
