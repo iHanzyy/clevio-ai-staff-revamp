@@ -1,6 +1,7 @@
 import HeroSection from "@/components/features/home/HeroSection";
 import ArthurSection from "@/components/features/home/ArthurSection";
 import HowItWorksSection from "@/components/features/home/HowItWorksSection";
+import FeaturesSection from "@/components/features/home/FeaturesSection";
 
 export default function LandingPage() {
   return (
@@ -8,6 +9,7 @@ export default function LandingPage() {
       <HeroSection />
       <ArthurSection />
       <HowItWorksSection />
+      <FeaturesSection />
     </main>
   );
 }
