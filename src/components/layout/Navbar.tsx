@@ -29,15 +29,16 @@ export function Navbar({ className }: NavbarProps) {
         <>
             <nav
                 className={cn(
-                    "flex items-center justify-between px-5 py-2 md:px-6 md:py-2.5",
-                    // Dimensions & Background
-                    "w-[95%] max-w-7xl h-auto min-h-[50px] md:min-h-[64px]",
-                    // Liquid Glass Effect (Apple Tech Elegant - Glassmorphism)
-                    "bg-white/20 backdrop-blur-xl backdrop-saturate-150",
-                    "border border-white/30",
-                    "rounded-full",
-                    // Shadow
-                    "shadow-[0_452px_127px_0_rgba(0,0,0,0.01),0_289px_116px_0_rgba(0,0,0,0.04),0_163px_98px_0_rgba(0,0,0,0.15)]",
+                    "flex items-center justify-between",
+                    // Mobile (Figma spec)
+                    "w-[350px] h-[67px] px-3 py-2",
+                    "rounded-[999px] border border-white",
+                    "bg-white/[0.01] backdrop-blur-[2px]",
+                    // Desktop (keep existing glass style)
+                    "md:w-[95%] md:max-w-7xl md:h-auto md:min-h-[64px] md:px-6 md:py-2.5",
+                    "md:bg-white/20 md:backdrop-blur-xl md:backdrop-saturate-150",
+                    "md:border-white/30",
+                    "md:shadow-[0_452px_127px_0_rgba(0,0,0,0.01),0_289px_116px_0_rgba(0,0,0,0.04),0_163px_98px_0_rgba(0,0,0,0.15)]",
                     className,
                     "relative z-50 transition-all duration-300"
                 )}
@@ -50,7 +51,7 @@ export function Navbar({ className }: NavbarProps) {
                             alt="Clevio Logo"
                             width={32}
                             height={34}
-                            className="w-auto h-[34px] md:h-[40px] object-contain"
+                            className="w-auto h-[30px] md:h-[40px] object-contain"
                             priority
                         />
                     </Link>
@@ -197,4 +198,3 @@ export function Navbar({ className }: NavbarProps) {
         </>
     );
 }
-

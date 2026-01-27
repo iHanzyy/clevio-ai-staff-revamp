@@ -27,7 +27,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pt-25">
         {/* Main Text Content */}
         <div className="relative w-full flex flex-col items-center text-center max-w-85 sm:max-w-2xl mx-auto mb-6 sm:mb-8">
-          <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-7 scale-[3] sm:scale-[3] z-0">
+          <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-5 scale-[3] sm:scale-[3] z-0">
             <Image
               src="/shadow.png"
               alt=""
@@ -69,7 +69,7 @@ export default function HeroSection() {
         </div>
 
         {/* Quick Action Chips - Marquee */}
-        <div className="mt-6 w-full overflow-hidden px-6 sm:mt-0 sm:absolute sm:bottom-6 sm:left-0 sm:right-0">
+        <div className="mt-4 w-full overflow-hidden px-6 sm:mt-0 sm:absolute sm:bottom-6 sm:left-0 sm:right-0">
           <div className="flex animate-marquee-scroll px-4">
             {marqueeChips.map((label, index) => (
               <button
