@@ -31,7 +31,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className={`${poppins.variable} antialiased relative min-h-screen w-full overflow-hidden`}
+        className={`${poppins.variable} antialiased relative min-h-screen w-full overflow-x-hidden`}
       >
         {/* Persistent Content Wrapper */}
         <div className="relative z-10 flex flex-col items-center w-full h-full">
