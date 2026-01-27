@@ -5,6 +5,7 @@ import FeaturesSection from "@/components/features/home/FeaturesSection";
 import TestimonialsSection from "@/components/features/home/TestimonialsSection";
 import ComparisonSection from "@/components/features/home/ComparisonSection";
 import PricingSection from "@/components/features/home/PricingSection";
+import CtaSection from "@/components/features/home/CtaSection";
 
 export default function LandingPage() {
   return (
@@ -16,6 +17,7 @@ export default function LandingPage() {
       <TestimonialsSection />
       <ComparisonSection />
       <PricingSection />
+      <CtaSection />
     </main>
   );
 }
