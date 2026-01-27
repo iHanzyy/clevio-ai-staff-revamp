@@ -2,6 +2,7 @@ import HeroSection from "@/components/features/home/HeroSection";
 import ArthurSection from "@/components/features/home/ArthurSection";
 import HowItWorksSection from "@/components/features/home/HowItWorksSection";
 import FeaturesSection from "@/components/features/home/FeaturesSection";
+import TestimonialsSection from "@/components/features/home/TestimonialsSection";
 
 export default function LandingPage() {
   return (
@@ -10,6 +11,7 @@ export default function LandingPage() {
       <ArthurSection />
       <HowItWorksSection />
       <FeaturesSection />
+      <TestimonialsSection />
     </main>
   );
 }
