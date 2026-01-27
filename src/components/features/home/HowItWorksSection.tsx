@@ -26,36 +26,51 @@ const stepsData = [
 
 export default function HowItWorksSection() {
     return (
-        <section
-            className="relative w-full py-16 px-6 sm:px-8 md:px-12 lg:px-16 font-google-sans-flex"
-            style={{
-                backgroundColor: '#FFFAF2'
-            }}
-        >
-            {/* Section Header */}
-            <div className="max-w-4xl mx-auto text-center mb-12">
-                <h2 className="font-bold text-2xl sm:text-3xl md:text-4xl text-gray-900 mb-3">
-                    Cara Kerja Staf AI
-                </h2>
-                <p className="font-medium text-[15px] text-gray-700">
-                    Mulai dengan Staf AI Anda dalam 3 langkah mudah
-                </p>
+        <section className="relative w-full font-google-sans-flex">
+            {/* Main Content */}
+            <div
+                className="pt-16 pb-12 px-6 sm:px-8 md:px-12 lg:px-16"
+                style={{ backgroundColor: '#FFFAF2' }}
+            >
+                {/* Section Header */}
+                <div className="max-w-4xl mx-auto text-center mb-12">
+                    <h2 className="font-bold text-2xl sm:text-3xl md:text-4xl text-gray-900 mb-3">
+                        Cara Kerja Staf AI
+                    </h2>
+                    <p className="font-medium text-[15px] text-gray-700">
+                        Mulai dengan Staf AI Anda dalam 3 langkah mudah
+                    </p>
+                </div>
+
+                {/* Steps Container */}
+                <div className="max-w-5xl mx-auto">
+                    <div className="flex flex-col md:flex-row justify-center items-start gap-4 md:gap-6 lg:gap-8">
+                        {stepsData.map((step) => (
+                            <StepCard
+                                key={step.stepNumber}
+                                stepNumber={step.stepNumber}
+                                imageSrc={step.imageSrc}
+                                title={step.title}
+                                description={step.description}
+                            />
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            {/* Steps Container */}
-            <div className="max-w-5xl mx-auto">
-                <div className="flex flex-col md:flex-row justify-center items-start gap-4 md:gap-6 lg:gap-8">
-                    {stepsData.map((step) => (
-                        <StepCard
-                            key={step.stepNumber}
-                            stepNumber={step.stepNumber}
-                            imageSrc={step.imageSrc}
-                            title={step.title}
-                            description={step.description}
-                        />
-                    ))}
-                </div>
+            {/* Bottom Wave */}
+            <div className="w-full" style={{ marginTop: '-1px' }}>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 388 115"
+                    fill="none"
+                    className="w-full h-auto"
+                    preserveAspectRatio="none"
+                >
+                    <path d="M390 0C327.334 55.2819 0 -2.17545 0 61.2232C0 124.622 0 117.785 0 117.785H390V0Z" fill="#02457A" />
+                </svg>
             </div>
         </section>
     );
 }
+
