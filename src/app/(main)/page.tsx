@@ -3,6 +3,7 @@ import ArthurSection from "@/components/features/home/ArthurSection";
 import HowItWorksSection from "@/components/features/home/HowItWorksSection";
 import FeaturesSection from "@/components/features/home/FeaturesSection";
 import TestimonialsSection from "@/components/features/home/TestimonialsSection";
+import ComparisonSection from "@/components/features/home/ComparisonSection";
 
 export default function LandingPage() {
   return (
@@ -12,6 +13,7 @@ export default function LandingPage() {
       <HowItWorksSection />
       <FeaturesSection />
       <TestimonialsSection />
+      <ComparisonSection />
     </main>
   );
 }
