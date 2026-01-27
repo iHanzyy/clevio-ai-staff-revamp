@@ -12,14 +12,27 @@ const testimonialsData = [
         title: "Impact Incubator",
         testimonial: "Saya memakai staf AI untuk membantu pekerjaan saya agar tugas-tugas rutin bisa selesai lebih cepat dan akurat."
     },
-    // Placeholder for more testimonials
-    // {
-    //     id: 2,
-    //     imageSrc: "/sinta.png",
-    //     name: "Sinta Kaniawati",
-    //     title: "Ketua Dewan Pengurus Bina Antarbudaya",
-    //     testimonial: "..."
-    // },
+    {
+        id: 2,
+        imageSrc: "/sinta.png",
+        name: "Sinta Kaniawati",
+        title: "Ketua Dewan Pengurus Bina Antarbudaya",
+        testimonial: "Saya memakai staf AI untuk membantu pekerjaan saya agar tugas-tugas rutin bisa selesai lebih cepat dan akurat."
+    },
+    {
+        id: 3,
+        imageSrc: "/gatot.png",
+        name: "Gatot Nuradi Sam",
+        title: "Executive Director Bina Antarbudaya",
+        testimonial: "Saya memakai staf AI untuk membantu pekerjaan saya agar tugas-tugas rutin bisa selesai lebih cepat dan akurat."
+    },
+    {
+        id: 4,
+        imageSrc: "/kemal.png",
+        name: "Dr. Kemal H.S. Ist",
+        title: "Konsultan Manajemen Governence, Risk and Compliance",
+        testimonial: "Saya memakai staf AI untuk membantu pekerjaan saya agar tugas-tugas rutin bisa selesai lebih cepat dan akurat."
+    }
 ];
 
 export default function TestimonialsSection() {
@@ -62,13 +75,10 @@ export default function TestimonialsSection() {
             </div>
 
             {/* Main Content */}
-            <div
-                className="py-16 px-6 sm:px-8 md:px-12 lg:px-16"
-                style={{ backgroundColor: '#FFFAF2' }}
-            >
+            <div style={{ backgroundColor: '#FFFAF2' }}>
                 {/* Section Header */}
-                <div className="max-w-4xl mx-auto text-center mb-16">
-                    <h2 className="font-bold text-[24px] text-gray-900 mb-3">
+                <div className="max-w-4xl mx-auto text-center pt-16 mb-8 px-6 sm:px-8 md:px-12 lg:px-16">
+                    <h2 className="font-bold text-[24px] text-gray-900">
                         Ini kata mereka
                     </h2>
                     <p className="font-medium text-[15px] text-gray-700">
@@ -76,12 +86,12 @@ export default function TestimonialsSection() {
                     </p>
                 </div>
 
-                {/* Testimonials Carousel */}
-                <div className="max-w-5xl mx-auto">
+                {/* Testimonials Carousel - Full width, no padding */}
+                <div className="w-full">
                     <div
                         ref={carouselRef}
                         onScroll={handleScroll}
-                        className="flex gap-6 overflow-x-auto pb-8 pt-10 px-4 snap-x snap-mandatory scrollbar-hide"
+                        className="flex gap-6 overflow-x-auto pb-8 pt-10 snap-x snap-mandatory scrollbar-hide"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         {testimonialsData.map((testimonial) => (
@@ -98,14 +108,14 @@ export default function TestimonialsSection() {
 
                     {/* Carousel Indicators */}
                     {testimonialsData.length > 1 && (
-                        <div className="flex justify-center gap-2 mt-6">
+                        <div className="flex justify-center gap-2 mt-6 pb-16">
                             {testimonialsData.map((_, index) => (
                                 <button
                                     key={index}
                                     onClick={() => scrollToIndex(index)}
                                     className={`h-2 rounded-full transition-all duration-300 ${index === activeIndex
-                                            ? 'w-8 bg-gray-800'
-                                            : 'w-2 bg-gray-400'
+                                        ? 'w-8 bg-gray-800'
+                                        : 'w-2 bg-gray-400'
                                         }`}
                                     aria-label={`Go to testimonial ${index + 1}`}
                                 />

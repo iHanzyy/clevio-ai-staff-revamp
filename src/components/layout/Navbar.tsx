@@ -173,7 +173,7 @@ export function Navbar({ className }: NavbarProps) {
                                                 href={item.path}
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                 className={cn(
-                                                    "flex items-center justify-between px-6 py-4 rounded-[1.5rem] transition-all duration-200 group",
+                                                    "flex items-center justify-between px-6 py-4 rounded-3xl transition-all duration-200 group",
                                                     isActive
                                                         ? "bg-white/60 shadow-sm"
                                                         : "hover:bg-white/30"

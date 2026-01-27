@@ -21,19 +21,18 @@ export default function TestimonialCard({ imageSrc, name, title, testimonial }: 
         >
             {/* Profile Image - positioned at top-left overlapping card */}
             <div
-                className="absolute -top-8 left-4 w-16 h-16 overflow-hidden"
+                className="absolute -top-10 left-5 w-20 h-20 overflow-hidden"
                 style={{
                     borderRadius: '74px',
                     border: '1px solid #2563EB',
                     background: '#2563EB',
-                    boxShadow: '0 0 11.2px 0 #2563EB'
                 }}
             >
                 <Image
                     src={imageSrc}
                     alt={name}
-                    width={64}
-                    height={64}
+                    width={128}
+                    height={128}
                     className="w-full h-full object-cover"
                 />
             </div>
