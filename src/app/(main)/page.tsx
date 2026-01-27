@@ -4,6 +4,7 @@ import HowItWorksSection from "@/components/features/home/HowItWorksSection";
 import FeaturesSection from "@/components/features/home/FeaturesSection";
 import TestimonialsSection from "@/components/features/home/TestimonialsSection";
 import ComparisonSection from "@/components/features/home/ComparisonSection";
+import PricingSection from "@/components/features/home/PricingSection";
 
 export default function LandingPage() {
   return (
@@ -14,6 +15,7 @@ export default function LandingPage() {
       <FeaturesSection />
       <TestimonialsSection />
       <ComparisonSection />
+      <PricingSection />
     </main>
   );
 }
