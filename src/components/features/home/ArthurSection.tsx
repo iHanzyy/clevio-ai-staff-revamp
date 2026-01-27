@@ -45,7 +45,7 @@ export default function ArthurSection() {
                 </svg>
 
                 {/* Content positioned INSIDE the wave area */}
-                <div className="relative z-10 flex flex-col justify-center h-full pt-40 pb-8 px-6 sm:px-8 md:px-12 lg:px-16">
+                <div className="relative z-10 flex flex-col justify-center h-full pt-35 pb-8 px-6 sm:px-8 md:px-12 lg:px-16">
                     {/* Heading */}
                     <div className="max-w-4xl mx-auto mb-6 w-full">
                         <h2 className="text-center text-xl sm:text-2xl md:text-3xl leading-normal text-gray-800" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
