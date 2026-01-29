@@ -6,8 +6,22 @@ interface PaymentData {
   status: string;
   access_token?: string;
   plan_code?: string;
+  timestamp: number; // For TTL cleanup
 }
 const paymentDataStore: Map<string, PaymentData> = new Map();
+
+// Cleanup expired payments (older than 1 hour) every 10 minutes
+// Prevents memory leak in long-running process
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, data] of paymentDataStore.entries()) {
+      if (now - data.timestamp > 3600 * 1000) {
+        paymentDataStore.delete(key);
+      }
+    }
+  }, 600 * 1000);
+}
 
 /**
  * GET /api/v1/payment/status?order_id=xxx
@@ -71,6 +85,7 @@ export async function POST(request: NextRequest) {
       status,
       access_token,
       plan_code,
+      timestamp: Date.now()
     });
 
     return NextResponse.json({

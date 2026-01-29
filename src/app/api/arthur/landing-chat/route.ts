@@ -1,35 +1,37 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 import https from 'https';
+import { rateLimit } from '@/lib/rateLimit';
+import { headers } from 'next/headers';
 
 export async function POST(req: Request) {
     try {
+        // Rate Limit: 30 messages per minute per IP
+        const ip = headers().get('x-forwarded-for') || 'unknown';
+        if (!rateLimit(ip, 30, 60000)) {
+            return NextResponse.json({ error: 'Too many messages. Please slow down.' }, { status: 429 });
+        }
+
         const body = await req.json();
         const n8nUrl = process.env.N8N_CHAT_WEBHOOK_URL;
 
         if (!n8nUrl) {
             console.error("[LandingChatProxy] Error: N8N_CHAT_WEBHOOK_URL is missing.");
-            return NextResponse.json(
-                { error: 'Server misconfiguration: N8N_CHAT_WEBHOOK_URL not set' },
-                { status: 500 }
-            );
+            return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
         }
 
-        // Force IPv4 to resolve connectivity issues on some VPS environments
         const agent = new https.Agent({ family: 4 });
 
         const response = await axios.post(n8nUrl, body, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             httpsAgent: agent,
             validateStatus: () => true,
         });
 
         if (response.status >= 400) {
-            console.error('[LandingChatProxy] N8N Error Response:', response.data);
+            console.error('[LandingChatProxy] N8N Error:', response.data);
             return NextResponse.json(
-                { error: 'Failed to communicate with AI service', details: response.data },
+                { error: 'Failed to process message' },
                 { status: response.status }
             );
         }
@@ -39,7 +41,7 @@ export async function POST(req: Request) {
     } catch (error: any) {
         console.error('[LandingChatProxy] Internal Error:', error.message);
         return NextResponse.json(
-            { error: 'Internal Server Error', details: error.message },
+            { error: 'An unexpected error occurred' },
             { status: 500 }
         );
     }
