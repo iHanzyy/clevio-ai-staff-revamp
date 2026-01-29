@@ -52,6 +52,7 @@ export default function HowItWorksSection() {
                                 imageSrc={step.imageSrc}
                                 title={step.title}
                                 description={step.description}
+                                priority={step.stepNumber === 1}
                             />
                         ))}
                     </div>

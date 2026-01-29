@@ -7,9 +7,10 @@ interface StepCardProps {
     imageSrc: string;
     title: string;
     description: string;
+    priority?: boolean;
 }
 
-export default function StepCard({ stepNumber, imageSrc, title, description }: StepCardProps) {
+export default function StepCard({ stepNumber, imageSrc, title, description, priority = false }: StepCardProps) {
     return (
         <div className="relative w-full max-w-[349px] mx-auto">
             {/* Step Number Badge - positioned top-left, overlapping the card */}
@@ -38,6 +39,8 @@ export default function StepCard({ stepNumber, imageSrc, title, description }: S
                         src={imageSrc}
                         alt={title}
                         fill
+                        priority={priority}
+                        sizes="(max-width: 768px) 100vw, 350px"
                         className="object-cover"
                         style={{ borderRadius: '20px' }}
                     />

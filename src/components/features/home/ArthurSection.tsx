@@ -1,17 +1,284 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { agentService } from "@/services/agentService";
+
+interface Message {
+    id: number;
+    from: "arthur" | "user";
+    text: string;
+}
 
 export default function ArthurSection() {
+    const router = useRouter();
     const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState<Message[]>([
+        { id: 1, from: "arthur", text: "Halo! Saya Arthur, AI Creator yang siap membantu Anda." }
+    ]);
     const [isTyping, setIsTyping] = useState(false);
+    const [isProcessingFinal, setIsProcessingFinal] = useState(false);
 
-    const handleSendMessage = () => {
-        if (message.trim()) {
-            // TODO: Handle send message logic
-            console.log("Message sent:", message);
-            setMessage("");
+    // State to hold session and credentials
+    const [sessionId, setSessionId] = useState("");
+    const [credentials, setCredentials] = useState({ email: "", password: "" });
+
+    // Ref for auto-scroll
+    const chatContainerRef = useRef<HTMLDivElement>(null);
+
+    // Polling ref
+    const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Initialize session and credentials on mount
+    useEffect(() => {
+        // Generate random credentials
+        const randomString = Math.random().toString(36).substring(2, 10);
+        const generatedEmail = `${randomString}@clevio.staff`;
+        const generatedPassword = `${randomString}1`;
+
+        // Generate random session ID
+        const generatedSessionId = `arthur-session-${Math.random().toString(36).substring(2, 9)}`;
+
+        setCredentials({
+            email: generatedEmail,
+            password: generatedPassword
+        });
+        setSessionId(generatedSessionId);
+    }, []);
+
+    // Auto-scroll to bottom when messages change
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages, isTyping]);
+
+    // Cleanup polling on unmount
+    useEffect(() => {
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+        };
+    }, []);
+
+    // Start polling for agent data from webhook
+    const startPollingForAgentData = () => {
+        if (pollingIntervalRef.current) return; // Already polling
+
+        let pollCount = 0;
+        const maxPolls = 60; // 60 * 2s = 2 minutes max
+
+        pollingIntervalRef.current = setInterval(async () => {
+            pollCount++;
+
+            if (pollCount > maxPolls) {
+                // Timeout - stop polling
+                if (pollingIntervalRef.current) {
+                    clearInterval(pollingIntervalRef.current);
+                    pollingIntervalRef.current = null;
+                }
+                setIsTyping(false);
+                setMessages(prev => [...prev, {
+                    id: Date.now(),
+                    from: "arthur",
+                    text: "Maaf, terjadi timeout. Silakan coba lagi."
+                }]);
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/webhooks/arthur/agent-created?session_id=${sessionId}`);
+
+                if (res.ok) {
+                    const agentData = await res.json();
+
+                    if (agentData && agentData.name) {
+                        // Stop polling
+                        if (pollingIntervalRef.current) {
+                            clearInterval(pollingIntervalRef.current);
+                            pollingIntervalRef.current = null;
+                        }
+
+                        // Save to localStorage
+                        localStorage.setItem('agent_payload', JSON.stringify(agentData));
+
+                        // Show success message
+                        setMessages(prev => [...prev, {
+                            id: Date.now(),
+                            from: "arthur",
+                            text: "Agen Anda berhasil dibuat! Sedang memproses akun Anda..."
+                        }]);
+
+                        setIsTyping(false);
+                        setIsProcessingFinal(true);
+
+                        // Proceed to registration and agent creation
+                        await handleFinalRegistration(agentData);
+                    }
+                }
+            } catch (err) {
+                console.error("[ArthurSection] Polling error:", err);
+            }
+        }, 2000); // Poll every 2 seconds
+    };
+
+    const handleFinalRegistration = async (agentData: any) => {
+        try {
+            // Step 1: Hit register webhook and get access_token
+            const registerResponse = await fetch('/api/arthur/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: credentials.email,
+                    password: credentials.password
+                })
+            });
+
+            const registerData = await registerResponse.json();
+            console.log("[ArthurSection] Register response:", registerData);
+
+            // Step 2: Extract and save access_token (Handle Array or Object)
+            let accessToken;
+            if (Array.isArray(registerData) && registerData.length > 0) {
+                accessToken = registerData[0].access_token;
+            } else {
+                accessToken = registerData.access_token;
+            }
+
+            const tokenToUse = accessToken; // alias for clarity
+
+            if (accessToken) {
+                // Save to localStorage (for API calls)
+                localStorage.setItem('jwt_token', accessToken);
+
+                // Save to cookie (for middleware protection)
+                document.cookie = `session_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+
+                console.log("[ArthurSection] Access token saved successfully");
+
+                // Step 3: Create agent using Proxy (to avoid CORS)
+                try {
+                    console.log("[ArthurSection] Creating agent via Proxy...");
+                    const createAgentResponse = await fetch('/api/agents/create', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            payload: agentData,
+                            token: tokenToUse
+                        })
+                    });
+
+                    if (!createAgentResponse.ok) {
+                        throw new Error("Failed to create agent via proxy");
+                    }
+
+                    console.log("[ArthurSection] Agent created successfully via Proxy");
+
+                } catch (agentError) {
+                    console.error("[ArthurSection] Failed to create agent:", agentError);
+                    // Still redirect even if agent creation fails
+                }
+            } else {
+                console.warn("[ArthurSection] No access_token received from register webhook");
+            }
+
+            // Step 4: Redirect to dashboard
+            router.push('/dashboard');
+
+        } catch (error) {
+            console.error("[ArthurSection] Registration error:", error);
+            // Still try to redirect
+            router.push('/dashboard');
+        }
+    };
+
+    const handleSendMessage = async () => {
+        if (!message.trim() || isTyping || isProcessingFinal) return;
+
+        // Add user message
+        const userMsg: Message = { id: Date.now(), from: "user", text: message };
+        setMessages(prev => [...prev, userMsg]);
+        setMessage("");
+        setIsTyping(true);
+
+        try {
+            const response = await fetch('/api/arthur/landing-chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionId: sessionId,
+                    chatInput: userMsg.text,
+                    email: credentials.email,
+                    password: credentials.password
+                })
+            });
+
+            const data = await response.json();
+            console.log("[ArthurSection] Chat response:", data);
+
+            // Extract response text from various N8N response formats
+            let responseText = "";
+
+            if (Array.isArray(data) && data.length > 0 && data[0].system_prompt) {
+                // Direct agent data response - process immediately
+                console.log("[ArthurSection] Direct agent data received");
+                localStorage.setItem('agent_payload', JSON.stringify(data[0]));
+                setMessages(prev => [...prev, {
+                    id: Date.now() + 1,
+                    from: "arthur",
+                    text: "Agen Anda berhasil dibuat! Sedang memproses..."
+                }]);
+                setIsTyping(false);
+                setIsProcessingFinal(true);
+                await handleFinalRegistration(data[0]);
+                return;
+            } else if (data.output) {
+                responseText = data.output;
+            } else if (data.text) {
+                responseText = data.text;
+            } else if (typeof data === 'string') {
+                responseText = data;
+            } else if (data.message) {
+                responseText = data.message;
+            } else {
+                responseText = "Saya mengerti. Bisa Anda jelaskan lebih lanjut?";
+            }
+
+            // Add Arthur's response
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                from: "arthur",
+                text: responseText
+            }]);
+
+            // ALWAYS start polling after every response (runs in background)
+            // Polling will check if N8N has posted agent data to webhook
+            startPollingForAgentData();
+
+            // Don't set isTyping false yet - polling will handle it
+            // But set a timeout to stop typing indicator if no data found quickly
+            setTimeout(() => {
+                if (!isProcessingFinal) {
+                    setIsTyping(false);
+                }
+            }, 3000);
+
+        } catch (error) {
+            console.error("[ArthurSection] Chat error:", error);
+            setIsTyping(false);
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                from: "arthur",
+                text: "Maaf, terjadi kesalahan koneksi. Silakan coba lagi."
+            }]);
         }
     };
 
@@ -20,14 +287,6 @@ export default function ArthurSection() {
             handleSendMessage();
         }
     };
-
-    // Dummy chat messages
-    const chatMessages = [
-        { id: 1, from: "arthur", text: "Halo! Saya Arthur, AI Creator yang siap membantu Anda." },
-        { id: 2, from: "user", text: "Hai Arthur, saya ingin membuat staf AI untuk customer service." },
-        { id: 3, from: "arthur", text: "Tentu! Saya akan membantu Anda membuat AI staf untuk customer service. Apa nama yang ingin Anda berikan?" },
-        { id: 4, from: "user", text: "Bagaimana kalau kita beri nama \"Sarah\"?" },
-    ];
 
     return (
         <section className="relative w-full font-google-sans-flex -mt-60">
@@ -61,6 +320,7 @@ export default function ArthurSection() {
                                     src="/arthurProfile.webp"
                                     alt="Arthur"
                                     fill
+                                    sizes="60px"
                                     className="object-cover"
                                 />
                             </div>
@@ -88,19 +348,22 @@ export default function ArthurSection() {
                 }}
             >
                 {/* Chat Messages Container */}
-                <div className="max-w-3xl mx-auto mb-8 space-y-4">
-                    {chatMessages.map((msg) => (
+                <div
+                    ref={chatContainerRef}
+                    className="max-w-3xl mx-auto mb-8 space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300"
+                >
+                    {messages.map((msg) => (
                         <div
                             key={msg.id}
                             className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"} animate-fade-in-up`}
                         >
                             <div
-                                className={`max-w-[70%] sm:max-w-[60%] px-5 py-3.5 rounded-3xl shadow-md ${msg.from === "arthur"
+                                className={`max-w-[70%] sm:max-w-[80%] px-5 py-3.5 rounded-3xl shadow-md ${msg.from === "arthur"
                                     ? "bg-[#2563EB] text-white"
                                     : "bg-[#02457A] text-white"
                                     }`}
                             >
-                                <p className="text-sm sm:text-base leading-relaxed">{msg.text}</p>
+                                <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                             </div>
                         </div>
                     ))}
@@ -128,12 +391,13 @@ export default function ArthurSection() {
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             onKeyPress={handleKeyPress}
-                            className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base"
+                            disabled={isTyping || isProcessingFinal}
+                            className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base disabled:opacity-50"
                         />
                         {/* Button INSIDE input */}
                         <button
                             onClick={handleSendMessage}
-                            disabled={!message.trim()}
+                            disabled={!message.trim() || isTyping || isProcessingFinal}
                             className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-[#2563EB] rounded-full flex items-center justify-center hover:bg-[#1d4ed8] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Send Message"
                         >
@@ -142,6 +406,7 @@ export default function ArthurSection() {
                                     src="/starIcon.png"
                                     alt="Send"
                                     fill
+                                    sizes="20px"
                                     className="object-contain"
                                 />
                             </div>

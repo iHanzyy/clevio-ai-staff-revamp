@@ -37,14 +37,28 @@ export async function GET(request: NextRequest) {
 
 /**
  * POST /api/v1/payment/status
- * Set payment status (called by n8n after Midtrans callback)
- * Receives: order_id, status, access_token, plan_code from N8N
+ * Set payment status (called by n8n after Midtrans callback OR for trial activation)
+ * 
+ * For PAID: Receives order_id, status, access_token, plan_code from N8N
+ * For TRIAL: Receives access_token, plan_code (no order_id/status needed)
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { order_id, status, access_token, plan_code } = body;
 
+    // TRIAL flow: no order_id/status required, just return success with token info
+    if (plan_code === 'TRIAL') {
+      console.log('[PaymentStatus] Trial activation - access_token received');
+      return NextResponse.json({
+        success: true,
+        plan_code: 'TRIAL',
+        access_token: access_token,
+        message: 'Trial activated successfully'
+      });
+    }
+
+    // PAID flow: requires order_id and status
     if (!order_id || !status) {
       return NextResponse.json(
         { success: false, message: 'Missing order_id or status' },
@@ -63,7 +77,7 @@ export async function POST(request: NextRequest) {
       success: true,
       order_id,
       status,
-      access_token: access_token ? 'received' : undefined,
+      access_token: access_token,
       plan_code,
     });
   } catch {

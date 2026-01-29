@@ -60,6 +60,7 @@ export default function HeroSection() {
                     src="/starIcon.png"
                     alt="Star"
                     fill
+                    sizes="20px"
                     className="object-contain"
                   />
                 </div>
