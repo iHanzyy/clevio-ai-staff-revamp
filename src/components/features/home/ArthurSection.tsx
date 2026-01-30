@@ -68,7 +68,7 @@ export default function ArthurSection() {
         if (pollingIntervalRef.current) return; // Already polling
 
         let pollCount = 0;
-        const maxPolls = 60; // 60 * 2s = 2 minutes max
+        const maxPolls = 120; // 120 * 2s = 4 minutes max
 
         pollingIntervalRef.current = setInterval(async () => {
             pollCount++;

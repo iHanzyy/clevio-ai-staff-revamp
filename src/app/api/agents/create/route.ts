@@ -7,7 +7,8 @@ import { headers } from 'next/headers';
 export async function POST(req: Request) {
     try {
         // 1. Rate Limiting Protection (Max 10 requests per minute per IP for creation)
-        const ip = headers().get('x-forwarded-for') || 'unknown';
+        const headerList = await headers();
+        const ip = headerList.get('x-forwarded-for') || 'unknown';
         if (!rateLimit(ip, 10, 60000)) {
             return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
         }

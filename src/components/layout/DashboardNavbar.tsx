@@ -9,11 +9,13 @@ import { useRouter } from "next/navigation";
 import { authService } from "@/services/authService";
 import type { User } from "@/services/authService";
 import SettingsModal from "@/components/features/dashboard/SettingsModal";
+import TrialPopup from "@/components/ui/TrialPopup";
 
 export default function DashboardNavbar({ showCreateButton = true }: { showCreateButton?: boolean }) {
     const router = useRouter();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const profileRef = React.useRef<HTMLDivElement>(null);
 
@@ -114,7 +116,11 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                                     </button>
                                     <button
                                         onClick={() => {
-                                            router.push('/addons');
+                                            if (user?.plan_code === 'TRIAL') {
+                                                setIsTrialPopupOpen(true);
+                                            } else {
+                                                router.push('/addons');
+                                            }
                                             setIsProfileOpen(false);
                                         }}
                                         className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
@@ -143,6 +149,14 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                 isOpen={isSettingsOpen}
                 onClose={() => setIsSettingsOpen(false)}
                 user={user}
+            />
+
+            {/* Trial Popup */}
+            <TrialPopup
+                isOpen={isTrialPopupOpen}
+                onClose={() => setIsTrialPopupOpen(false)}
+                type="feature"
+                message="Fitur Add-Ons hanya tersedia untuk pengguna terdaftar. Silakan Sign In untuk membeli."
             />
         </>
     );

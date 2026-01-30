@@ -6,10 +6,17 @@ import { cn } from "@/lib/utils";
 import WhatsAppModal from "./WhatsAppModal";
 import { Agent } from "@/services/agentService";
 import { whatsappService } from "@/services/whatsappService";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
+import TrialPopup from "@/components/ui/TrialPopup";
 
 export default function AgentIntegrations({ selectedAgent }: { selectedAgent: Agent | null }) {
+
     const [isWAModalOpen, setIsWAModalOpen] = useState(false);
     const [waStatus, setWaStatus] = useState<"active" | "inactive">("inactive");
+
+    // Trial Logic
+    const { isTrial } = useTrialStatus();
+    const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
 
     const fetchStatus = async () => {
         if (!selectedAgent) return;
@@ -34,35 +41,53 @@ export default function AgentIntegrations({ selectedAgent }: { selectedAgent: Ag
         <div className={cn(
             "w-full px-6 py-6 rounded-[1rem] h-full", // h-full
             "bg-[#FDFDFD]",
-            "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]"
+            "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
+            "relative overflow-hidden" // Needed for overlay
         )}>
-            <h3 className="text-gray-900 font-bold text-lg mb-1">Integrasi Agent</h3>
-            <div className="grid grid-cols-2 gap-4">
-                <IntegrationCard
-                    src="/iconWhatsapp.svg"
-                    label="WhatsApp"
-                    status={waStatus}
-                    onClick={() => {
-                        if (selectedAgent) setIsWAModalOpen(true);
-                    }}
-                />
-                <IntegrationCard src="/iconTelegram.svg" label="Telegram" status="coming_soon" />
-                <IntegrationCard src="/iconInstagram.svg" label="Instagram" status="coming_soon" />
-                <IntegrationCard src="/iconEmbed.svg" label="Embed" status="inactive" />
+            {/* Trial Overlay - Must be FIRST and OUTSIDE content */}
+            {isTrial && (
+                <div
+                    className="absolute inset-0 z-20 cursor-pointer"
+                    onClick={() => setIsTrialPopupOpen(true)}
+                ></div>
+            )}
+
+            <div className={cn(isTrial && "opacity-50 grayscale")}>
+                <h3 className="text-gray-900 font-bold text-lg mb-1">Integrasi Agent</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    <IntegrationCard
+                        src="/iconWhatsapp.svg"
+                        label="WhatsApp"
+                        status={waStatus}
+                        onClick={() => {
+                            if (selectedAgent) setIsWAModalOpen(true);
+                        }}
+                    />
+                    <IntegrationCard src="/iconTelegram.svg" label="Telegram" status="coming_soon" />
+                    <IntegrationCard src="/iconInstagram.svg" label="Instagram" status="coming_soon" />
+                    <IntegrationCard src="/iconEmbed.svg" label="Embed" status="inactive" />
+                </div>
+
+                {selectedAgent && (
+                    <WhatsAppModal
+                        isOpen={isWAModalOpen}
+                        onClose={() => {
+                            setIsWAModalOpen(false);
+                            fetchStatus(); // Refresh on close as fallback
+                        }}
+                        agentId={selectedAgent.id}
+                        agentName={selectedAgent.name}
+                        onStatusChange={fetchStatus}
+                    />
+                )}
             </div>
 
-            {selectedAgent && (
-                <WhatsAppModal
-                    isOpen={isWAModalOpen}
-                    onClose={() => {
-                        setIsWAModalOpen(false);
-                        fetchStatus(); // Refresh on close as fallback
-                    }}
-                    agentId={selectedAgent.id}
-                    agentName={selectedAgent.name}
-                    onStatusChange={fetchStatus}
-                />
-            )}
+            <TrialPopup
+                isOpen={isTrialPopupOpen}
+                onClose={() => setIsTrialPopupOpen(false)}
+                type="feature"
+                message="Integrasi Agent hanya tersedia untuk pengguna terdaftar."
+            />
         </div>
     );
 }

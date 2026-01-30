@@ -13,6 +13,9 @@ import AgentSlotSection from "@/components/features/addons/AgentSlotSection";
 import CartPanel from "@/components/features/addons/CartPanel";
 import CartFAB from "@/components/features/addons/CartFAB";
 import { CartProvider } from "@/contexts/CartContext";
+import { useRouter } from "next/navigation";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
+import TrialPopup from "@/components/ui/TrialPopup";
 
 type TabType = 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
 
@@ -21,6 +24,20 @@ export default function AddOnsPage() {
     const [agents, setAgents] = useState<Agent[]>([]);
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
+    const { isTrial, isLoading: isTrialLoading } = useTrialStatus();
+
+    // Block Trial Users
+    if (isTrial && !isTrialLoading) {
+        return (
+            <TrialPopup
+                isOpen={true}
+                onClose={() => router.push('/dashboard')}
+                type="feature"
+                message="Fitur Add-Ons hanya tersedia untuk pengguna terdaftar. Silakan Sign In untuk membeli."
+            />
+        );
+    }
 
     // Fetch agents on mount
     useEffect(() => {

@@ -7,7 +7,8 @@ import { headers } from 'next/headers';
 export async function POST(req: Request) {
     try {
         // Rate Limit: 5 registrations per minute per IP
-        const ip = headers().get('x-forwarded-for') || 'unknown';
+        const headerList = await headers();
+        const ip = headerList.get('x-forwarded-for') || 'unknown';
         if (!rateLimit(ip, 5, 60000)) {
             return NextResponse.json({ error: 'Too many registration attempts.' }, { status: 429 });
         }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import DashboardNavbar from "@/components/layout/DashboardNavbar";
+import TrialTimer from "@/components/features/dashboard/TrialTimer";
 
 export const metadata: Metadata = {
     title: "Dashboard - Clevio AI Staff",
@@ -13,6 +14,7 @@ export default function DashboardLayout({
 }>) {
     return (
         <div className="h-screen w-full bg-[#14161B] text-white flex flex-col overflow-hidden">
+            <TrialTimer />
             {/* Navbar pinned to top */}
             <DashboardNavbar />
 

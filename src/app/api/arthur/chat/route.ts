@@ -8,7 +8,8 @@ import { headers } from 'next/headers';
 export async function POST(req: Request) {
     try {
         // Rate Limit for Dashboard: 100 req/min (higher than landing)
-        const ip = headers().get('x-forwarded-for') || 'unknown';
+        const headerList = await headers();
+        const ip = headerList.get('x-forwarded-for') || 'unknown';
         if (!rateLimit(ip, 100, 60000)) {
             return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
         }

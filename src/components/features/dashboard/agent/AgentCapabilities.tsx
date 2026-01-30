@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { X, Check, Loader2 } from "lucide-react";
 import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
+import { useTrialStatus } from "@/hooks/useTrialStatus";
+import TrialPopup from "@/components/ui/TrialPopup";
 
 // Mapping Configuration
 const TOOL_CATEGORIES = {
@@ -65,6 +67,8 @@ interface AgentCapabilitiesProps {
 export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAutoMode = false, isSelected = false, onSectionClick }: AgentCapabilitiesProps) {
     const [activeModal, setActiveModal] = useState<keyof typeof TOOL_CATEGORIES | null>(null);
     const [confirmationState, setConfirmationState] = useState<{ type: 'activate' | 'deactivate', toolId: string, label: string } | null>(null);
+    const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
+    const { isTrial } = useTrialStatus();
     const { showToast } = useToast();
 
     const handleIconClick = (category: keyof typeof TOOL_CATEGORIES) => {
@@ -74,6 +78,13 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAuto
 
     const handleAdditionalToolClick = (toolId: string, label: string) => {
         if (!selectedAgent || isAutoMode) return;
+
+        // Block Restricted Tools for Trial Users
+        if (isTrial && (toolId === 'web_search' || toolId === 'deep_research')) {
+            setIsTrialPopupOpen(true);
+            return;
+        }
+
         const isActive = selectedAgent.mcp_tools?.includes(toolId);
         setConfirmationState({
             type: isActive ? 'deactivate' : 'activate',
@@ -163,12 +174,14 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAuto
                             label="Web Search"
                             isActive={selectedAgent?.mcp_tools?.includes('web_search')}
                             onClick={() => handleAdditionalToolClick('web_search', 'Web Search')}
+                            disabled={isTrial}
                         />
                         <CapabilityIcon
                             src="/telescopeIcon.svg"
                             label="Deep Research"
                             isActive={selectedAgent?.mcp_tools?.includes('deep_research')}
                             onClick={() => handleAdditionalToolClick('deep_research', 'Deep Research')}
+                            disabled={isTrial}
                         />
                     </div>
                 </div>
@@ -202,24 +215,32 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAuto
                     }}
                 />
             )}
+
+            {/* Trial Popup */}
+            <TrialPopup
+                isOpen={isTrialPopupOpen}
+                onClose={() => setIsTrialPopupOpen(false)}
+                type="feature"
+                message="Fitur Advanced (Web Search/Deep Research) hanya untuk user terdaftar."
+            />
         </div>
     );
 }
 
-function CapabilityIcon({ src, label, isActive, onClick }: { src: string, label: string, isActive?: boolean, onClick?: () => void }) {
+function CapabilityIcon({ src, label, isActive, onClick, disabled }: { src: string, label: string, isActive?: boolean, onClick?: () => void, disabled?: boolean }) {
     return (
-        <div className="flex flex-col items-center text-center gap-2 group" onClick={onClick}>
+        <div className={cn("flex flex-col items-center text-center gap-2 group", disabled && "opacity-50 grayscale")} onClick={onClick}>
             <div className={cn(
                 "w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-2xl p-2.5 transition-all duration-300",
                 "bg-white shadow-sm border border-gray-100",
                 onClick && "cursor-pointer hover:scale-105 hover:shadow-md",
-                isActive && "border-lime-500 ring-2 ring-lime-100"
+                isActive && !disabled && "border-lime-500 ring-2 ring-lime-100"
             )}>
                 <div className="relative w-full h-full">
                     <Image src={src} alt={label} fill className="object-contain" />
                 </div>
             </div>
-            <span className={cn("text-xs font-bold transition-colors", isActive ? "text-lime-600" : "text-gray-700")}>{label}</span>
+            <span className={cn("text-xs font-bold transition-colors", isActive && !disabled ? "text-lime-600" : "text-gray-700")}>{label}</span>
         </div>
     );
 }
