@@ -14,8 +14,8 @@ import CartPanel from "@/components/features/addons/CartPanel";
 import CartFAB from "@/components/features/addons/CartFAB";
 import { CartProvider } from "@/contexts/CartContext";
 import { useRouter } from "next/navigation";
-import { useTrialStatus } from "@/hooks/useTrialStatus";
-import TrialPopup from "@/components/ui/TrialPopup";
+import { useUserTier } from "@/hooks/useUserTier";
+import PlanRestrictionPopup from "@/components/ui/PlanRestrictionPopup";
 
 type TabType = 'kemampuan-tambahan' | 'limit-pesan' | 'slot-agent' | 'riwayat';
 
@@ -25,12 +25,21 @@ export default function AddOnsPage() {
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
-    const { isTrial, isLoading: isTrialLoading } = useTrialStatus();
+    const { isGuest, isLoading: isTrialLoading } = useUserTier();
+
+    useEffect(() => {
+        if (activeTab) {
+            const element = document.getElementById(activeTab);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+    }, [activeTab]);
 
     // Block Trial Users
-    if (isTrial && !isTrialLoading) {
+    if (isGuest && !isTrialLoading) {
         return (
-            <TrialPopup
+            <PlanRestrictionPopup
                 isOpen={true}
                 onClose={() => router.push('/dashboard')}
                 type="feature"

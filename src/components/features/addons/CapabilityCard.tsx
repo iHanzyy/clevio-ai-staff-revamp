@@ -73,7 +73,7 @@ export default function CapabilityCard({ icon, title, description, price, onAdd,
                         onClick={onBuy}
                         className={cn(
                             "flex-1 py-2.5 px-4 rounded-lg font-semibold text-sm text-white",
-                            "bg-gradient-to-br from-[#65a30d] to-[#84cc16]",
+                            "bg-linear-to-br from-[#65a30d] to-[#84cc16]",
                             "hover:opacity-90 active:scale-[0.98]",
                             "transition-all duration-200",
                             "cursor-pointer"

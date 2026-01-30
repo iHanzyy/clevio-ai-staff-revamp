@@ -203,7 +203,7 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
                         className={cn(
                             "px-6 py-2.5 rounded-xl font-bold text-sm text-white flex items-center gap-2 transition-all shadow-lg",
                             hasChanges && !isUpdating
-                                ? "bg-gradient-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 cursor-pointer shadow-lime-500/20"
+                                ? "bg-linear-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 cursor-pointer shadow-lime-500/20"
                                 : "bg-gray-300 cursor-not-allowed text-gray-500 shadow-none"
                         )}
                     >
@@ -241,7 +241,7 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
                                     disabled={isUpdating}
                                     className={cn(
                                         "flex-1 py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer",
-                                        "bg-gradient-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
+                                        "bg-linear-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
                                     )}
                                 >
                                     {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ya, Simpan"}

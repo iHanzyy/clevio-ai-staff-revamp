@@ -61,7 +61,7 @@ export default function ConfirmationModal({
                             type === "danger"
                                 ? "bg-red-500 shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_8px_16px_rgba(239,68,68,0.3)] hover:bg-red-600"
                                 : type === "success"
-                                    ? "bg-gradient-to-br from-[#65a30d] to-[#84cc16] shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_8px_16px_rgba(101,163,13,0.3)] hover:scale-[1.02]"
+                                    ? "bg-linear-to-br from-[#65a30d] to-[#84cc16] shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_8px_16px_rgba(101,163,13,0.3)] hover:scale-[1.02]"
                                     : "bg-gray-900 shadow-[inset_0_2px_4px_rgba(255,255,255,0.2),0_8px_16px_rgba(17,24,39,0.3)] hover:bg-gray-800"
                         )}
                     >

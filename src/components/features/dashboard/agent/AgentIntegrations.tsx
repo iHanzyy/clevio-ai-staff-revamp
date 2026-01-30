@@ -6,8 +6,9 @@ import { cn } from "@/lib/utils";
 import WhatsAppModal from "./WhatsAppModal";
 import { Agent } from "@/services/agentService";
 import { whatsappService } from "@/services/whatsappService";
-import { useTrialStatus } from "@/hooks/useTrialStatus";
-import TrialPopup from "@/components/ui/TrialPopup";
+
+import { useUserTier } from "@/hooks/useUserTier";
+import PlanRestrictionPopup from "@/components/ui/PlanRestrictionPopup";
 
 export default function AgentIntegrations({ selectedAgent }: { selectedAgent: Agent | null }) {
 
@@ -15,7 +16,7 @@ export default function AgentIntegrations({ selectedAgent }: { selectedAgent: Ag
     const [waStatus, setWaStatus] = useState<"active" | "inactive">("inactive");
 
     // Trial Logic
-    const { isTrial } = useTrialStatus();
+    const { isGuest } = useUserTier();
     const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
 
     const fetchStatus = async () => {
@@ -45,14 +46,14 @@ export default function AgentIntegrations({ selectedAgent }: { selectedAgent: Ag
             "relative overflow-hidden" // Needed for overlay
         )}>
             {/* Trial Overlay - Must be FIRST and OUTSIDE content */}
-            {isTrial && (
+            {isGuest && (
                 <div
                     className="absolute inset-0 z-20 cursor-pointer"
                     onClick={() => setIsTrialPopupOpen(true)}
                 ></div>
             )}
 
-            <div className={cn(isTrial && "opacity-50 grayscale")}>
+            <div className={cn(isGuest && "opacity-50 grayscale")}>
                 <h3 className="text-gray-900 font-bold text-lg mb-1">Integrasi Agent</h3>
                 <div className="grid grid-cols-2 gap-4">
                     <IntegrationCard
@@ -82,7 +83,7 @@ export default function AgentIntegrations({ selectedAgent }: { selectedAgent: Ag
                 )}
             </div>
 
-            <TrialPopup
+            <PlanRestrictionPopup
                 isOpen={isTrialPopupOpen}
                 onClose={() => setIsTrialPopupOpen(false)}
                 type="feature"

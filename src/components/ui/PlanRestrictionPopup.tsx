@@ -5,14 +5,14 @@ import { cn } from "@/lib/utils";
 import { X, Lock } from "lucide-react";
 import Image from "next/image";
 
-interface TrialPopupProps {
+interface PlanRestrictionPopupProps {
     isOpen: boolean;
     onClose: () => void;
     type: "timer" | "feature"; // 'timer' for 5-min warning, 'feature' for locked feature
     message?: string;
 }
 
-export default function TrialPopup({ isOpen, onClose, type, message }: TrialPopupProps) {
+export default function PlanRestrictionPopup({ isOpen, onClose, type, message }: PlanRestrictionPopupProps) {
     if (!isOpen) return null;
 
     const handleSignIn = () => {

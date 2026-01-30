@@ -8,6 +8,7 @@ export default function CtaSection() {
         >
             {/* CTA Card */}
             <div
+                suppressHydrationWarning={true}
                 className="mx-auto flex flex-col items-center text-center p-8"
                 style={{
                     width: '350px',

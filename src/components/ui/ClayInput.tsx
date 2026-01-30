@@ -36,7 +36,7 @@ export default function ClayInput({
                 <input
                     type="text"
                     placeholder={placeholder}
-                    className="flex-grow bg-transparent border-none outline-none px-2 sm:px-4 text-gray-700 placeholder:text-gray-400 font-sans text-sm sm:text-base h-9 sm:h-12"
+                    className="grow bg-transparent border-none outline-none px-2 sm:px-4 text-gray-700 placeholder:text-gray-400 font-sans text-sm sm:text-base h-9 sm:h-12"
                 />
                 <button
                     onClick={handleSend}

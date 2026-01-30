@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Trash2, FileText, Plus, Loader2, FileStack, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent } from "@/services/agentService";
 import { knowledgeService, KnowledgeDocument } from "@/services/knowledgeService";
 import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import { useToast } from "@/components/ui/ToastProvider";
-import { useTrialStatus } from "@/hooks/useTrialStatus";
-import TrialPopup from "@/components/ui/TrialPopup";
+import { useUserTier } from "@/hooks/useUserTier";
+import PlanRestrictionPopup from "@/components/ui/PlanRestrictionPopup";
 
 interface AgentKnowledgeProps {
     selectedAgent: Agent | null;
@@ -28,10 +28,10 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
     // Trial Logic
-    const { isTrial } = useTrialStatus();
+    const { isGuest } = useUserTier();
     const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
 
-    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const { showToast } = useToast();
 
     useEffect(() => {
@@ -50,7 +50,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
             setDocuments(docs.filter(d => !d.is_deleted));
         } catch (error) {
             console.error("Failed to fetch documents", error);
-            showToast("Gagal mengambil dokumen.", "error");
+            showToast("Gagal mengambil dokumen. Terjadi kesalahan saat mengambil dokumen.", "error");
         } finally {
             setIsLoading(false);
         }
@@ -62,7 +62,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
 
         const newFiles = Array.from(files).filter(file => {
             if (file.size > 10 * 1024 * 1024) {
-                showToast(`File ${file.name} terlalu besar (Maks 10MB)`, "error");
+                showToast(`File ${file.name} terlalu besar. Ukuran maksimum file adalah 10MB.`, "error");
                 return false;
             }
             return true;
@@ -185,12 +185,12 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
             />
 
             <div className={cn(
-                "w-full px-6 py-6 rounded-[1rem] flex flex-col h-full",
+                "w-full px-6 py-6 rounded-2xl flex flex-col h-full",
                 "bg-[#FDFDFD]",
                 "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
                 "relative overflow-hidden" // Needed for overlay
             )}>
-                <div className={cn("flex flex-col h-full", isTrial && "opacity-50 grayscale pointer-events-none")}>
+                <div className={cn("flex flex-col h-full", isGuest && "opacity-50 grayscale pointer-events-none")}>
                     <h3 className="text-gray-900 font-bold text-lg mb-4">Pengetahuan Agen</h3>
 
                     {/* UPLOADING STATE - Progress bars in section */}
@@ -277,7 +277,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
                             <button
                                 onClick={handleOpenFilePicker}
                                 disabled={!selectedAgent || isLoading}
-                                className="w-full py-3 bg-gradient-to-br from-[#65a30d] to-[#84cc16] text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_0_rgba(101,163,13,0.39)] outline-none"
+                                className="w-full py-3 bg-linear-to-br from-[#65a30d] to-[#84cc16] text-white font-bold rounded-xl hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_0_rgba(101,163,13,0.39)] outline-none"
                                 style={{ marginTop: documents.length > 0 ? "1rem" : "0" }}
                             >
                                 Pilih Dokumen
@@ -287,7 +287,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
                 </div> {/* End of grayscaled content */}
 
                 {/* Trial Overlay */}
-                {isTrial && (
+                {isGuest && (
                     <div
                         className="absolute inset-0 z-20 cursor-pointer"
                         onClick={() => setIsTrialPopupOpen(true)}
@@ -295,7 +295,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
                 )}
             </div >
 
-            <TrialPopup
+            <PlanRestrictionPopup
                 isOpen={isTrialPopupOpen}
                 onClose={() => setIsTrialPopupOpen(false)}
                 type="feature"
@@ -354,7 +354,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMod
                                 </button>
                                 <button
                                     onClick={handleUpload}
-                                    className="flex-1 py-3 bg-gradient-to-br from-[#65a30d] to-[#84cc16] text-white font-bold rounded-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_0_rgba(101,163,13,0.39)]"
+                                    className="flex-1 py-3 bg-linear-to-br from-[#65a30d] to-[#84cc16] text-white font-bold rounded-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_4px_14px_0_rgba(101,163,13,0.39)]"
                                 >
                                     Kirim Dokumen
                                 </button>

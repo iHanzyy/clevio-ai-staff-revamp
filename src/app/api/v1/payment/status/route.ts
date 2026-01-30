@@ -61,14 +61,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { order_id, status, access_token, plan_code } = body;
 
-    // TRIAL flow: no order_id/status required, just return success with token info
-    if (plan_code === 'TRIAL') {
-      console.log('[PaymentStatus] Trial activation - access_token received');
+    // GUEST flow: no order_id/status required, just return success with token info
+    if (plan_code === 'GUEST') {
+      console.log(`[PaymentStatus] GUEST activation - access_token received`);
       return NextResponse.json({
         success: true,
-        plan_code: 'TRIAL',
+        plan_code: 'GUEST',
         access_token: access_token,
-        message: 'Trial activated successfully'
+        message: 'GUEST activated successfully'
       });
     }
 

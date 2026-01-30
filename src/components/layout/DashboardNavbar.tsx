@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { authService } from "@/services/authService";
 import type { User } from "@/services/authService";
 import SettingsModal from "@/components/features/dashboard/SettingsModal";
-import TrialPopup from "@/components/ui/TrialPopup";
+import PlanRestrictionPopup from "@/components/ui/PlanRestrictionPopup";
 
 export default function DashboardNavbar({ showCreateButton = true }: { showCreateButton?: boolean }) {
     const router = useRouter();
@@ -116,7 +116,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                                     </button>
                                     <button
                                         onClick={() => {
-                                            if (user?.plan_code === 'TRIAL') {
+                                            if (user?.plan_code === 'GUEST') {
                                                 setIsTrialPopupOpen(true);
                                             } else {
                                                 router.push('/addons');
@@ -152,7 +152,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
             />
 
             {/* Trial Popup */}
-            <TrialPopup
+            <PlanRestrictionPopup
                 isOpen={isTrialPopupOpen}
                 onClose={() => setIsTrialPopupOpen(false)}
                 type="feature"

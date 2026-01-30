@@ -84,7 +84,7 @@ export default function AgentSlotSection({ agents }: AgentSlotSectionProps) {
             {/* Purchase Slot Card */}
             <div className={cn(
                 "p-6 rounded-2xl",
-                "bg-gradient-to-br from-purple-500 to-purple-700",
+                "bg-linear-to-br from-purple-500 to-purple-700",
                 "shadow-xl shadow-purple-500/20"
             )}>
                 <h3 className="text-white font-bold text-xl mb-2">Tambah Slot Agen</h3>

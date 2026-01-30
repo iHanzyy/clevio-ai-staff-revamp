@@ -229,7 +229,7 @@ export default function WhatsAppModal({
                             <button
                                 onClick={handleConnect}
                                 disabled={isLoadingAction}
-                                className="px-6 py-3 rounded-[18px] text-white font-bold bg-gradient-to-br from-[#65a30d] to-[#84cc16] shadow-md hover:scale-[1.02] transition-all text-sm cursor-pointer active:scale-[0.98]"
+                                className="px-6 py-3 rounded-[18px] text-white font-bold bg-linear-to-br from-[#65a30d] to-[#84cc16] shadow-md hover:scale-[1.02] transition-all text-sm cursor-pointer active:scale-[0.98]"
                             >
                                 {isLoadingAction ? "Memproses..." : "Ya, Hubungkan"}
                             </button>

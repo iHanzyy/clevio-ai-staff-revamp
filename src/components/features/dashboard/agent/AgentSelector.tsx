@@ -53,7 +53,7 @@ export default function AgentSelector({ agents, selectedAgent, onSelectAgent, on
             <div
                 onClick={() => isAutoMode && onSectionClick?.()}
                 className={cn(
-                    "w-full px-6 py-4 rounded-[1rem] transition-all duration-200",
+                    "w-full px-6 py-4 rounded-2xl transition-all duration-200",
                     "bg-[#FDFDFD]",
                     "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
                     // Clickable cursor in AUTO mode
@@ -294,7 +294,7 @@ function EditNameModal({ initialName, onClose, agentId, agentData, onUpdate }: E
                         className={cn(
                             "px-6 py-2.5 rounded-xl font-bold text-sm text-white flex items-center gap-2 transition-all shadow-lg",
                             hasChanges && !isUpdating
-                                ? "bg-gradient-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 cursor-pointer shadow-lime-500/20"
+                                ? "bg-linear-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 cursor-pointer shadow-lime-500/20"
                                 : "bg-gray-300 cursor-not-allowed text-gray-500 shadow-none"
                         )}
                     >
@@ -305,7 +305,7 @@ function EditNameModal({ initialName, onClose, agentId, agentData, onUpdate }: E
 
                 {/* Confirmation Overlay */}
                 {showConfirm && (
-                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-[2rem] flex items-center justify-center p-4 animate-fade-in">
+                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-4xl flex items-center justify-center p-4 animate-fade-in">
                         <div className="w-full max-w-sm text-center">
 
                             {/* Icon Container - Matching AdditionalToolModal */}
@@ -332,7 +332,7 @@ function EditNameModal({ initialName, onClose, agentId, agentData, onUpdate }: E
                                     disabled={isUpdating}
                                     className={cn(
                                         "flex-1 py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer",
-                                        "bg-gradient-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
+                                        "bg-linear-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
                                     )}
                                 >
                                     {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Ya, Simpan"}
@@ -360,7 +360,7 @@ function DeleteConfirmModal({ agentName, isDeleting, onClose, onConfirm }: Delet
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            <div className="relative w-full max-w-sm bg-[#FDFDFD] rounded-[2rem] p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50 text-center">
+            <div className="relative w-full max-w-sm bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50 text-center">
                 {/* Icon */}
                 <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-red-100">
                     <Trash2 className="w-8 h-8 text-red-500" />

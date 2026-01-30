@@ -20,7 +20,7 @@ export default function Footer() {
             className="w-full py-12 px-6 sm:px-8 md:px-12 lg:px-16 font-google-sans-flex"
             style={{ backgroundColor: '#1E293B' }}
         >
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-4xl mx-auto" suppressHydrationWarning={true}>
                 {/* Logo */}
                 <div className="mb-8">
                     <Image

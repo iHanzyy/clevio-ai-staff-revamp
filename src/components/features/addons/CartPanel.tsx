@@ -136,7 +136,7 @@ export default function CartPanel() {
                                         onClick={handleCheckout}
                                         className={cn(
                                             "w-full py-3 rounded-xl font-bold text-white",
-                                            "bg-gradient-to-br from-[#65a30d] to-[#84cc16]",
+                                            "bg-linear-to-br from-[#65a30d] to-[#84cc16]",
                                             "hover:opacity-90 active:scale-[0.98]",
                                             "transition-all cursor-pointer",
                                             "shadow-lg shadow-lime-500/20"

@@ -72,7 +72,7 @@ export default function PricingCard({
             </div>
 
             {/* Features */}
-            <div className="flex-grow mb-8">
+            <div className="grow mb-8">
                 <span className="block text-sm font-semibold mb-4 text-gray-900">
                     Key Features:
                 </span>
@@ -82,7 +82,7 @@ export default function PricingCard({
                             <div className={cn(
                                 "flex items-center justify-center w-5 h-5 rounded-full mt-0.5 shadow-sm",
                                 feature.included
-                                    ? "bg-gradient-to-br from-[#34C759] to-[#2DA849]"
+                                    ? "bg-linear-to-br from-[#34C759] to-[#2DA849]"
                                     : "bg-black/5"
                             )}>
                                 {feature.included ? (

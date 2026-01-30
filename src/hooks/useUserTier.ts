@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import { authService, User } from '@/services/authService';
 
-export function useTrialStatus() {
-    const [isTrial, setIsTrial] = useState(false);
+export function useUserTier() {
+    const [status, setStatus] = useState({
+        isGuest: false,
+        isTrial: false,
+        planCode: ''
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
 
@@ -15,16 +19,17 @@ export function useTrialStatus() {
                 const userData = await authService.getMe();
                 setUser(userData);
 
-                if (userData.plan_code === 'TRIAL') {
-                    setIsTrial(true);
-                } else {
-                    setIsTrial(false);
-                }
+                setStatus({
+                    isGuest: userData.plan_code === 'GUEST',
+                    isTrial: userData.plan_code === 'TRIAL',
+                    planCode: userData.plan_code
+                });
+
             } catch (error) {
                 console.error("Failed to check trial status", error);
-                // If failed to fetch me (e.g. 401), we assume not logged in properly or error.
-                // But for "Trial" checking, stick to false unless explicitly 'TRIAL'.
-                setIsTrial(false);
+                // Default to restrictive states if error? Or loose?
+                // For safety, assume false for everything if auth fails (user likely handled by middleware or login page)
+                setStatus({ isGuest: false, isTrial: false, planCode: '' });
             } finally {
                 setIsLoading(false);
             }
@@ -33,5 +38,11 @@ export function useTrialStatus() {
         checkStatus();
     }, []);
 
-    return { isTrial, isLoading, user };
+    return {
+        isGuest: status.isGuest,
+        isTrial: status.isTrial,
+        planCode: status.planCode,
+        isLoading,
+        user
+    };
 }

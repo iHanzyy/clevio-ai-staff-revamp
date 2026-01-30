@@ -25,6 +25,7 @@ export default function PricingCard({
 }: PricingCardProps) {
     return (
         <div
+            suppressHydrationWarning={true}
             className={`relative p-6 flex flex-col font-google-sans-flex ${isPopular ? 'scale-105 z-10' : ''}`}
             style={{
                 borderRadius: '22px',
@@ -77,7 +78,7 @@ export default function PricingCard({
             )}
 
             {/* Features List */}
-            <ul className="flex flex-col gap-3 mb-8 flex-grow">
+            <ul className="flex flex-col gap-3 mb-8 grow">
                 {features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
                         <LuCheck

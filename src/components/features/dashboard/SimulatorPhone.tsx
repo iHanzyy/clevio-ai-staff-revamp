@@ -243,7 +243,7 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                             }}
                             onKeyDown={handleKeyDown}
                             disabled={!selectedAgent}
-                            className="flex-grow bg-transparent outline-none text-gray-700 placeholder:text-gray-400 text-sm min-h-[40px] max-h-[120px] py-2.5 resize-none scrollbar-hide"
+                            className="grow bg-transparent outline-none text-gray-700 placeholder:text-gray-400 text-sm min-h-[40px] max-h-[120px] py-2.5 resize-none scrollbar-hide"
                             style={{ height: '40px' }}
                         />
                         <button

@@ -13,7 +13,7 @@ export default function MainLayout({
             </div>
 
             {/* Dynamic Page Content */}
-            <main className="w-full h-full flex-grow">
+            <main className="w-full h-full grow">
                 {children}
             </main>
         </div>

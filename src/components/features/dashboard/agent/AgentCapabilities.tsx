@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 import { X, Check, Loader2 } from "lucide-react";
 import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
-import { useTrialStatus } from "@/hooks/useTrialStatus";
-import TrialPopup from "@/components/ui/TrialPopup";
+import { useUserTier } from "@/hooks/useUserTier";
+import PlanRestrictionPopup from "@/components/ui/PlanRestrictionPopup";
 
 // Mapping Configuration
 const TOOL_CATEGORIES = {
@@ -62,25 +62,28 @@ interface AgentCapabilitiesProps {
     isAutoMode?: boolean;
     isSelected?: boolean;
     onSectionClick?: () => void;
+    agentData?: Agent; // Added based on usage in the instruction
+    onUpdate?: () => void; // Added based on usage in the instruction
 }
 
-export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAutoMode = false, isSelected = false, onSectionClick }: AgentCapabilitiesProps) {
+export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData, onUpdate, isSelected, onSectionClick, onAgentUpdate }: AgentCapabilitiesProps) {
     const [activeModal, setActiveModal] = useState<keyof typeof TOOL_CATEGORIES | null>(null);
     const [confirmationState, setConfirmationState] = useState<{ type: 'activate' | 'deactivate', toolId: string, label: string } | null>(null);
     const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
-    const { isTrial } = useTrialStatus();
-    const { showToast } = useToast();
+    const { isGuest, isTrial } = useUserTier();
+    // const { toast } = useToast();
 
     const handleIconClick = (category: keyof typeof TOOL_CATEGORIES) => {
         if (!selectedAgent || isAutoMode) return;
         setActiveModal(category);
     };
 
-    const handleAdditionalToolClick = (toolId: string, label: string) => {
+    // Block Restricted Tools for GUEST or TRIAL (Both blocked until Paid)
+    const handleAdditionalToolClick = (toolId: string, toolName: string) => {
         if (!selectedAgent || isAutoMode) return;
 
-        // Block Restricted Tools for Trial Users
-        if (isTrial && (toolId === 'web_search' || toolId === 'deep_research')) {
+        const isRestricted = isGuest || isTrial;
+        if (isRestricted && (toolId === 'web_search' || toolId === 'deep_research')) {
             setIsTrialPopupOpen(true);
             return;
         }
@@ -89,7 +92,7 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAuto
         setConfirmationState({
             type: isActive ? 'deactivate' : 'activate',
             toolId,
-            label
+            label: toolName
         });
     };
 
@@ -103,7 +106,7 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAuto
         <div
             onClick={() => isAutoMode && onSectionClick?.()}
             className={cn(
-                "w-full px-6 py-6 rounded-[1rem] flex flex-col h-full transition-all duration-200",
+                "w-full px-6 py-6 rounded-2xl flex flex-col h-full transition-all duration-200",
                 "bg-[#FDFDFD]",
                 "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
                 // Clickable cursor in AUTO mode
@@ -217,7 +220,7 @@ export default function AgentCapabilities({ selectedAgent, onAgentUpdate, isAuto
             )}
 
             {/* Trial Popup */}
-            <TrialPopup
+            <PlanRestrictionPopup
                 isOpen={isTrialPopupOpen}
                 onClose={() => setIsTrialPopupOpen(false)}
                 type="feature"
@@ -310,7 +313,7 @@ function GoogleToolsModal({ categoryKey, config, currentTools, onClose, agentId,
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
             {/* Claymorphism Modal */}
-            <div className="relative w-full max-w-md bg-[#FDFDFD] rounded-[2rem] p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
+            <div className="relative w-full max-w-md bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
 
                 {/* Header */}
                 <div className="flex items-start justify-between mb-6">
@@ -429,7 +432,7 @@ function AdditionalToolModal({ state, onClose, agentId, agentData, onUpdate }: A
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
-            <div className="relative w-full max-w-sm bg-[#FDFDFD] rounded-[2rem] p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50 text-center">
+            <div className="relative w-full max-w-sm bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50 text-center">
 
                 <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
                     <Image
@@ -462,7 +465,7 @@ function AdditionalToolModal({ state, onClose, agentId, agentData, onUpdate }: A
                         className={cn(
                             "flex-1 py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer",
                             state.type === 'activate'
-                                ? "bg-gradient-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
+                                ? "bg-linear-to-br from-[#65a30d] to-[#84cc16] hover:scale-105 shadow-lime-500/20"
                                 : "bg-red-500 hover:bg-red-600 hover:scale-105 shadow-red-500/20"
                         )}
                     >

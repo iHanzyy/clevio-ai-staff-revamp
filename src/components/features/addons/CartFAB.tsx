@@ -19,7 +19,7 @@ export default function CartFAB() {
             className={cn(
                 "fixed bottom-6 right-6 z-40",
                 "w-14 h-14 rounded-full",
-                "bg-gradient-to-br from-[#65a30d] to-[#84cc16]",
+                "bg-linear-to-br from-[#65a30d] to-[#84cc16]",
                 "shadow-lg shadow-lime-500/30",
                 "flex items-center justify-center",
                 "hover:scale-110 active:scale-95",

@@ -279,7 +279,7 @@ export default function MessageLimitSection({ agents, selectedAgent, onSelectAge
                                         onClick={() => handlePurchase(pkg.id)}
                                         className={cn(
                                             "flex-1 py-3 rounded-xl font-bold text-sm transition-all cursor-pointer",
-                                            "bg-gradient-to-br from-[#65a30d] to-[#84cc16] text-white",
+                                            "bg-linear-to-br from-[#65a30d] to-[#84cc16] text-white",
                                             "hover:opacity-90 shadow-lg shadow-lime-500/20"
                                         )}
                                     >
