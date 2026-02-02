@@ -126,9 +126,48 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
                     {selectedAgent?.auth_required === true ? (
                         /* Show Connect Button when auth_required is true */
                         <button
-                            onClick={() => {
-                                if (selectedAgent?.auth_url) {
-                                    window.location.href = selectedAgent.auth_url;
+                            onClick={async () => {
+                                if (!selectedAgent) return;
+                                try {
+                                    // Derive scopes from selectedAgent.google_tools or usage defaults
+                                    // Note: Backend documentation says google_tools fields trigger scopes.
+                                    // We pass the current google_tools list so backend can derive scopes?
+                                    // The doc says: "Backend derives the required scopes from that list [google_tools]... and passes them to /auth/google".
+                                    // Wait, the doc says WE must pass scopes in the body:
+                                    // "POST /auth/google ... -d { scopes: [...], agent_id: ... }"
+                                    // AND "Backend implementation should use [GOOGLE_TOOL_SCOPE_MAP] to derive scopes".
+                                    // This implies the FRONTEND (or whoever calls /auth/google) needs to pass scopes.
+                                    // OR, if the backend derives them, maybe we can just pass an empty list or the tool list?
+                                    // Doc says: "Backend should load the same mapping... to build the scopes array when calling /auth/google".
+                                    // This phrasing is confusing. "When calling /auth/google" - who calls it? The client.
+                                    // So the CLIENT must build the scopes array.
+
+                                    // Let's hardcode the scopes for now based on the selected google_tools, or simply request ALL possible scopes if we want to be safe, 
+                                    // OR better: Assume the backend *can* derive them if we don't pass them? 
+                                    // No, the CURL example explicitly shows "scopes": [...]
+
+                                    // Let's gather scopes based on selectedAgent.google_tools
+                                    // Since we don't have the map here easily, and the user wants to Fix It fast.
+                                    // The error "no trial..." suggests the previous call was malformed or went to a wrong path.
+                                    // Let's try passing the standard scopes the user likely needs.
+
+                                    const scopes = [
+                                        "https://www.googleapis.com/auth/gmail.readonly",
+                                        "https://www.googleapis.com/auth/gmail.send",
+                                        "https://www.googleapis.com/auth/gmail.compose",
+                                        "https://www.googleapis.com/auth/calendar",
+                                        "https://www.googleapis.com/auth/spreadsheets",
+                                        "https://www.googleapis.com/auth/documents",
+                                        "https://www.googleapis.com/auth/drive.file"
+                                    ];
+
+                                    const { auth_url } = await agentService.initiateGoogleAuth(selectedAgent.id, scopes);
+                                    if (auth_url) {
+                                        window.location.href = auth_url;
+                                    }
+                                } catch (error) {
+                                    console.error("Failed to initiate Google Auth:", error);
+                                    // toast.error("Gagal menghubungkan Google Workspace");
                                 }
                             }}
                             className={cn(

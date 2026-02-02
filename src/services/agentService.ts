@@ -49,6 +49,15 @@ export const agentService = {
         return response.data;
     },
 
+    // Initiate Google OAuth
+    initiateGoogleAuth: async (agentId: string, scopes: string[]): Promise<{ auth_url: string; auth_state: string }> => {
+        const response = await api.post<{ auth_url: string; auth_state: string }>('/auth/google', {
+            agent_id: agentId,
+            scopes
+        });
+        return response.data;
+    },
+
     // Execute Agent (Chat)
     executeAgent: async (agentId: string, message: string, sessionId?: string) => {
         const payload = {
