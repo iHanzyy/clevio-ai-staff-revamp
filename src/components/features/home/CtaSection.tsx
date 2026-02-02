@@ -9,10 +9,8 @@ export default function CtaSection() {
             {/* CTA Card */}
             <div
                 suppressHydrationWarning={true}
-                className="mx-auto flex flex-col items-center text-center p-8"
+                className="mx-auto flex flex-col items-center text-center p-8 md:px-12 md:py-16 w-[350px] max-w-full md:w-full md:max-w-4xl"
                 style={{
-                    width: '350px',
-                    maxWidth: '100%',
                     minHeight: '316px',
                     borderRadius: '19px',
                     background: 'linear-gradient(0deg, #FFFAF2 0%, #C3D2F4 100%)'
@@ -20,7 +18,7 @@ export default function CtaSection() {
             >
                 {/* Headline */}
                 <h2
-                    className="font-bold text-[24px] mb-4"
+                    className="font-bold text-[24px] md:text-[48px] mb-4 md:mb-8 leading-tight"
                     style={{ color: '#02457A' }}
                 >
                     Bangun tim<br />staf AI Anda
@@ -28,7 +26,7 @@ export default function CtaSection() {
 
                 {/* Subtitle */}
                 <p
-                    className="font-normal text-[15px] mb-6"
+                    className="font-normal text-[15px] md:text-[20px] mb-6 md:mb-10 max-w-2xl"
                     style={{ color: '#02457A' }}
                 >
                     Mulai transformasi digital bisnis Anda hari ini. Gratis untuk memulai, tidak perlu kartu kredit.
@@ -36,7 +34,7 @@ export default function CtaSection() {
 
                 {/* CTA Button */}
                 <button
-                    className="px-8 py-3 text-white font-medium text-[15px] transition-all duration-300 hover:opacity-90 mb-6"
+                    className="px-8 py-3 md:px-12 md:py-4 text-white font-medium text-[15px] md:text-[18px] transition-all duration-300 hover:opacity-90 mb-6 md:mb-8"
                     style={{
                         borderRadius: '59px',
                         background: 'linear-gradient(0deg, #2563EB 0%, #2563EB 100%), #FFF',
@@ -48,7 +46,7 @@ export default function CtaSection() {
 
                 {/* Benefits */}
                 <p
-                    className="font-normal text-[12px]"
+                    className="font-normal text-[12px] md:text-[15px]"
                     style={{ color: '#2563EB' }}
                 >
                     Tidak perlu kartu kredit • Setup dalam 5 menit • Cancel kapan saja
