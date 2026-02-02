@@ -26,7 +26,7 @@ export default function PricingCard({
     return (
         <div
             suppressHydrationWarning={true}
-            className={`relative p-6 flex flex-col font-google-sans-flex ${isPopular ? 'scale-105 z-10' : ''}`}
+            className={`relative p-6 md:p-10 flex flex-col font-google-sans-flex ${isPopular ? 'scale-105 z-10' : ''}`}
             style={{
                 borderRadius: '22px',
                 border: isPopular ? '2px solid #2563EB' : '1px solid rgba(0, 0, 0, 0.40)',
@@ -38,7 +38,7 @@ export default function PricingCard({
         >
             {/* Title */}
             <h3
-                className="font-bold text-[24px]"
+                className="font-bold text-[24px] md:text-[32px]"
                 style={{ color: '#02457A' }}
             >
                 {title}
@@ -46,7 +46,7 @@ export default function PricingCard({
 
             {/* Subtitle */}
             <p
-                className="font-normal text-[15px] mb-4"
+                className="font-normal text-[15px] md:text-[18px] mb-4 md:mb-8"
                 style={{ color: '#02457A' }}
             >
                 {subtitle}
@@ -55,21 +55,21 @@ export default function PricingCard({
             {/* Price or Custom Text */}
             {isEnterprise ? (
                 <p
-                    className="font-bold text-[24px] mb-6"
+                    className="font-bold text-[24px] md:text-[36px] mb-6 md:mb-10"
                     style={{ color: '#02457A' }}
                 >
                     Mari berdiskusi!
                 </p>
             ) : (
-                <p className="mb-6">
+                <p className="mb-6 md:mb-10">
                     <span
-                        className="font-bold text-[24px]"
+                        className="font-bold text-[24px] md:text-[36px]"
                         style={{ color: '#02457A' }}
                     >
                         {price}
                     </span>
                     <span
-                        className="font-normal text-[14px]"
+                        className="font-normal text-[14px] md:text-[16px] ml-1"
                         style={{ color: '#02457A' }}
                     >
                         {priceLabel}
@@ -78,14 +78,14 @@ export default function PricingCard({
             )}
 
             {/* Features List */}
-            <ul className="flex flex-col gap-3 mb-8 grow">
+            <ul className="flex flex-col gap-3 md:gap-4 mb-8 md:mb-12 grow">
                 {features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-3">
                         <LuCheck
-                            className="w-5 h-5 flex-shrink-0"
+                            className="w-5 h-5 md:w-6 md:h-6 flex-shrink-0"
                             style={{ color: '#10B981' }}
                         />
-                        <span className="text-[14px] text-gray-800">
+                        <span className="text-[14px] md:text-[16px] text-gray-800">
                             {feature}
                         </span>
                     </li>
@@ -94,7 +94,7 @@ export default function PricingCard({
 
             {/* CTA Button */}
             <button
-                className="w-full py-3 text-white font-medium text-[15px] transition-all duration-300 hover:opacity-90"
+                className="w-full py-3 md:py-4 text-white font-medium text-[15px] md:text-[18px] transition-all duration-300 hover:opacity-90"
                 style={{
                     borderRadius: '30px',
                     background: '#2563EB',

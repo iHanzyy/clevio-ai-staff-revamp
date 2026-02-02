@@ -94,13 +94,13 @@ export default function ComparisonSection() {
             style={{ backgroundColor: '#FFFAF2' }}
         >
             {/* Section Header */}
-            <div className="max-w-4xl mx-auto text-center mb-8">
-                <h2 className="font-bold text-[24px] mb-3">
+            <div className="max-w-4xl mx-auto text-center mb-8 md:mb-12">
+                <h2 className="font-bold text-[24px] md:text-[40px] mb-3 md:mb-6">
                     <span className="text-[#2563EB]">Staf AI</span>
-                    <span className="text-[#2563EB] text-sm align-top">✦</span>
+                    <span className="text-[#2563EB] text-sm md:text-2xl align-top">✦</span>
                     <span className="text-gray-900"> VS Staf Biasa</span>
                 </h2>
-                <p className="font-medium text-[15px] text-gray-700">
+                <p className="font-medium text-[15px] md:text-[20px] text-gray-700 leading-relaxed">
                     Lihat perbedaan signifikan antara<br />
                     <span className="text-[#2563EB]">Staf AI</span>
                     {' '}dan Staf Biasa
@@ -142,13 +142,13 @@ export default function ComparisonSection() {
             </div>
 
             {/* Comparison Cards */}
-            <div className="max-w-2xl mx-auto flex flex-col gap-4">
+            <div className="max-w-2xl md:max-w-4xl mx-auto flex flex-col gap-4 md:gap-6">
                 {currentData.map((item) => {
                     const IconComponent = item.icon;
                     return (
                         <div
                             key={item.id}
-                            className="flex items-center gap-4 bg-white p-4 transition-all duration-300"
+                            className="flex items-center gap-4 md:gap-8 bg-white p-4 md:p-8 transition-all duration-300"
                             style={{
                                 borderRadius: '20px',
                                 borderLeft: `4px solid ${accentColor}`,
@@ -157,23 +157,23 @@ export default function ComparisonSection() {
                         >
                             {/* Icon */}
                             <div
-                                className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-xl"
+                                className="flex-shrink-0 w-12 h-12 md:w-20 md:h-20 flex items-center justify-center rounded-xl md:rounded-2xl"
                                 style={{
                                     backgroundColor: activeTab === 'ai' ? '#EFF6FF' : '#F3F4F6'
                                 }}
                             >
                                 <IconComponent
-                                    className="w-6 h-6"
+                                    className="w-6 h-6 md:w-10 md:h-10"
                                     style={{ color: accentColor }}
                                 />
                             </div>
 
                             {/* Content */}
                             <div>
-                                <h3 className="font-bold text-[16px] text-gray-900">
+                                <h3 className="font-bold text-[16px] md:text-[24px] text-gray-900 mb-1 md:mb-2">
                                     {item.title}
                                 </h3>
-                                <p className="font-normal text-[13px] text-gray-600">
+                                <p className="font-normal text-[13px] md:text-[18px] text-gray-600 leading-relaxed">
                                     {item.description}
                                 </p>
                             </div>

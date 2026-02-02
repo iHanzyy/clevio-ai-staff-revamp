@@ -64,17 +64,17 @@ export default function PricingSection() {
             style={{ backgroundColor: '#FFFAF2' }}
         >
             {/* Section Header */}
-            <div className="max-w-4xl mx-auto text-center mb-12">
-                <h2 className="font-bold text-[24px] text-gray-900 mb-2">
+            <div className="max-w-4xl mx-auto text-center mb-12 md:mb-16">
+                <h2 className="font-bold text-[24px] md:text-[40px] text-gray-900 mb-2 md:mb-4">
                     Pilih paket Anda
                 </h2>
-                <p className="font-bold text-[15px] text-gray-700">
+                <p className="font-bold text-[15px] md:text-[20px] text-gray-700">
                     Fitur canggih dengan harga terjangkau
                 </p>
             </div>
 
             {/* Pricing Cards */}
-            <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
                 {pricingData.map((plan) => (
                     <PricingCard
                         key={plan.id}
