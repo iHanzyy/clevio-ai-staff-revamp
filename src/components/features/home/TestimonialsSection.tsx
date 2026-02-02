@@ -77,25 +77,25 @@ export default function TestimonialsSection() {
             {/* Main Content */}
             <div style={{ backgroundColor: '#FFFAF2' }}>
                 {/* Section Header */}
-                <div className="max-w-4xl mx-auto text-center pt-16 mb-8 px-6 sm:px-8 md:px-12 lg:px-16">
-                    <h2 className="font-bold text-[24px] text-gray-900">
+                <div className="max-w-4xl mx-auto text-center pt-16 mb-12 px-6 sm:px-8 md:px-12 lg:px-16">
+                    <h2 className="font-bold text-[24px] md:text-[40px] text-gray-900">
                         Ini kata mereka
                     </h2>
-                    <p className="font-medium text-[15px] text-gray-700">
+                    <p className="font-medium text-[15px] md:text-[20px] text-gray-700">
                         Mereka sudah, Anda kapan?
                     </p>
                 </div>
 
-                {/* Testimonials Carousel - Full width, no padding */}
-                <div className="w-full">
+                {/* Testimonials Container */}
+                <div className="w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pb-16 md:pt-10">
                     <div
                         ref={carouselRef}
                         onScroll={handleScroll}
-                        className="flex gap-6 overflow-x-auto pb-8 pt-10 snap-x snap-mandatory scrollbar-hide"
+                        className="flex gap-6 overflow-x-auto pb-8 pt-10 snap-x snap-mandatory scrollbar-hide md:grid md:grid-cols-2 lg:grid-cols-4 md:overflow-visible md:pb-0 md:pt-0"
                         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                     >
                         {testimonialsData.map((testimonial) => (
-                            <div key={testimonial.id} className="snap-start">
+                            <div key={testimonial.id} className="snap-start w-auto h-full">
                                 <TestimonialCard
                                     imageSrc={testimonial.imageSrc}
                                     name={testimonial.name}
@@ -106,9 +106,9 @@ export default function TestimonialsSection() {
                         ))}
                     </div>
 
-                    {/* Carousel Indicators */}
+                    {/* Carousel Indicators - Visible on Mobile Only */}
                     {testimonialsData.length > 1 && (
-                        <div className="flex justify-center gap-2 mt-6 pb-16">
+                        <div className="flex justify-center gap-2 mt-6 md:hidden">
                             {testimonialsData.map((_, index) => (
                                 <button
                                     key={index}
