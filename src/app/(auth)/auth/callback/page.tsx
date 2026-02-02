@@ -20,9 +20,13 @@ export default function AuthCallbackPage() {
             // 3. Save token to Cookie (Native Method for Reliability)
             document.cookie = `session_token=${token}; path=/; max-age=604800; SameSite=Lax`;
 
-            // 4. Redirect to Dashboard (Active User Flow)
+            // 4. Check for post-login redirect (e.g., from Pricing Pro button)
+            const postLoginRedirect = localStorage.getItem('post_login_redirect');
+            localStorage.removeItem('post_login_redirect'); // Clean up
+
+            // 5. Redirect to intended destination or Dashboard
             setTimeout(() => {
-                window.location.href = '/dashboard';
+                window.location.href = postLoginRedirect || '/dashboard';
             }, 1000); // 1s delay to see the nice loader
         } else {
             // Redirect back to login on error

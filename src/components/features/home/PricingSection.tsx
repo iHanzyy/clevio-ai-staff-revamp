@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import PricingCard from "@/components/ui/PricingCard";
 
 // Pricing data
@@ -58,8 +59,45 @@ const pricingData = [
 ];
 
 export default function PricingSection() {
+    const router = useRouter();
+
     const handleScrollToArthur = () => {
         window.dispatchEvent(new CustomEvent('scrollToArthur'));
+    };
+
+    const handleProClick = async () => {
+        // Check if user is already logged in
+        const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
+
+        if (token) {
+            // User is logged in, go directly to payment
+            router.push('/payment');
+        } else {
+            // User not logged in, trigger Google OAuth via proxy to avoid CORS
+            try {
+                const response = await fetch('/api/auth/google-login');
+                const data = await response.json();
+                const authUrl = typeof data === 'string' ? data : data.auth_url;
+
+                if (authUrl) {
+                    // Store intended destination for after login
+                    localStorage.setItem('post_login_redirect', '/payment');
+                    window.location.href = authUrl;
+                }
+            } catch (error) {
+                console.error("Failed to get Google login URL:", error);
+            }
+        }
+    };
+
+    const getClickHandler = (plan: typeof pricingData[0]) => {
+        if (plan.buttonText === "Coba Gratis") {
+            return handleScrollToArthur;
+        }
+        if (plan.title === "Pro") {
+            return handleProClick;
+        }
+        return undefined;
     };
 
     return (
@@ -89,7 +127,7 @@ export default function PricingSection() {
                         buttonText={plan.buttonText}
                         isEnterprise={plan.isEnterprise}
                         isPopular={plan.isPopular}
-                        onClick={plan.buttonText === "Coba Gratis" ? handleScrollToArthur : undefined}
+                        onClick={getClickHandler(plan)}
                     />
                 ))}
             </div>
