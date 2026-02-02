@@ -218,17 +218,17 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
                             onClick={() => handleAdditionalToolClick('web_search', 'Web Search')}
                             disabled={isTrial}
                         />
-                        <CapabilityIcon
+                        {/* <CapabilityIcon
                             src="/telescopeIcon.svg"
                             label="Deep Research"
                             isActive={selectedAgent?.mcp_tools?.includes('deep_research')}
                             onClick={() => handleAdditionalToolClick('deep_research', 'Deep Research')}
                             disabled={isTrial}
-                        />
+                        /> */}
                     </div>
                 </div>
             </div>
-
+                            
             {/* MODAL */}
             {activeModal && selectedAgent && (
                 <GoogleToolsModal
