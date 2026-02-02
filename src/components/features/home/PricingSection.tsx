@@ -58,6 +58,10 @@ const pricingData = [
 ];
 
 export default function PricingSection() {
+    const handleScrollToArthur = () => {
+        window.dispatchEvent(new CustomEvent('scrollToArthur'));
+    };
+
     return (
         <section
             className="relative w-full py-16 px-6 sm:px-8 md:px-12 lg:px-16 font-google-sans-flex"
@@ -85,6 +89,7 @@ export default function PricingSection() {
                         buttonText={plan.buttonText}
                         isEnterprise={plan.isEnterprise}
                         isPopular={plan.isPopular}
+                        onClick={plan.buttonText === "Coba Gratis" ? handleScrollToArthur : undefined}
                     />
                 ))}
             </div>

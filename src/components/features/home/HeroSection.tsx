@@ -1,6 +1,11 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 
 export default function HeroSection() {
+  const [isMarqueePaused, setIsMarqueePaused] = useState(false);
+
   const chips = [
     "Customer Service",
     "Marketing Assistant",
@@ -8,6 +13,20 @@ export default function HeroSection() {
     "Sales Assistant",
   ];
   const marqueeChips = [...chips, ...chips, ...chips, ...chips];
+
+  const handleInputClick = () => {
+    window.dispatchEvent(new CustomEvent('scrollToArthur'));
+  };
+
+  const handleChipClick = (label: string) => {
+    // Pause marquee briefly
+    setIsMarqueePaused(true);
+    setTimeout(() => setIsMarqueePaused(false), 1500);
+
+    // Dispatch event to Arthur with message
+    const message = `Saya ingin membuat ${label} agent`;
+    window.dispatchEvent(new CustomEvent('sendToArthur', { detail: { message } }));
+  };
 
   return (
     <div className="relative min-h-[90vh] sm:min-h-[837px] w-full overflow-hidden font-google-sans-flex">
@@ -51,12 +70,15 @@ export default function HeroSection() {
 
           {/* Search Input Container with Button Inside */}
           <div className="relative z-10 w-full max-w-[320px] sm:max-w-2xl">
-            <div className="relative bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] pl-6 pr-14 py-4 sm:py-5 border border-white/50 backdrop-blur-sm">
+            <div
+              onClick={handleInputClick}
+              className="relative bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] pl-6 pr-14 py-4 sm:py-5 border border-white/50 backdrop-blur-sm cursor-pointer hover:shadow-[0_12px_40px_rgb(0,0,0,0.16)] transition-shadow"
+            >
               <input
                 type="text"
                 placeholder="Ketik disini......."
-                className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base sm:text-lg"
-                disabled
+                className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base sm:text-lg pointer-events-none"
+                readOnly
               />
               {/* Button INSIDE input */}
               <button
@@ -78,12 +100,21 @@ export default function HeroSection() {
         </div>
 
         {/* Quick Action Chips - Marquee (Now flowing below input) */}
-        <div className="mt-8 sm:mt-16 w-full overflow-hidden relative z-10">
-          <div className="flex animate-marquee-scroll px-4">
+        <div className="mt-8 sm:mt-16 w-full overflow-hidden relative z-20">
+          <div className={`flex ${isMarqueePaused ? '' : 'animate-marquee-scroll'} px-4`}>
             {marqueeChips.map((label, index) => (
               <button
                 key={`chip-${index}`}
-                className="mx-3 px-6 py-3 rounded-full bg-[#02457A] text-white text-sm font-medium shadow-lg hover:bg-[#035696] hover:scale-105 transition-all shrink-0 cursor-pointer whitespace-nowrap border border-white/10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleChipClick(label);
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleChipClick(label);
+                }}
+                className="marquee-chip mx-3 px-6 py-3 rounded-full bg-[#02457A] text-white text-sm font-medium shadow-lg active:bg-[#035696] active:scale-95 transition-all shrink-0 cursor-pointer whitespace-nowrap border border-white/10"
               >
                 {label}
               </button>
@@ -91,7 +122,16 @@ export default function HeroSection() {
             {marqueeChips.map((label, index) => (
               <button
                 key={`chip-dup-${index}`}
-                className="mx-3 px-6 py-3 rounded-full bg-[#02457A] text-white text-sm font-medium shadow-lg hover:bg-[#035696] hover:scale-105 transition-all shrink-0 cursor-pointer whitespace-nowrap border border-white/10"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleChipClick(label);
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  handleChipClick(label);
+                }}
+                className="marquee-chip mx-3 px-6 py-3 rounded-full bg-[#02457A] text-white text-sm font-medium shadow-lg active:bg-[#035696] active:scale-95 transition-all shrink-0 cursor-pointer whitespace-nowrap border border-white/10"
               >
                 {label}
               </button>
@@ -102,3 +142,4 @@ export default function HeroSection() {
     </div>
   );
 }
+

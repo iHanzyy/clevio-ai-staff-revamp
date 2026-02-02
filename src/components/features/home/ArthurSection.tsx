@@ -27,8 +27,49 @@ export default function ArthurSection() {
     // Ref for auto-scroll
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
+    // Ref for section scroll target
+    const sectionRef = useRef<HTMLElement>(null);
+
+    // Ref for input focus
+    const inputRef = useRef<HTMLInputElement>(null);
+
     // Polling ref
     const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Listen for custom events from HeroSection
+    useEffect(() => {
+        const handleScrollToArthur = () => {
+            sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Focus input after scroll completes
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 600);
+        };
+
+        const handleSendToArthur = (e: CustomEvent<{ message: string }>) => {
+            // Scroll first
+            sectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Set message and send after scroll
+            setTimeout(() => {
+                setMessage(e.detail.message);
+                inputRef.current?.focus();
+                // Trigger send after state update
+                setTimeout(() => {
+                    const sendButton = document.querySelector('[aria-label="Send Message"]') as HTMLButtonElement;
+                    sendButton?.click();
+                }, 100);
+            }, 600);
+        };
+
+        window.addEventListener('scrollToArthur', handleScrollToArthur);
+        window.addEventListener('sendToArthur', handleSendToArthur as EventListener);
+
+        return () => {
+            window.removeEventListener('scrollToArthur', handleScrollToArthur);
+            window.removeEventListener('sendToArthur', handleSendToArthur as EventListener);
+        };
+    }, []);
 
     // Initialize session and credentials on mount
     useEffect(() => {
@@ -289,7 +330,7 @@ export default function ArthurSection() {
     };
 
     return (
-        <section className="relative w-full font-google-sans-flex -mt-60 sm:mt-0">
+        <section ref={sectionRef} id="arthur-section" className="relative w-full font-google-sans-flex -mt-50 sm:mt-0">
             {/* Wave SVG at TOP - overlapping from hero */}
             <div className="relative w-full" style={{ minHeight: '280px' }}>
                 <svg
@@ -386,6 +427,7 @@ export default function ArthurSection() {
                 <div className="max-w-3xl mx-auto">
                     <div className="relative bg-white rounded-full shadow-2xl pl-6 pr-14 py-4">
                         <input
+                            ref={inputRef}
                             type="text"
                             placeholder="Ketik disini......."
                             value={message}

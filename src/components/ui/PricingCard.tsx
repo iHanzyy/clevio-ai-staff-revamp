@@ -11,6 +11,7 @@ interface PricingCardProps {
     buttonText: string;
     isEnterprise?: boolean;
     isPopular?: boolean;
+    onClick?: () => void;
 }
 
 export default function PricingCard({
@@ -21,7 +22,8 @@ export default function PricingCard({
     features,
     buttonText,
     isEnterprise = false,
-    isPopular = false
+    isPopular = false,
+    onClick
 }: PricingCardProps) {
     return (
         <div
@@ -94,7 +96,8 @@ export default function PricingCard({
 
             {/* CTA Button */}
             <button
-                className="w-full py-3 md:py-4 text-white font-medium text-[15px] md:text-[18px] transition-all duration-300 hover:opacity-90"
+                onClick={onClick}
+                className="w-full py-3 md:py-4 text-white font-medium text-[15px] md:text-[18px] transition-all duration-300 hover:opacity-90 cursor-pointer"
                 style={{
                     borderRadius: '30px',
                     background: '#2563EB',

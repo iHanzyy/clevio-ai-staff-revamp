@@ -132,3 +132,15 @@ body {
     display: inline-flex;
     animation: marquee-scroll 60s linear infinite;
 }
+
+/* Pause marquee on hover/touch for better UX */
+.animate-marquee-scroll:hover,
+.animate-marquee-scroll:active {
+    animation-play-state: paused;
+}
+
+/* Marquee chip touch-friendly */
+.marquee-chip {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
