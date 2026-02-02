@@ -289,7 +289,7 @@ export default function ArthurSection() {
     };
 
     return (
-        <section className="relative w-full font-google-sans-flex -mt-60">
+        <section className="relative w-full font-google-sans-flex -mt-60 sm:mt-0">
             {/* Wave SVG at TOP - overlapping from hero */}
             <div className="relative w-full" style={{ minHeight: '280px' }}>
                 <svg
