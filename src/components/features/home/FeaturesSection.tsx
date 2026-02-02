@@ -156,7 +156,7 @@ export default function FeaturesSection() {
         >
             {/* Section Header */}
             <div className="max-w-4xl mx-auto text-center mb-12">
-                <h2 className="font-bold text-[24px] text-white mb-3">
+                <h2 className="font-bold text-[24px] sm:text-3xl md:text-4xl text-white mb-3">
                     Fitur Inovatif
                 </h2>
                 <p className="font-medium text-[15px] text-white/90">
@@ -170,21 +170,21 @@ export default function FeaturesSection() {
                     {featuresData.map((feature) => (
                         <div
                             key={feature.id}
-                            className="bg-white p-6 text-center"
-                            style={{ borderRadius: '18px' }}
+                            className="bg-white p-8 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.2)] group"
+                            style={{ borderRadius: '24px' }}
                         >
                             {/* Icon */}
-                            <div className="flex justify-center items-center h-20 mb-4">
+                            <div className="flex justify-center items-center h-20 mb-6 group-hover:scale-110 transition-transform duration-300">
                                 {renderIcon(feature.icon)}
                             </div>
 
                             {/* Title */}
-                            <h3 className="font-bold text-lg text-[#02457A] mb-2">
+                            <h3 className="font-bold text-xl text-[#02457A] mb-3">
                                 {feature.title}
                             </h3>
 
                             {/* Description */}
-                            <p className="font-medium text-sm text-gray-600 leading-relaxed">
+                            <p className="font-medium text-[15px] text-gray-600 leading-relaxed">
                                 {feature.description}
                             </p>
                         </div>

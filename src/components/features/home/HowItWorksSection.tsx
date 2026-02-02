@@ -59,13 +59,13 @@ export default function HowItWorksSection() {
                 </div>
             </div>
 
-            {/* Bottom Wave */}
-            <div className="w-full" style={{ marginTop: '-1px' }}>
+            {/* Bottom Wave - Fixed Height on Desktop Only */}
+            <div className="w-full sm:h-[100px] sm:overflow-hidden" style={{ marginTop: '-1px' }}>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 388 115"
                     fill="none"
-                    className="w-full h-auto"
+                    className="w-full h-auto sm:h-full"
                     preserveAspectRatio="none"
                 >
                     <path d="M390 0C327.334 55.2819 0 -2.17545 0 61.2232C0 124.622 0 117.785 0 117.785H390V0Z" fill="#02457A" />

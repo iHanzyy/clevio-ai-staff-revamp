@@ -60,14 +60,14 @@ export default function TestimonialsSection() {
     };
 
     return (
-        <section className="relative w-full font-google-sans-flex">
-            {/* Top Wave */}
-            <div className="w-full" style={{ marginBottom: '-1px' }}>
+        <section className="relative w-full font-google-sans-flex -mt-[2px]">
+            {/* Top Wave - Fixed Height on Desktop Only */}
+            <div className="w-full sm:h-[100px] sm:overflow-hidden" style={{ marginBottom: '-1px' }}>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 390 173"
                     fill="none"
-                    className="w-full h-auto"
+                    className="w-full h-auto sm:h-full"
                     preserveAspectRatio="none"
                 >
                     <path d="M0 173C62.6661 91.9511 390 176.189 390 83.2405C390 -9.70837 390 0.31553 390 0.31553H0V173Z" fill="#02457A" />
