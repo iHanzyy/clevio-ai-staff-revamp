@@ -304,7 +304,7 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
                             label="Web Search"
                             isActive={selectedAgent?.mcp_tools?.includes('web_search')}
                             onClick={() => handleAdditionalToolClick('web_search', 'Web Search')}
-                            disabled={isTrial}
+                            disabled={isGuest}
                         />
                         {/* <CapabilityIcon
                             src="/telescopeIcon.svg"
