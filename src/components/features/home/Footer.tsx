@@ -10,8 +10,8 @@ const navLinks = [
     { label: "Fitur", href: "#features" },
     { label: "Cara Kerja", href: "#how-it-works" },
     { label: "Whatsapp Support", href: "#" },
-    { label: "Terms & Conditions", href: "#" },
-    { label: "Privacy Policy", href: "#" },
+    { label: "Terms & Conditions", href: "/terms" },
+    { label: "Privacy Policy", href: "/privacy" },
 ];
 
 export default function Footer() {
