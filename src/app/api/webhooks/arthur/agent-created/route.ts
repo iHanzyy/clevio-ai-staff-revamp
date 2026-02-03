@@ -68,7 +68,7 @@ export async function POST(req: Request) {
             "mcp_servers": {
                 "calculator_sse": {
                     "transport": "sse",
-                    "url": "http://0.0.0.0:8190/sse"
+                    "url": "http://194.238.23.242:18100/sse"
                 }
             },
             "mcp_tools": mcp_tools || [],
