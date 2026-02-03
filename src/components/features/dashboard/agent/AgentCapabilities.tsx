@@ -8,6 +8,7 @@ import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useUserTier } from "@/hooks/useUserTier";
 import PlanRestrictionPopup from "@/components/ui/PlanRestrictionPopup";
+import { getScopesForTools } from "@/lib/googleScopes";
 
 // Mapping Configuration
 const TOOL_CATEGORIES = {
@@ -71,7 +72,7 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
     const [confirmationState, setConfirmationState] = useState<{ type: 'activate' | 'deactivate', toolId: string, label: string } | null>(null);
     const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
     const { isGuest, isTrial } = useUserTier();
-    // const { toast } = useToast();
+    const { showToast } = useToast();
 
     const handleIconClick = (category: keyof typeof TOOL_CATEGORIES) => {
         if (!selectedAgent || isAutoMode) return;
@@ -123,51 +124,71 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
                     <h4 className="text-gray-900 font-bold text-sm mb-4">Google Workspace:</h4>
 
                     {/* Conditional: Show Connect Button or Icons */}
-                    {selectedAgent?.auth_required === true ? (
-                        /* Show Connect Button when auth_required is true */
+                    {/* Conditional: Show Connect Button OR Icons */}
+                    {/* SHOW BUTTON IF: Auth Required OR (Tools selected AND we want to allow connecting) */}
+                    {(selectedAgent?.auth_required === true ||
+                        (selectedAgent?.google_tools && selectedAgent.google_tools.length > 0)) ? (
+                        /* Show Connect Button when auth is needed or useful */
                         <button
                             onClick={async () => {
+                                console.log("[AgentCapabilities] Connect button clicked");
                                 if (!selectedAgent) return;
                                 try {
-                                    // Derive scopes from selectedAgent.google_tools or usage defaults
-                                    // Note: Backend documentation says google_tools fields trigger scopes.
-                                    // We pass the current google_tools list so backend can derive scopes?
-                                    // The doc says: "Backend derives the required scopes from that list [google_tools]... and passes them to /auth/google".
-                                    // Wait, the doc says WE must pass scopes in the body:
-                                    // "POST /auth/google ... -d { scopes: [...], agent_id: ... }"
-                                    // AND "Backend implementation should use [GOOGLE_TOOL_SCOPE_MAP] to derive scopes".
-                                    // This implies the FRONTEND (or whoever calls /auth/google) needs to pass scopes.
-                                    // OR, if the backend derives them, maybe we can just pass an empty list or the tool list?
-                                    // Doc says: "Backend should load the same mapping... to build the scopes array when calling /auth/google".
-                                    // This phrasing is confusing. "When calling /auth/google" - who calls it? The client.
-                                    // So the CLIENT must build the scopes array.
+                                    // Use dynamic scopes
+                                    const scopes = getScopesForTools(selectedAgent.google_tools || []);
+                                    console.log("[AgentCapabilities] Scopes:", scopes);
 
-                                    // Let's hardcode the scopes for now based on the selected google_tools, or simply request ALL possible scopes if we want to be safe, 
-                                    // OR better: Assume the backend *can* derive them if we don't pass them? 
-                                    // No, the CURL example explicitly shows "scopes": [...]
+                                    // Retrieve token
+                                    const token = localStorage.getItem('jwt_token');
 
-                                    // Let's gather scopes based on selectedAgent.google_tools
-                                    // Since we don't have the map here easily, and the user wants to Fix It fast.
-                                    // The error "no trial..." suggests the previous call was malformed or went to a wrong path.
-                                    // Let's try passing the standard scopes the user likely needs.
+                                    // 1. First, FORCE REFRESH status to clear stale cache
+                                    console.log("[AgentCapabilities] Forcing Refresh Status...");
+                                    await fetch('/api/auth/google-workspace', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Authorization': token ? `Bearer ${token}` : '',
+                                        },
+                                        body: JSON.stringify({
+                                            agent_id: selectedAgent.id,
+                                            action: 'refresh'
+                                        })
+                                    });
 
-                                    const scopes = [
-                                        "https://www.googleapis.com/auth/gmail.readonly",
-                                        "https://www.googleapis.com/auth/gmail.send",
-                                        "https://www.googleapis.com/auth/gmail.compose",
-                                        "https://www.googleapis.com/auth/calendar",
-                                        "https://www.googleapis.com/auth/spreadsheets",
-                                        "https://www.googleapis.com/auth/documents",
-                                        "https://www.googleapis.com/auth/drive.file"
-                                    ];
+                                    // 2. Then INITIATE Auth
+                                    const response = await fetch('/api/auth/google-workspace', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'Authorization': token ? `Bearer ${token}` : '',
+                                        },
+                                        body: JSON.stringify({
+                                            agent_id: selectedAgent.id,
+                                            scopes
+                                        })
+                                    });
 
-                                    const { auth_url } = await agentService.initiateGoogleAuth(selectedAgent.id, scopes);
-                                    if (auth_url) {
-                                        window.location.href = auth_url;
+                                    console.log("[AgentCapabilities] Proxy Status:", response.status);
+
+                                    if (!response.ok) {
+                                        const error = await response.json();
+                                        console.error("Failed to initiate Google Auth:", error);
+                                        return;
+                                    }
+
+                                    const data = await response.json();
+                                    console.log("[AgentCapabilities] Auth Data:", data);
+
+                                    if (data.auth_url) {
+                                        // Persist agent ID for post-OAuth redirect
+                                        localStorage.setItem('selected_agent_id', selectedAgent.id);
+                                        window.location.href = data.auth_url;
+                                    } else {
+                                        console.warn("No auth_url returned from backend");
+                                        showToast("Status Validated: Agen sudah terhubung & Token Valid.", "success");
                                     }
                                 } catch (error) {
                                     console.error("Failed to initiate Google Auth:", error);
-                                    // toast.error("Gagal menghubungkan Google Workspace");
                                 }
                             }}
                             className={cn(
@@ -189,7 +210,7 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
                             <span className="font-bold text-gray-700 text-sm">Connect with Google Workspace</span>
                         </button>
                     ) : (
-                        /* Show Icons when auth_required is false or undefined */
+                        /* Show Icons when connected or no google tools */
                         <div className="flex flex-wrap gap-4">
                             {(Object.keys(TOOL_CATEGORIES) as Array<keyof typeof TOOL_CATEGORIES>).map((key) => (
                                 <CapabilityIcon
@@ -228,7 +249,7 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
                     </div>
                 </div>
             </div>
-                            
+
             {/* MODAL */}
             {activeModal && selectedAgent && (
                 <GoogleToolsModal
@@ -337,6 +358,54 @@ function GoogleToolsModal({ categoryKey, config, currentTools, onClose, agentId,
             };
 
             await agentService.updateAgent(agentId, payload);
+
+            // If we have google tools selected, automatically trigger OAuth
+            if (finalGoogleTools.length > 0) {
+                showToast("Mengarahkan ke Google untuk otorisasi...", "info");
+
+                // Get scopes for the tools
+                const scopes = getScopesForTools(finalGoogleTools);
+                const token = localStorage.getItem('jwt_token');
+
+                // 1. First, FORCE REFRESH status
+                await fetch('/api/auth/google-workspace', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : '',
+                    },
+                    body: JSON.stringify({
+                        agent_id: agentId,
+                        action: 'refresh'
+                    })
+                });
+
+                // 2. Call OAuth endpoint via proxy
+                const response = await fetch('/api/auth/google-workspace', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : '',
+                    },
+                    body: JSON.stringify({
+                        agent_id: agentId,
+                        scopes
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.auth_url) {
+                        // Persist agent ID for post-OAuth redirect
+                        localStorage.setItem('selected_agent_id', agentId);
+                        window.location.href = data.auth_url;
+                        return; // Don't call onUpdate, we're redirecting
+                    } else {
+                        showToast("Agen sudah terhubung. Token divalidasi.", "success");
+                    }
+                }
+            }
+
             showToast("Kemampuan berhasil diperbarui!", "success");
             onUpdate();
         } catch (error) {
