@@ -141,8 +141,14 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
     const handleAdditionalToolClick = (toolId: string, toolName: string) => {
         if (!selectedAgent || isAutoMode) return;
 
-        const isRestricted = isGuest || isTrial;
-        if (isRestricted && (toolId === 'web_search' || toolId === 'deep_research')) {
+        // Web Search: Block only if Guest
+        if (toolId === 'web_search' && isGuest) {
+            setIsTrialPopupOpen(true);
+            return;
+        }
+
+        // Deep Research: Block if Guest or Trial
+        if (toolId === 'deep_research' && (isGuest || isTrial)) {
             setIsTrialPopupOpen(true);
             return;
         }
