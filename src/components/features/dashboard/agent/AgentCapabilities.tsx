@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { X, Check, Loader2 } from "lucide-react";
@@ -24,16 +24,16 @@ const TOOL_CATEGORIES = {
             "gmail_create_draft": "Buat Draf Email"
         }
     },
-    "Sheets": {
-        label: "Google Sheets",
-        icon: "/GoogleSheetIcon.svg",
-        tools: {
-            "google_sheets_list_spreadsheets": "Lihat Daftar Spreadsheet",
-            "google_sheets_create_spreadsheet": "Buat Spreadsheet Baru",
-            "google_sheets_get_values": "Baca Data Cell",
-            "google_sheets_update_values": "Update Data Cell"
-        }
-    },
+    // "Sheets": {
+    //     label: "Google Sheets",
+    //     icon: "/GoogleSheetIcon.svg",
+    //     tools: {
+    //         "google_sheets_list_spreadsheets": "Lihat Daftar Spreadsheet",
+    //         "google_sheets_create_spreadsheet": "Buat Spreadsheet Baru",
+    //         "google_sheets_get_values": "Baca Data Cell",
+    //         "google_sheets_update_values": "Update Data Cell"
+    //     }
+    // },
     "Docs": {
         label: "Google Docs",
         icon: "/GoogleDocsIcon.svg",
@@ -73,6 +73,64 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
     const [isTrialPopupOpen, setIsTrialPopupOpen] = useState(false);
     const { isGuest, isTrial } = useUserTier();
     const { showToast } = useToast();
+    const [forceHidden, setForceHidden] = useState(false);
+
+    // Reset forceHidden when agent changes
+    useEffect(() => {
+        setForceHidden(false);
+    }, [selectedAgent?.id]);
+
+    // Auto-Validate on Mount if AuthRequired is true (Fixes stale state after redirect)
+    useEffect(() => {
+        const validateLinkage = async () => {
+            if (!selectedAgent || !selectedAgent.auth_required || isAutoMode) return;
+
+            try {
+                const token = localStorage.getItem('jwt_token');
+                const scopes = getScopesForTools(selectedAgent.google_tools || []);
+
+                // 1. Force Refresh
+                await fetch('/api/auth/google-workspace', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : '',
+                    },
+                    body: JSON.stringify({
+                        agent_id: selectedAgent.id,
+                        action: 'refresh'
+                    })
+                });
+
+                // 2. Check Status
+                const response = await fetch('/api/auth/google-workspace', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token ? `Bearer ${token}` : '',
+                    },
+                    body: JSON.stringify({
+                        agent_id: selectedAgent.id,
+                        scopes
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (!data.auth_url) {
+                        // Backend says "Connected" -> Optimistic Fix
+                        console.log("[AgentCapabilities] Auto-Validated: Hiding Connect Button");
+                        setForceHidden(true);
+                        if (onAgentUpdate) onAgentUpdate();
+                    }
+                }
+            } catch (error) {
+                console.error("[AgentCapabilities] Auto-validation failed", error);
+            }
+        };
+
+        validateLinkage();
+    }, [selectedAgent?.id, selectedAgent?.auth_required]);
 
     const handleIconClick = (category: keyof typeof TOOL_CATEGORIES) => {
         if (!selectedAgent || isAutoMode) return;
@@ -125,10 +183,9 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
 
                     {/* Conditional: Show Connect Button or Icons */}
                     {/* Conditional: Show Connect Button OR Icons */}
-                    {/* SHOW BUTTON IF: Auth Required OR (Tools selected AND we want to allow connecting) */}
-                    {(selectedAgent?.auth_required === true ||
-                        (selectedAgent?.google_tools && selectedAgent.google_tools.length > 0)) ? (
-                        /* Show Connect Button when auth is needed or useful */
+                    {/* SHOW BUTTON IF: Auth Required ONLY AND Not Force Hidden */}
+                    {(selectedAgent?.auth_required === true && !forceHidden) ? (
+                        /* Show Connect Button when auth is needed */
                         <button
                             onClick={async () => {
                                 console.log("[AgentCapabilities] Connect button clicked");
@@ -186,6 +243,10 @@ export default function AgentCapabilities({ selectedAgent, isAutoMode, agentData
                                     } else {
                                         console.warn("No auth_url returned from backend");
                                         showToast("Status Validated: Agen sudah terhubung & Token Valid.", "success");
+                                        // Trigger parent update to refresh auth_required state
+                                        if (onAgentUpdate) onAgentUpdate();
+                                        // Force hide button immediately (Optimistic UI)
+                                        setForceHidden(true);
                                     }
                                 } catch (error) {
                                     console.error("Failed to initiate Google Auth:", error);

@@ -3,7 +3,11 @@ import fs from 'fs';
 import path from 'path';
 
 // File-based storage for pending payloads (works across serverless invocations)
-const STORAGE_DIR = path.join(process.cwd(), '.tmp');
+// File-based storage for pending payloads (works across serverless invocations)
+// NOTE: On Vercel, this is ephemeral. For production, use Vercel KV or Database.
+const STORAGE_DIR = process.env.VERCEL || process.env.NODE_ENV === 'production'
+    ? '/tmp'
+    : path.join(process.cwd(), '.tmp');
 const STORAGE_FILE = path.join(STORAGE_DIR, 'pending_payloads.json');
 
 // Helper to ensure storage directory exists
