@@ -435,7 +435,7 @@ export default function ArthurPhone({
                                 </>
                             ) : (
                                 // Info message
-                                <span className="text-sm animate-fade-in">⏳ Mohon menunggu sekitar 1-2 menit...</span>
+                                <span className="text-sm animate-fade-in italic">⏳ Mohon menunggu sekitar 1-2 menit...</span>
                             )}
                         </div>
                     </div>

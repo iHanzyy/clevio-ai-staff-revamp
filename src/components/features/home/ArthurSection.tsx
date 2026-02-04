@@ -19,6 +19,8 @@ export default function ArthurSection() {
     ]);
     const [isTyping, setIsTyping] = useState(false);
     const [isProcessingFinal, setIsProcessingFinal] = useState(false);
+    const [showLongWaitMessage, setShowLongWaitMessage] = useState(false);
+    const [showInfoInsteadOfDots, setShowInfoInsteadOfDots] = useState(false);
 
     // State to hold session and credentials
     const [sessionId, setSessionId] = useState("");
@@ -64,6 +66,8 @@ export default function ArthurSection() {
 
     // Polling ref
     const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const longWaitTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const toggleIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     // Listen for custom events from HeroSection
     useEffect(() => {
@@ -119,6 +123,42 @@ export default function ArthurSection() {
 
 
 
+
+    // Long wait timer: show alternating message after 10 seconds of typing
+    useEffect(() => {
+        if (isTyping) {
+            // Start timer when typing begins - after 10s, start alternating
+            longWaitTimerRef.current = setTimeout(() => {
+                setShowLongWaitMessage(true);
+                // Start alternating between dots and info every 3 seconds
+                toggleIntervalRef.current = setInterval(() => {
+                    setShowInfoInsteadOfDots(prev => !prev);
+                }, 3000);
+            }, 10000); // 10 seconds
+        } else {
+            // Reset everything when typing completes
+            if (longWaitTimerRef.current) {
+                clearTimeout(longWaitTimerRef.current);
+                longWaitTimerRef.current = null;
+            }
+            if (toggleIntervalRef.current) {
+                clearInterval(toggleIntervalRef.current);
+                toggleIntervalRef.current = null;
+            }
+            setShowLongWaitMessage(false);
+            setShowInfoInsteadOfDots(false);
+        }
+
+        return () => {
+            if (longWaitTimerRef.current) {
+                clearTimeout(longWaitTimerRef.current);
+            }
+            if (toggleIntervalRef.current) {
+                clearInterval(toggleIntervalRef.current);
+            }
+        };
+    }, [isTyping]);
+
     // Cleanup polling on unmount
     useEffect(() => {
         return () => {
@@ -165,11 +205,12 @@ export default function ArthurSection() {
                         localStorage.setItem('agent_payload', JSON.stringify(agentData));
 
                         // Show success message
-                        setMessages(prev => [...prev, {
-                            id: Date.now(),
-                            from: "arthur",
-                            text: "Agen Anda berhasil dibuat! Sedang memproses akun Anda..."
-                        }]);
+                        // REMOVED: User requested to replace text with animation
+                        // setMessages(prev => [...prev, {
+                        //     id: Date.now(),
+                        //     from: "arthur",
+                        //     text: "Agen Anda berhasil dibuat! Sedang memproses akun Anda..."
+                        // }]);
 
                         setIsTyping(false);
                         setIsProcessingFinal(true);
@@ -291,11 +332,12 @@ export default function ArthurSection() {
                 // Direct agent data response - process immediately
                 console.log("[ArthurSection] Direct agent data received");
                 localStorage.setItem('agent_payload', JSON.stringify(data[0]));
-                setMessages(prev => [...prev, {
-                    id: Date.now() + 1,
-                    from: "arthur",
-                    text: "Agen Anda berhasil dibuat! Sedang memproses..."
-                }]);
+                // REMOVED: User requested to replace text with animation
+                // setMessages(prev => [...prev, {
+                //     id: Date.now() + 1,
+                //     from: "arthur",
+                //     text: "Agen Anda berhasil dibuat! Sedang memproses..."
+                // }]);
                 setIsTyping(false);
                 setIsProcessingFinal(true);
                 await handleFinalRegistration(data[0]);
@@ -421,14 +463,34 @@ export default function ArthurSection() {
                         </div>
                     ))}
 
-                    {/* Typing Indicator */}
+                    {/* Typing Indicator with Long Wait Logic */}
                     {isTyping && (
                         <div className="flex justify-start animate-fade-in">
-                            <div className="bg-[#2563EB] text-white px-5 py-3.5 rounded-3xl shadow-md">
-                                <div className="flex gap-1.5">
-                                    <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                                    <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                                    <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                            <div className="bg-[#2563EB] text-white px-5 py-3.5 rounded-3xl shadow-md min-h-[48px] flex items-center">
+                                {(!showLongWaitMessage || !showInfoInsteadOfDots) ? (
+                                    <div className="flex gap-1.5">
+                                        <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                                        <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                                        <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                                    </div>
+                                ) : (
+                                    <span className="text-sm animate-fade-in italic">⏳ Mohon menunggu sekitar 1-2 menit...</span>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Creation Animation - Replaces Text Message */}
+                    {isProcessingFinal && (
+                        <div className="flex justify-center py-6 animate-fade-in-up">
+                            <div className="bg-white/90 backdrop-blur-sm border border-blue-100 rounded-2xl px-8 py-6 shadow-lg flex flex-col items-center gap-4">
+                                <div className="relative w-12 h-12">
+                                    <div className="absolute inset-0 border-4 border-blue-100 rounded-full"></div>
+                                    <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
+                                </div>
+                                <div className="text-center">
+                                    <h3 className="font-bold text-blue-600 text-lg">Creating Agent...</h3>
+                                    <p className="text-xs text-gray-500 mt-1">Setup personality & tools</p>
                                 </div>
                             </div>
                         </div>
