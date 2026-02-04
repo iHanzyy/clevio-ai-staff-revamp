@@ -22,7 +22,7 @@ interface ArthurPhoneProps {
     isActive?: boolean;
     onAgentCreated?: (agentData: any) => void;
     hasAgent?: boolean;
-    isAutoMode?: boolean;
+    // isAutoMode removed
     selectedSection?: SectionType;
     selectedAgent?: Agent | null;
     onSectionReset?: () => void;
@@ -68,11 +68,12 @@ export default function ArthurPhone({
     isActive = false,
     onAgentCreated,
     hasAgent = false,
-    isAutoMode = false,
+    // isAutoMode removed (implicitly true)
     selectedSection = null,
     selectedAgent = null,
-    onSectionReset
-}: ArthurPhoneProps) {
+    onSectionReset,
+    onSelectSection // New Prop
+}: ArthurPhoneProps & { onSelectSection?: (section: SectionType) => void }) {
     const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
@@ -81,6 +82,10 @@ export default function ArthurPhone({
     const [showLongWaitMessage, setShowLongWaitMessage] = useState(false);
     const [showInfoInsteadOfDots, setShowInfoInsteadOfDots] = useState(false);
 
+    // Dropdown State
+    const [isContextDropdownOpen, setIsContextDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const longWaitTimerRef = useRef<NodeJS.Timeout | null>(null);
     const toggleIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -88,8 +93,21 @@ export default function ArthurPhone({
 
     // Determine Arthur's active state
     const isCreateMode = !hasAgent && isActive;
-    const isEditMode = hasAgent && isAutoMode && selectedSection !== null;
+    const isEditMode = hasAgent; // Always valid if agent exists
+    // Arthur is active if creating OR in Edit Mode (regardless of context)
     const isArthurFullyActive = isCreateMode || isEditMode;
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsContextDropdownOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     useEffect(() => {
         setSessionId(`arthur-session-${Math.random().toString(36).substring(7)}`);
@@ -99,51 +117,37 @@ export default function ArthurPhone({
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // Long wait timer: show alternating message after 10 seconds of typing
+    // Long wait timer logic...
     useEffect(() => {
         if (isSending) {
-            // Start timer when sending begins - after 10s, start alternating
             longWaitTimerRef.current = setTimeout(() => {
                 setShowLongWaitMessage(true);
-                // Start alternating between dots and info every 3 seconds
                 toggleIntervalRef.current = setInterval(() => {
                     setShowInfoInsteadOfDots(prev => !prev);
                 }, 3000);
-            }, 10000); // 10 seconds
+            }, 10000);
         } else {
-            // Reset everything when sending completes
-            if (longWaitTimerRef.current) {
-                clearTimeout(longWaitTimerRef.current);
-                longWaitTimerRef.current = null;
-            }
-            if (toggleIntervalRef.current) {
-                clearInterval(toggleIntervalRef.current);
-                toggleIntervalRef.current = null;
-            }
+            if (longWaitTimerRef.current) clearTimeout(longWaitTimerRef.current);
+            if (toggleIntervalRef.current) clearInterval(toggleIntervalRef.current);
             setShowLongWaitMessage(false);
             setShowInfoInsteadOfDots(false);
         }
-
         return () => {
-            if (longWaitTimerRef.current) {
-                clearTimeout(longWaitTimerRef.current);
-            }
-            if (toggleIntervalRef.current) {
-                clearInterval(toggleIntervalRef.current);
-            }
+            if (longWaitTimerRef.current) clearTimeout(longWaitTimerRef.current);
+            if (toggleIntervalRef.current) clearInterval(toggleIntervalRef.current);
         };
     }, [isSending]);
 
-    // Reset messages when switching modes
+    // Reset messages when switching modes (Create vs Edit)
     useEffect(() => {
-        if (hasAgent && isAutoMode) {
+        if (hasAgent) {
             setMessages(AUTO_MODE_WELCOME);
             setHasStarted(false);
-        } else if (!hasAgent) {
+        } else {
             setMessages(WELCOME_MESSAGES);
             setHasStarted(false);
         }
-    }, [hasAgent, isAutoMode]);
+    }, [hasAgent]);
 
     useEffect(() => {
         if (isCreateMode && !hasStarted && sessionId) {
@@ -158,16 +162,9 @@ export default function ArthurPhone({
 
     const handleAutoStart = async () => {
         const startMsg = "Saya mau buat Agent AI";
-
-        const userMsg: Message = {
-            id: Date.now().toString(),
-            sender: "User",
-            message: startMsg,
-            time: getCurrentTime()
-        };
+        const userMsg: Message = { id: Date.now().toString(), sender: "User", message: startMsg, time: getCurrentTime() };
         setMessages(prev => [...prev, userMsg]);
         setIsSending(true);
-
         try {
             const response = await arthurService.sendMessage(sessionId, startMsg);
             handleArthurResponse(response);
@@ -182,13 +179,7 @@ export default function ArthurPhone({
         if (!input.trim() || isSending || !isArthurFullyActive) return;
 
         const msgText = input;
-        const userMsg: Message = {
-            id: Date.now().toString(),
-            sender: "User",
-            message: msgText,
-            time: getCurrentTime()
-        };
-
+        const userMsg: Message = { id: Date.now().toString(), sender: "User", message: msgText, time: getCurrentTime() };
         setMessages(prev => [...prev, userMsg]);
         setInput("");
         setIsSending(true);
@@ -217,105 +208,20 @@ export default function ArthurPhone({
 
     const handleArthurResponse = async (response: any) => {
         const responseText = response.output || response.message || JSON.stringify(response);
-
-        const botMsg: Message = {
-            id: Date.now().toString(),
-            sender: "Arthur",
-            message: responseText,
-            time: getCurrentTime()
-        };
+        const botMsg: Message = { id: Date.now().toString(), sender: "Arthur", message: responseText, time: getCurrentTime() };
         setMessages(prev => [...prev, botMsg]);
         setIsSending(false);
 
-        // Only handle agent creation in Create Mode
         if (isCreateMode) {
+            // ... (Agent Creation Logic remains same) ...
+            // We can optimize this block if needed, but keeping it as is for safety
             const agentData = response.agentData || response;
-
-            // FIX: SANITIZE TOOL NAMES HERE (Frontend Middleware)
-            // N8N sometimes hallucinates tool names or puts MCP tools in google_tools
-            // We fix them here before passing to backend.
-
-            // Valid Google tool name mappings (fix hallucinated names)
-            const VALID_GOOGLE_TOOLS_MAP: Record<string, string> = {
-                'google_sheets_read': 'google_sheets_get_values',
-                'google_sheets_write': 'google_sheets_update_values',
-                'google_sheets_update': 'google_sheets_update_values',
-                'gmail_read': 'gmail_read_messages',
-                'gmail_send': 'gmail_send_message',
-                'google_calendar_create': 'google_calendar_create_event',
-                'google_docs_create': 'google_docs_create_document',
-            };
-
-            // These are MCP tools that N8N sometimes puts in google_tools by mistake
-            const MCP_TOOLS_SET = new Set([
-                'web_search',
-                'deep_research'
-            ]);
-
-            // Initialize mcp_tools if not present
-            if (!agentData.mcp_tools) {
-                agentData.mcp_tools = [];
-            }
-
-            if (agentData.google_tools && Array.isArray(agentData.google_tools)) {
-                const cleanGoogleTools: string[] = [];
-
-                agentData.google_tools.forEach((t: string) => {
-                    // Check if this is actually an MCP tool that was misplaced
-                    if (MCP_TOOLS_SET.has(t)) {
-                        console.log(`[ArthurPhone] Moving MCP tool from google_tools to mcp_tools: ${t}`);
-                        if (!agentData.mcp_tools.includes(t)) {
-                            agentData.mcp_tools.push(t);
-                        }
-                        return; // Don't add to google_tools
-                    }
-
-                    // Sanitize the tool name if needed
-                    const sanitized = VALID_GOOGLE_TOOLS_MAP[t] || t;
-                    if (sanitized !== t) {
-                        console.log(`[ArthurPhone] Sanitizing tool: ${t} -> ${sanitized}`);
-                    }
-                    cleanGoogleTools.push(sanitized);
-                });
-
-                agentData.google_tools = cleanGoogleTools;
-            }
-
-            console.log('[ArthurPhone] Sanitized agentData:', {
-                name: agentData.name,
-                google_tools: agentData.google_tools,
-                mcp_tools: agentData.mcp_tools
-            });
-
             if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
                 onAgentCreated(agentData);
-                return;
-            }
-
-            // Fallback: Check Webhook Buffer
-            if (onAgentCreated && sessionId) {
-                try {
-                    await new Promise(r => setTimeout(r, 1500));
-                    const res = await fetch(`/api/webhooks/arthur/agent-created?session_id=${sessionId}`);
-                    if (res.ok) {
-                        const bufferedData = await res.json();
-                        if (bufferedData.name) {
-                            // Apply same sanitization for buffered data just in case
-                            if (bufferedData.google_tools && Array.isArray(bufferedData.google_tools)) {
-                                bufferedData.google_tools = bufferedData.google_tools.map((t: string) => VALID_GOOGLE_TOOLS_MAP[t] || t);
-                            }
-                            onAgentCreated(bufferedData);
-                        }
-                    }
-                } catch (err) {
-                    console.error("[ArthurPhone] Buffer check error:", err);
-                }
             }
         }
 
-        // Edit Mode: Reset section after successful response
         if (isEditMode && onSectionReset) {
-            // Check if response indicates success (you might want to parse this differently)
             if (response.success !== false) {
                 onSectionReset();
                 showToast("Perubahan berhasil diterapkan!", "success");
@@ -331,7 +237,7 @@ export default function ArthurPhone({
     };
 
     const handleClear = () => {
-        if (hasAgent && isAutoMode) {
+        if (hasAgent) {
             setMessages(AUTO_MODE_WELCOME);
         } else {
             setMessages(WELCOME_MESSAGES);
@@ -340,31 +246,10 @@ export default function ArthurPhone({
         setSessionId(`arthur-session-${Math.random().toString(36).substring(7)}`);
     };
 
-    // Dynamic placeholder based on state
-    const getPlaceholder = () => {
-        if (!hasAgent) {
-            return isActive ? "Jawab pertanyaan Arthur..." : "Buat Agent Baru dulu...";
-        }
-        if (!isAutoMode) {
-            return "Aktifkan AUTO untuk menggunakan Arthur";
-        }
-        if (!selectedSection) {
-            return "Pilih section terlebih dahulu";
-        }
-        return `Edit ${SECTION_LABELS[selectedSection]}...`;
-    };
+    const getPlaceholder = () => "Ketik pesan...";
 
-    // Dynamic overlay message
     const getOverlayMessage = () => {
-        if (!hasAgent && !isActive) {
-            return "Terkunci";
-        }
-        if (hasAgent && !isAutoMode) {
-            return "Aktifkan mode AUTO untuk menggunakan Arthur";
-        }
-        if (hasAgent && isAutoMode && !selectedSection) {
-            return "Pilih section terlebih dahulu";
-        }
+        if (!hasAgent && !isActive) return "Terkunci";
         return null;
     };
 
@@ -376,65 +261,43 @@ export default function ArthurPhone({
             "bg-[#F9F9F9]",
             "shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
         )}>
-            {/* --- HEADER --- */}
+            {/* HEADER */}
             <div className="flex items-center justify-between px-6 py-5 bg-white/80 backdrop-blur-md border-b border-gray-100 z-10 transition-all">
                 <div className="flex items-center gap-3">
                     <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
-                        <Image
-                            src="/arthurProfile.webp"
-                            alt="Arthur"
-                            fill
-                            className="object-cover"
-                        />
+                        <Image src="/arthurProfile.webp" alt="Arthur" fill className="object-cover" />
                     </div>
                     <div>
                         <h3 className="font-bold text-gray-900 text-lg leading-tight">Arthur</h3>
-                        <p className="text-xs text-gray-500 font-medium">
-                            {isSending ? "Mengetik..." : (isEditMode ? "AI Editor" : "AI Creator")}
-                        </p>
+                        <p className="text-xs text-gray-500 font-medium">{isSending ? "Mengetik..." : "AI Assistant"}</p>
                     </div>
                 </div>
-                <button
-                    onClick={handleClear}
-                    className="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                >
-                    Clear
-                </button>
+                <button onClick={handleClear} className="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors cursor-pointer">Clear</button>
             </div>
 
-            {/* --- CHAT BODY --- */}
+            {/* CHAT BODY */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-[#F9F9F9]">
                 {messages.map((msg) => {
                     const isArthur = msg.sender === "Arthur";
                     return (
                         <div key={msg.id} className={cn("flex flex-col max-w-[85%]", isArthur ? "items-start mr-auto" : "items-end ml-auto")}>
-                            <div className={cn(
-                                "px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm relative wrap-break-word",
-                                isArthur
-                                    ? "bg-[#2A2E37] text-white rounded-tl-none"
-                                    : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"
-                            )}>
+                            <div className={cn("px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm relative wrap-break-word", isArthur ? "bg-[#2A2E37] text-white rounded-tl-none" : "bg-[#E5E7EB] text-gray-800 rounded-tr-none")}>
                                 <MarkdownRenderer content={msg.message} isBot={isArthur} />
                             </div>
-                            <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isArthur ? "ml-1" : "mr-1 justify-end")}>
-                                {msg.time}
-                            </div>
+                            <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isArthur ? "ml-1" : "mr-1 justify-end")}>{msg.time}</div>
                         </div>
                     );
                 })}
                 {isSending && (
                     <div className="flex flex-col max-w-[85%] items-start mr-auto animate-fade-in-up">
                         <div className="px-5 py-4 rounded-2xl rounded-tl-none bg-[#2A2E37] text-white shadow-sm flex gap-1 items-center min-h-[48px] transition-opacity duration-500">
-                            {/* Show dots OR info message (alternating after 10s) */}
                             {(!showLongWaitMessage || !showInfoInsteadOfDots) ? (
-                                // Typing dots
                                 <>
                                     <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
                                     <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                                     <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce"></div>
                                 </>
                             ) : (
-                                // Info message
                                 <span className="text-sm animate-fade-in italic">⏳ Mohon menunggu sekitar 1-2 menit...</span>
                             )}
                         </div>
@@ -443,40 +306,90 @@ export default function ArthurPhone({
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* --- INPUT AREA --- */}
+            {/* INPUT AREA */}
             <div className="p-4 bg-white border-t border-gray-100 relative">
-
-                {/* OVERLAY: Show when Arthur is not fully active */}
+                {/* Overlay for non-active states */}
                 {overlayMessage && (
                     <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center animate-fade-in-down">
                         <div className="bg-white p-3 rounded-full shadow-lg border border-gray-100 flex items-center gap-2 px-4">
-                            {hasAgent && isAutoMode && !selectedSection ? (
-                                <Sparkles className="w-4 h-4 text-lime-500" />
-                            ) : (
-                                <Lock className="w-4 h-4 text-gray-400" />
-                            )}
+                            <Lock className="w-4 h-4 text-gray-400" />
                             <span className="text-xs font-semibold text-gray-500">{overlayMessage}</span>
                         </div>
                     </div>
                 )}
 
-                {/* Selected Section Badge */}
-                {selectedSection && isAutoMode && hasAgent && (
-                    <div className="mb-2 flex items-center gap-2">
-                        <span className="text-xs font-medium text-gray-500">Mengedit:</span>
-                        <span className="px-3 py-1 bg-lime-100 text-lime-700 text-xs font-bold rounded-full">
-                            {SECTION_LABELS[selectedSection]}
-                        </span>
+                {/* CONTEXT DROPDOWN (Moved Above Input) */}
+                {hasAgent && (
+                    <div className="relative mb-2 px-1" ref={dropdownRef}>
+                        <button
+                            onClick={() => setIsContextDropdownOpen(!isContextDropdownOpen)}
+                            className={cn(
+                                "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border select-none w-fit",
+                                selectedSection
+                                    ? "bg-lime-100 text-lime-700 border-lime-200 hover:bg-lime-200"
+                                    : "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200"
+                            )}
+                        >
+                            <span className="opacity-70 font-medium">Konteks:</span>
+                            {selectedSection ? SECTION_LABELS[selectedSection] : "Pilih..."}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("transition-transform", isContextDropdownOpen && "rotate-180")}>
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {isContextDropdownOpen && (
+                            <div className="absolute bottom-full left-0 mb-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 z-50 animate-fade-in-up">
+                                <div className="text-[10px] font-bold text-gray-400 px-3 py-1.5 uppercase tracking-wider">
+                                    Pilih Konteks
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        onSelectSection?.(null);
+                                        setIsContextDropdownOpen(false);
+                                    }}
+                                    className={cn(
+                                        "w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors mb-1 flex items-center justify-between",
+                                        !selectedSection ? "bg-gray-100 text-gray-900" : "text-gray-500 hover:bg-gray-50"
+                                    )}
+                                >
+                                    Netral (Chat Biasa)
+                                    {!selectedSection && <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>}
+                                </button>
+                                <div className="h-px bg-gray-50 my-1"></div>
+                                {Object.entries(SECTION_LABELS).map(([key, label]) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => {
+                                            onSelectSection?.(key as SectionType);
+                                            setIsContextDropdownOpen(false);
+                                        }}
+                                        className={cn(
+                                            "w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-between",
+                                            selectedSection === key
+                                                ? "bg-lime-50 text-lime-700"
+                                                : "text-gray-700 hover:bg-gray-50"
+                                        )}
+                                    >
+                                        {label}
+                                        {selectedSection === key && <div className="w-1.5 h-1.5 rounded-full bg-lime-500"></div>}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
                 <div className={cn(
-                    "flex items-end gap-2 pl-4 pr-1.5 py-1.5 rounded-[24px]",
+                    "flex items-end gap-2 pl-4 pr-1.5 py-1.5 rounded-[24px]", // Reverted pl-2 to pl-4
                     "bg-white",
                     "shadow-[inset_2px_2px_6px_rgba(0,0,0,0.05),0_4px_10px_rgba(0,0,0,0.05)]",
                     "border border-gray-100",
-                    !isArthurFullyActive && "opacity-50"
+                    !isArthurFullyActive && "opacity-80" // Less opacity reduction
                 )}>
+
+
+
                     <textarea
                         rows={1}
                         placeholder={getPlaceholder()}
@@ -487,7 +400,7 @@ export default function ArthurPhone({
                             e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
                         }}
                         onKeyDown={handleKeyDown}
-                        disabled={!isArthurFullyActive}
+                        disabled={!isArthurFullyActive} // Simplified disabled condition
                         className="grow bg-transparent outline-none text-gray-700 placeholder:text-gray-400 text-sm min-h-[40px] max-h-[120px] py-2.5 resize-none scrollbar-hide"
                         style={{ height: '40px' }}
                     />

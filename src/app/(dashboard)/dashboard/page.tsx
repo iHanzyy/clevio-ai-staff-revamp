@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 
 import { agentService, Agent } from "@/services/agentService";
 
-import AgentModeToggle from "@/components/features/dashboard/agent/AgentModeToggle";
+
 
 export default function DashboardPage() {
     const [hasAgent, setHasAgent] = useState(false);
@@ -18,7 +18,7 @@ export default function DashboardPage() {
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isArthurActive, setIsArthurActive] = useState(false);
-    const [isAutoMode, setIsAutoMode] = useState(false);
+
     // Section selection for AUTO mode (Arthur context)
     const [selectedSection, setSelectedSection] = useState<'name' | 'system_prompt' | 'capabilities' | null>(null);
     // Agent version to trigger simulator session reset on updates
@@ -162,10 +162,11 @@ export default function DashboardPage() {
                         isActive={isArthurActive}
                         onAgentCreated={handleAgentCreated}
                         hasAgent={hasAgent}
-                        isAutoMode={isAutoMode}
+                        // isAutoMode removed
                         selectedSection={selectedSection}
                         selectedAgent={selectedAgent}
                         onSectionReset={() => setSelectedSection(null)}
+                        onSelectSection={setSelectedSection} // Pass setter for Dropdown
                     />
                 </div>
 
@@ -173,13 +174,7 @@ export default function DashboardPage() {
                 <div className="lg:col-span-6 h-full flex flex-col min-h-0 relative">
 
                     {/* Toggle Switch (Floating Top-Right) */}
-                    {hasAgent && (
-                        <AgentModeToggle
-                            isAutoMode={isAutoMode}
-                            onToggle={setIsAutoMode}
-                            className="absolute -top-8.75 right-0 z-50"
-                        />
-                    )}
+
 
                     {!hasAgent ? (
                         <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
@@ -189,8 +184,11 @@ export default function DashboardPage() {
                             selectedAgent={selectedAgent}
                             onSelectAgent={handleSelectAgent}
                             onAgentUpdate={refreshAgents}
-                            isAutoMode={isAutoMode}
-                            onToggleMode={setIsAutoMode}
+                            selectedAgent={selectedAgent}
+                            onSelectAgent={handleSelectAgent}
+                            onAgentUpdate={refreshAgents}
+                            // isAutoMode removed
+                            // onToggleMode removed
                             selectedSection={selectedSection}
                             onSelectSection={setSelectedSection}
                         />

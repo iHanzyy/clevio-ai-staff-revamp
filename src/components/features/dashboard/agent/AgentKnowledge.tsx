@@ -13,10 +13,9 @@ import PlanRestrictionPopup from "@/components/ui/PlanRestrictionPopup";
 interface AgentKnowledgeProps {
     selectedAgent: Agent | null;
     onAgentUpdate?: () => void;
-    isAutoMode?: boolean;
 }
 
-export default function AgentKnowledge({ selectedAgent, onAgentUpdate, isAutoMode = false }: AgentKnowledgeProps) {
+export default function AgentKnowledge({ selectedAgent, onAgentUpdate }: AgentKnowledgeProps) {
     const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});

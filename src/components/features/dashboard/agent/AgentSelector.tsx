@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
 import { useRouter } from "next/navigation";
-import AgentModeToggle from "./AgentModeToggle";
 
 
 interface AgentSelectorProps {
