@@ -25,6 +25,35 @@ export default function ArthurSection() {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
 
     // Ref for auto-scroll
+
+
+    // Auto-scroll to bottom when messages change
+    useEffect(() => {
+        if (messages.length > 1) { // Don't scroll on initial load
+            // Use setTimeout to ensure DOM is updated completely
+            setTimeout(() => {
+                if (inputRef.current) {
+                    // Scroll the Input into view.
+                    // block: 'end' aligns the bottom of the input with the viewport bottom.
+                    // This ensures the input (and thus the latest message above it) is visible.
+                    inputRef.current.scrollIntoView({ behavior: 'instant', block: 'end' });
+                }
+            }, 100);
+        }
+    }, [messages, isTyping]);
+
+    // Cleanup polling on unmount
+    useEffect(() => {
+        return () => {
+            if (pollingIntervalRef.current) {
+                clearInterval(pollingIntervalRef.current);
+            }
+        };
+    }, []);
+
+    // ... (rest of code)
+
+    // Ref for Chat Container
     const chatContainerRef = useRef<HTMLDivElement>(null);
 
     // Ref for section scroll target
@@ -88,12 +117,7 @@ export default function ArthurSection() {
         setSessionId(generatedSessionId);
     }, []);
 
-    // Auto-scroll to bottom when messages change
-    useEffect(() => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
-    }, [messages, isTyping]);
+
 
     // Cleanup polling on unmount
     useEffect(() => {
@@ -121,11 +145,6 @@ export default function ArthurSection() {
                     pollingIntervalRef.current = null;
                 }
                 setIsTyping(false);
-                setMessages(prev => [...prev, {
-                    id: Date.now(),
-                    from: "arthur",
-                    text: "Maaf, terjadi timeout. Silakan coba lagi."
-                }]);
                 return;
             }
 
@@ -294,6 +313,7 @@ export default function ArthurSection() {
             }
 
             // Add Arthur's response
+            setIsTyping(false); // STOP TYPING IMMEDIATELY
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
                 from: "arthur",
@@ -303,14 +323,6 @@ export default function ArthurSection() {
             // ALWAYS start polling after every response (runs in background)
             // Polling will check if N8N has posted agent data to webhook
             startPollingForAgentData();
-
-            // Don't set isTyping false yet - polling will handle it
-            // But set a timeout to stop typing indicator if no data found quickly
-            setTimeout(() => {
-                if (!isProcessingFinal) {
-                    setIsTyping(false);
-                }
-            }, 3000);
 
         } catch (error) {
             console.error("[ArthurSection] Chat error:", error);
@@ -356,7 +368,7 @@ export default function ArthurSection() {
                     {/* Arthur Profile - Aligned Left */}
                     <div className="max-w-3xl mx-auto w-full">
                         <div className="flex items-center gap-3">
-                            <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden shadow-lg flex-shrink-0">
+                            <div className="relative w-[60px] h-[60px] rounded-full overflow-hidden shadow-lg shrink-0">
                                 <Image
                                     src="/arthurProfile.webp"
                                     alt="Arthur"
@@ -383,15 +395,15 @@ export default function ArthurSection() {
 
             {/* Chat Section - Gradient Background */}
             <div
-                className="relative py-8 px-6 sm:px-8 md:px-12 lg:px-16"
+                className="relative py-8 px-0 sm:px-8 md:px-12 lg:px-16"
                 style={{
                     background: 'linear-gradient(to bottom, #C3D2F4 0%, #FFFAF2 100%)'
                 }}
             >
-                {/* Chat Messages Container */}
+                {/* Chat Messages Container - Full Height/Page Scroll */}
                 <div
                     ref={chatContainerRef}
-                    className="max-w-3xl mx-auto mb-8 space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300"
+                    className="max-w-3xl mx-auto mb-4 space-y-4 px-6 sm:px-0 min-h-[300px]"
                 >
                     {messages.map((msg) => (
                         <div
@@ -399,7 +411,7 @@ export default function ArthurSection() {
                             className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"} animate-fade-in-up`}
                         >
                             <div
-                                className={`max-w-[70%] sm:max-w-[80%] px-5 py-3.5 rounded-3xl shadow-md ${msg.from === "arthur"
+                                className={`max-w-[85%] sm:max-w-[80%] px-5 py-3.5 rounded-3xl shadow-md ${msg.from === "arthur"
                                     ? "bg-[#2563EB] text-white"
                                     : "bg-[#02457A] text-white"
                                     }`}
@@ -421,38 +433,44 @@ export default function ArthurSection() {
                             </div>
                         </div>
                     )}
+
+                    {/* Spacer */}
+                    <div className="h-4" />
                 </div>
 
-                {/* Input Field */}
-                <div className="max-w-3xl mx-auto">
-                    <div className="relative bg-white rounded-full shadow-2xl pl-6 pr-14 py-4">
-                        <input
-                            ref={inputRef}
-                            type="text"
-                            placeholder="Ketik disini......."
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            onKeyPress={handleKeyPress}
-                            disabled={isTyping || isProcessingFinal}
-                            className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base disabled:opacity-50"
-                        />
-                        {/* Button INSIDE input */}
-                        <button
-                            onClick={handleSendMessage}
-                            disabled={!message.trim() || isTyping || isProcessingFinal}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-[#2563EB] rounded-full flex items-center justify-center hover:bg-[#1d4ed8] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                            aria-label="Send Message"
-                        >
-                            <div className="h-5 w-5 relative">
-                                <Image
-                                    src="/starIcon.png"
-                                    alt="Send"
-                                    fill
-                                    sizes="20px"
-                                    className="object-contain"
-                                />
-                            </div>
-                        </button>
+                {/* Input Field - Normal Flow (Not Sticky) */}
+                <div className="p-4 pb-8 -mx-1 sm:-mx-8 md:-mx-12 lg:-mx-16 z-30">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="relative bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 pl-6 pr-14 py-4 transition-transform duration-200 focus-within:scale-[1.01]">
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                placeholder="Ketik disini......."
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                onKeyPress={handleKeyPress}
+                                disabled={isTyping || isProcessingFinal}
+                                className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base disabled:opacity-50"
+                                style={{ fontSize: '16px' }} // Prevent iOS zoom
+                            />
+                            {/* Button INSIDE input */}
+                            <button
+                                onClick={handleSendMessage}
+                                disabled={!message.trim() || isTyping || isProcessingFinal}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-[#2563EB] rounded-full flex items-center justify-center hover:bg-[#1d4ed8] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                aria-label="Send Message"
+                            >
+                                <div className="h-5 w-5 relative">
+                                    <Image
+                                        src="/starIcon.png"
+                                        alt="Send"
+                                        fill
+                                        sizes="20px"
+                                        className="object-contain"
+                                    />
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
