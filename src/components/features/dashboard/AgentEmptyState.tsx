@@ -12,7 +12,7 @@ export default function AgentEmptyState({ onCreateClick }: AgentEmptyStateProps)
     return (
         <div className="h-full flex flex-col items-center justify-center p-6">
             <div className={cn(
-                "w-full max-w-md p-10 rounded-[2rem] flex flex-col items-center text-center",
+                "w-full max-w-md p-10 rounded-4xl flex flex-col items-center text-center",
                 "bg-[#1C1F26]/95 backdrop-blur-sm", // Dark Glass
                 "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
                 "border border-white/5"

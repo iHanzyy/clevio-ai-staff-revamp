@@ -46,7 +46,7 @@ export default function PricingCard({
             {/* Popular Badge */}
             {isPopular && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-[0_0_20px_-5px_rgba(9,0,255,0.5)] uppercase tracking-wider ring-1 ring-white/20">
+                    <span className="bg-linear-to-r from-blue-500 to-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-[0_0_20px_-5px_rgba(9,0,255,0.5)] uppercase tracking-wider ring-1 ring-white/20">
                         Most Popular
                     </span>
                 </div>
@@ -111,7 +111,7 @@ export default function PricingCard({
                     "w-full py-4 rounded-2xl font-semibold transition-all duration-300 active:scale-95 cursor-pointer",
                     isPopular
                         // Pro Button: Gradient Blue + Shadow + Border (Reference Style)
-                        ? "bg-gradient-to-t from-blue-500 to-blue-600 shadow-lg shadow-blue-800/80 border border-blue-500 text-white hover:brightness-110"
+                        ? "bg-linear-to-t from-blue-500 to-blue-600 shadow-lg shadow-blue-800/80 border border-blue-500 text-white hover:brightness-110"
                         // Standard Button: Dark
                         : "bg-[#1a1a1a] text-white hover:bg-black/80 hover:shadow-xl shadow-lg"
                 )}

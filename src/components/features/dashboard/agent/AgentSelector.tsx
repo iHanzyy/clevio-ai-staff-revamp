@@ -255,7 +255,7 @@ function EditNameModal({ initialName, onClose, agentId, agentData, onUpdate }: E
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
             {/* Claymorphism Modal */}
-            <div className="relative w-full max-w-lg bg-[#FDFDFD] rounded-[2rem] p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
+            <div className="relative w-full max-w-lg bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
 
                 {/* Header */}
                 <div className="flex items-start justify-between mb-6">

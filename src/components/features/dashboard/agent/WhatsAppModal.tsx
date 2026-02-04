@@ -168,11 +168,11 @@ export default function WhatsAppModal({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-999 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
             <div className={cn(
-                "relative bg-[#F9FAFB] rounded-[2rem] p-8 max-w-sm w-full animate-fade-in-up flex flex-col items-center text-center",
+                "relative bg-[#F9FAFB] rounded-4xl p-8 max-w-sm w-full animate-fade-in-up flex flex-col items-center text-center",
                 "shadow-[inset_-6px_-6px_14px_rgba(255,255,255,0.8),inset_6px_6px_10px_rgba(0,0,0,0.03),0_20px_40px_rgba(0,0,0,0.08)]",
                 "border border-white/60"
             )}>

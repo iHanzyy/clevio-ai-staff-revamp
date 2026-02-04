@@ -372,7 +372,7 @@ export default function ArthurPhone({
 
     return (
         <div className={cn(
-            "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-[2rem] overflow-hidden border-[8px] border-[#1C1F26]",
+            "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-4xl overflow-hidden border-8 border-[#1C1F26]",
             "bg-[#F9F9F9]",
             "shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
         )}>
@@ -409,7 +409,7 @@ export default function ArthurPhone({
                     return (
                         <div key={msg.id} className={cn("flex flex-col max-w-[85%]", isArthur ? "items-start mr-auto" : "items-end ml-auto")}>
                             <div className={cn(
-                                "px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm relative break-words",
+                                "px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm relative wrap-break-word",
                                 isArthur
                                     ? "bg-[#2A2E37] text-white rounded-tl-none"
                                     : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"

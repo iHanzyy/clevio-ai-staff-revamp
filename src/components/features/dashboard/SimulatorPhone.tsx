@@ -144,8 +144,8 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
             {/* MAIN DEVICE BODY */}
             <div className={cn(
                 "relative w-full h-full flex flex-col overflow-hidden",
-                "rounded-[3rem]",
-                "border-[8px] md:border-[10px] border-[#1C1F26]",
+                "rounded-4xl",
+                "border-8 md:border-10 border-[#1C1F26]",
                 "bg-[#F9F9F9]",
                 "shadow-[0_20px_50px_rgba(0,0,0,0.3)]",
                 "select-none"
@@ -195,7 +195,7 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                         <div key={msg.id} className={cn("flex flex-col max-w-[85%]", msg.isBot ? "items-start mr-auto" : "items-end ml-auto")}>
                             {/* Message Bubble */}
                             <div className={cn(
-                                "px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm relative break-words",
+                                "px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm relative wrap-break-word",
                                 msg.isBot
                                     ? "bg-[#2A2E37] text-white rounded-tl-none"
                                     : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"

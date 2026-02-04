@@ -39,7 +39,7 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
             <div
                 onClick={() => isAutoMode && onSectionClick?.()}
                 className={cn(
-                    "w-full px-6 py-6 rounded-[1rem] transition-all duration-200",
+                    "w-full px-6 py-6 rounded-2xl transition-all duration-200",
                     "bg-[#FDFDFD]",
                     "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
                     // Clickable cursor in AUTO mode
@@ -166,7 +166,7 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
             <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
 
             {/* Claymorphism Modal */}
-            <div className="relative w-full max-w-2xl bg-[#FDFDFD] rounded-[2rem] p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
+            <div className="relative w-full max-w-2xl bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
 
                 {/* Header */}
                 <div className="flex items-start justify-between mb-6">
@@ -214,7 +214,7 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
 
                 {/* Confirmation Overlay */}
                 {showConfirm && (
-                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-[2rem] flex items-center justify-center p-4 animate-fade-in">
+                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-4xl flex items-center justify-center p-4 animate-fade-in">
                         <div className="w-full max-w-sm text-center">
 
                             {/* Icon Container - Matching AdditionalToolModal */}

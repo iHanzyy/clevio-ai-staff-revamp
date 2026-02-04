@@ -40,7 +40,7 @@ export default function AgentIntegrations({ selectedAgent }: { selectedAgent: Ag
 
     return (
         <div className={cn(
-            "w-full px-6 py-6 rounded-[1rem] h-full", // h-full
+            "w-full px-6 py-6 rounded-2xl h-full", // h-full
             "bg-[#FDFDFD]",
             "shadow-[0_4px_10px_rgba(0,0,0,0.05),inset_2px_2px_4px_rgba(255,255,255,1)]",
             "relative overflow-hidden" // Needed for overlay

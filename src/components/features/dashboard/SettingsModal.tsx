@@ -14,7 +14,7 @@ export default function SettingsModal({ isOpen, onClose, user }: SettingsModalPr
     if (!isOpen || !user) return null;
 
     return (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-200 flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
@@ -22,7 +22,7 @@ export default function SettingsModal({ isOpen, onClose, user }: SettingsModalPr
             />
 
             {/* Modal Content - White Clay Style */}
-            <div className="relative w-full max-w-md bg-[#FDFDFD] rounded-[2rem] p-6 overflow-hidden animate-in fade-in zoom-in-95 duration-200 shadow-[0_20px_50px_rgba(0,0,0,0.1),inset_0_0_0_2px_rgba(255,255,255,0.5)] border border-white/40 font-sans">
+            <div className="relative w-full max-w-md bg-[#FDFDFD] rounded-4xl p-6 overflow-hidden animate-in fade-in zoom-in-95 duration-200 shadow-[0_20px_50px_rgba(0,0,0,0.1),inset_0_0_0_2px_rgba(255,255,255,0.5)] border border-white/40 font-sans">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">

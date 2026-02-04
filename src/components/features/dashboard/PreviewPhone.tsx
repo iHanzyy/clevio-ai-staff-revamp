@@ -21,8 +21,8 @@ export default function PreviewPhone() {
             {/* MAIN DEVICE BODY */}
             <div className={cn(
                 "relative w-full h-full flex flex-col overflow-hidden",
-                "rounded-[3rem]", // Extra rounded corners for iPhone look
-                "border-[8px] md:border-[10px] border-[#1C1F26]", // The Bezel
+                "rounded-4xl", // Extra rounded corners for iPhone look
+                "border-8 md:border-10 border-[#1C1F26]", // The Bezel
                 "bg-[#F9F9F9]",
                 "shadow-[0_20px_50px_rgba(0,0,0,0.3)]",
                 "select-none"

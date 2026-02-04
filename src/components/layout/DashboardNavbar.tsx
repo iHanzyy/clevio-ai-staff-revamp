@@ -102,7 +102,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
 
                         {/* Dropdown Menu */}
                         {isProfileOpen && (
-                            <div className="absolute right-0 mt-3 w-48 bg-[#1C1F26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-[100] animate-fade-in-down origin-top-right">
+                            <div className="absolute right-0 mt-3 w-48 bg-[#1C1F26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-100 animate-fade-in-down origin-top-right">
                                 <div className="py-1">
                                     <button
                                         onClick={() => {
