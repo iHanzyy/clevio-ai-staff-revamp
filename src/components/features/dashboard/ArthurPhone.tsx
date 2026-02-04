@@ -94,8 +94,8 @@ export default function ArthurPhone({
     // Determine Arthur's active state
     const isCreateMode = !hasAgent && isActive;
     const isEditMode = hasAgent; // Always valid if agent exists
-    // Arthur is active if creating OR in Edit Mode (regardless of context)
-    const isArthurFullyActive = isCreateMode || isEditMode;
+    // Arthur is active if creating OR (Edit mode AND context selected)
+    const isArthurFullyActive = isCreateMode || (isEditMode && selectedSection !== null);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -221,12 +221,13 @@ export default function ArthurPhone({
             }
         }
 
-        if (isEditMode && onSectionReset) {
-            if (response.success !== false) {
-                onSectionReset();
-                showToast("Perubahan berhasil diterapkan!", "success");
-            }
-        }
+        // Removed automatic onSectionReset() to keep context active during conversation
+        // if (isEditMode && onSectionReset) {
+        //     if (response.success !== false) {
+        //         onSectionReset();
+        //         showToast("Perubahan berhasil diterapkan!", "success");
+        //     }
+        // }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -343,20 +344,7 @@ export default function ArthurPhone({
                                 <div className="text-[10px] font-bold text-gray-400 px-3 py-1.5 uppercase tracking-wider">
                                     Pilih Konteks
                                 </div>
-                                <button
-                                    onClick={() => {
-                                        onSelectSection?.(null);
-                                        setIsContextDropdownOpen(false);
-                                    }}
-                                    className={cn(
-                                        "w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors mb-1 flex items-center justify-between",
-                                        !selectedSection ? "bg-gray-100 text-gray-900" : "text-gray-500 hover:bg-gray-50"
-                                    )}
-                                >
-                                    Netral (Chat Biasa)
-                                    {!selectedSection && <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>}
-                                </button>
-                                <div className="h-px bg-gray-50 my-1"></div>
+
                                 {Object.entries(SECTION_LABELS).map(([key, label]) => (
                                     <button
                                         key={key}
