@@ -424,53 +424,20 @@ function GoogleToolsModal({ categoryKey, config, currentTools, onClose, agentId,
                 google_tools: finalGoogleTools
             };
 
-            await agentService.updateAgent(agentId, payload);
+            const updatedAgent = await agentService.updateAgent(agentId, payload);
 
-            // If we have google tools selected, automatically trigger OAuth
-            if (finalGoogleTools.length > 0) {
+            // Check if backend requires re-authentication (returned auth_url)
+            if (updatedAgent.auth_url) {
                 showToast("Mengarahkan ke Google untuk otorisasi...", "info");
-
-                // Get scopes for the tools
-                const scopes = getScopesForTools(finalGoogleTools);
-                const token = localStorage.getItem('jwt_token');
-
-                // 1. First, FORCE REFRESH status
-                await fetch('/api/auth/google-workspace', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': token ? `Bearer ${token}` : '',
-                    },
-                    body: JSON.stringify({
-                        agent_id: agentId,
-                        action: 'refresh'
-                    })
-                });
-
-                // 2. Call OAuth endpoint via proxy
-                const response = await fetch('/api/auth/google-workspace', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': token ? `Bearer ${token}` : '',
-                    },
-                    body: JSON.stringify({
-                        agent_id: agentId,
-                        scopes
-                    })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.auth_url) {
-                        // Persist agent ID for post-OAuth redirect
-                        localStorage.setItem('selected_agent_id', agentId);
-                        window.location.href = data.auth_url;
-                        return; // Don't call onUpdate, we're redirecting
-                    } else {
-                        showToast("Agen sudah terhubung. Token divalidasi.", "success");
-                    }
-                }
+                // Persist agent ID for post-OAuth redirect
+                localStorage.setItem('selected_agent_id', agentId);
+                // Redirect to the provided Auth URL
+                window.location.href = updatedAgent.auth_url;
+                return; // Stop here, redirecting...
+            } else if (finalGoogleTools.length > 0 && updatedAgent.auth_required) {
+                // Fallback: If auth_url was not in update response but auth is required (edge case),
+                // keeping logic minimal or assuming backend ALWAYS sends auth_url if needed.
+                // Given user instruction, backend sends it.
             }
 
             showToast("Kemampuan berhasil diperbarui!", "success");
