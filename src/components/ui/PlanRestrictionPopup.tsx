@@ -77,12 +77,12 @@ export default function PlanRestrictionPopup({ isOpen, onClose, type, message }:
                     </div>
 
                     <h3 className="text-xl font-bold text-gray-900 mb-2">
-                        {type === 'timer' ? "Waktu Habis!" : "Fitur Terkunci"}
+                        {type === 'timer' ? "Simpan Progress Anda" : "Fitur Terkunci"}
                     </h3>
 
                     <p className="text-gray-600 mb-6 px-4">
                         {message || (type === 'timer'
-                            ? "Waktu Guest mode Anda selama 5 menit telah habis."
+                            ? "Yuk Sign In agar data agent Anda tersimpan aman (Gratis)."
                             : "Fitur ini hanya tersedia untuk pengguna yang terdaftar.")}
                         <br />
                         Silakan Masuk untuk melanjutkan penggunaan <strong>gratis</strong>.
