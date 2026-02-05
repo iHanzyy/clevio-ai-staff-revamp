@@ -23,6 +23,31 @@ export const authService = {
         return response.data;
     },
 
+    // Email/Password Login
+    login: async (email: string, password: string) => {
+        // API requires Query params
+        const response = await api.post<{ jwt_token: string, token_type: string }>(
+            `/auth/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        );
+        return response.data;
+    },
+
+    // Email/Password Register
+    register: async (email: string, password: string) => {
+        // API requires Query params
+        const response = await api.post<{ message: string, user_id: string, email: string }>(
+            `/auth/register?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        );
+        return response.data;
+    },
+
+    // Helper to store token
+    setSession: (token: string) => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('jwt_token', token);
+        }
+    },
+
     // Logout Helper
     logout: () => {
         if (typeof window !== 'undefined') {
