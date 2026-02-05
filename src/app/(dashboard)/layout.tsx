@@ -13,7 +13,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="h-screen w-full bg-[#14161B] text-white flex flex-col overflow-hidden">
+        <div className="h-screen w-full bg-[linear-gradient(0deg,_#FFFAF2_0%,_#C3D2F4_100%)] text-white flex flex-col overflow-hidden">
             <GuestTimer />
             {/* Navbar pinned to top */}
             <DashboardNavbar />

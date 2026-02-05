@@ -51,7 +51,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
 
     return (
         <>
-            <nav className="w-full h-20 px-6 md:px-12 flex items-center justify-between bg-[#1C1F26] text-white">
+            <nav className="w-full h-20 px-6 md:px-12 flex items-center justify-between bg-[#02457A] text-white">
                 {/* LEFT: Logo & Brand */}
                 <div className="flex items-center gap-3">
                     <div className="relative w-8 h-8 md:w-10 md:h-10">
