@@ -184,11 +184,6 @@ export default function DashboardPage() {
                             selectedAgent={selectedAgent}
                             onSelectAgent={handleSelectAgent}
                             onAgentUpdate={refreshAgents}
-                            selectedAgent={selectedAgent}
-                            onSelectAgent={handleSelectAgent}
-                            onAgentUpdate={refreshAgents}
-                            // isAutoMode removed
-                            // onToggleMode removed
                             selectedSection={selectedSection}
                             onSelectSection={setSelectedSection}
                         />
