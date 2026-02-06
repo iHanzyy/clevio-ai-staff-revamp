@@ -135,32 +135,23 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
     return (
         <div className="relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col items-center justify-center">
 
-            {/* FRAME ELEMENTS (Buttons) - Absolute to container */}
-            <div className="absolute top-24 -left-[2px] w-1 h-7 bg-[#2A2E37] rounded-l-md" />
-            <div className="absolute top-36 -left-[2px] w-1 h-12 bg-[#2A2E37] rounded-l-md" />
-            <div className="absolute top-52 -left-[2px] w-1 h-12 bg-[#2A2E37] rounded-l-md" />
-            <div className="absolute top-40 -right-[2px] w-1 h-16 bg-[#2A2E37] rounded-r-md" />
-
             {/* MAIN DEVICE BODY */}
             <div className={cn(
                 "relative w-full h-full flex flex-col overflow-hidden",
                 "rounded-4xl",
-                "border-8 md:border-10 border-[#1C1F26]",
-                "bg-[#F9F9F9]",
-                "shadow-[0_20px_50px_rgba(0,0,0,0.3)]",
+                "bg-[#FDF8EE]", // Cream background
+                "shadow-[0px_4px_63px_3px_rgba(65,205,93,1)]", // Green Glow
                 "select-none"
-            )}>
-
-                {/* NOTCH */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[25px] bg-[#1C1F26] rounded-b-3xl z-30 flex items-center justify-center">
-                    <div className="flex gap-2">
-                        <div className="w-12 h-1.5 bg-[#0f1115] rounded-full opacity-60"></div>
-                        <div className="w-1.5 h-1.5 bg-blue-900/30 rounded-full"></div>
-                    </div>
-                </div>
+            )}
+                style={{
+                    backgroundImage: "url('/whatsapp_doodle_pattern.png')",
+                    backgroundBlendMode: "overlay",
+                    backgroundSize: "400px", // Adjust pattern size
+                    backgroundRepeat: "repeat"
+                }}>
 
                 {/* --- HEADER --- */}
-                <div className="flex items-center justify-between px-6 py-4 pt-9 bg-white/80 backdrop-blur-md border-b border-gray-100 z-20">
+                <div className="flex items-center justify-between px-6 py-4 pt-9 bg-[#41CD5D] border-b border-green-600/10 z-20 text-white">
                     <div className="flex items-center gap-3">
                         <div className="relative w-10 h-10 rounded-full overflow-hidden border border-gray-200 shadow-sm">
                             <Image
@@ -171,8 +162,8 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                             />
                         </div>
                         <div>
-                            <h3 className="font-bold text-gray-900 text-base leading-tight truncate max-w-[120px]">{agentName}</h3>
-                            <p className="text-[10px] text-gray-500 font-medium">{isSending ? "Mengetik..." : "Simulator"}</p>
+                            <h3 className="font-bold text-white text-base leading-tight truncate max-w-[120px]">{agentName}</h3>
+                            <p className="text-[10px] text-white/90 font-medium">{isSending ? "Mengetik..." : "Simulator"}</p>
                         </div>
                     </div>
                     <button
@@ -184,7 +175,11 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                 </div>
 
                 {/* --- CHAT BODY --- */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-[#F9F9F9]">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-transparent">
+                    {/* Top Disclaimer Bubble (Yellow) */}
+                    <div className="bg-[#FFF8B6] text-gray-800 rounded-lg px-3 py-2 shadow-sm mx-auto mb-2 text-center text-xs font-semibold w-fit max-w-[85%] leading-snug">
+                        Jika masih ada yang salah kamu bisa minta tolong ke Arthur
+                    </div>
                     {messages.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-full text-gray-400 text-xs text-center px-8">
                             <p>Mulai percakapan dengan {agentName}.</p>
@@ -197,8 +192,8 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                             <div className={cn(
                                 "px-4 py-2.5 rounded-2xl text-sm leading-relaxed shadow-sm relative wrap-break-word",
                                 msg.isBot
-                                    ? "bg-[#2A2E37] text-white rounded-tl-none"
-                                    : "bg-[#E5E7EB] text-gray-800 rounded-tr-none"
+                                    ? "bg-white text-gray-800 rounded-tl-none"
+                                    : "bg-[#41CD5D] text-white rounded-tr-none"
                             )}>
                                 <MarkdownRenderer content={msg.message} isBot={msg.isBot} />
                             </div>
@@ -222,10 +217,17 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                         </div>
                     )}
                     <div ref={messagesEndRef} />
+
+                    {messages.length > 0 && (
+                        <div className="bg-white text-gray-800 rounded-2xl px-4 py-3 shadow-sm mx-auto mt-6 text-center text-xs font-medium w-fit max-w-[90%] leading-relaxed border border-gray-100">
+                            Jika sudah selesai mencobanya silahkan simpan di Pengaturan Lanjutan
+                        </div>
+                    )}
                 </div>
 
+
                 {/* --- INPUT AREA --- */}
-                <div className="p-4 pb-8 bg-white border-t border-gray-100 z-20">
+                <div className="p-4 pb-4 bg-white border-t border-gray-100 z-20">
                     <div className={cn(
                         "flex items-end gap-2 pl-4 pr-1.5 py-1.5 rounded-[24px]",
                         "bg-white",
@@ -249,15 +251,12 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                         <button
                             onClick={handleSend}
                             disabled={!selectedAgent || isSending || !input.trim()}
-                            className="w-10 h-10 mb-0.5 bg-[#2A2E37] hover:bg-[#353A45] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                            className="w-10 h-10 mb-0.5 bg-[#41CD5D] hover:bg-[#36bf50] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                         >
                             <SendHorizontal className="w-5 h-5 ml-0.5" />
                         </button>
                     </div>
                 </div>
-
-                {/* HOME INDICATOR */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full z-30"></div>
             </div>
         </div>
     );
