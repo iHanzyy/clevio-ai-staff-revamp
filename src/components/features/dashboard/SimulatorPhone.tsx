@@ -139,15 +139,14 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
             <div className={cn(
                 "relative w-full h-full flex flex-col overflow-hidden",
                 "rounded-4xl",
-                "bg-[#FDF8EE]", // Cream background
+                "rounded-4xl",
+                "bg-cover bg-center bg-no-repeat", // Use tailwind utility or style
                 "shadow-[0px_4px_63px_3px_rgba(65,205,93,1)]", // Green Glow
                 "select-none"
             )}
                 style={{
-                    backgroundImage: "url('/whatsapp_doodle_pattern.png')",
-                    backgroundBlendMode: "overlay",
-                    backgroundSize: "400px", // Adjust pattern size
-                    backgroundRepeat: "repeat"
+                    backgroundImage: "url('/whatsapp_background.png')",
+                    // Removed blend mode and repeat to make it the main wallpaper
                 }}>
 
                 {/* --- HEADER --- */}

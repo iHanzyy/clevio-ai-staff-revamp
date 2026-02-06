@@ -36,7 +36,7 @@ export const authService = {
     // Email/Password Register (via N8N Proxy)
     register: async (email: string, password: string) => {
         // Now using internal proxy to N8N with JSON body
-        const response = await axios.post<{ message: string, data: any }>(
+        const response = await axios.post<{ message: string, redirect?: string, data: any }>(
             '/api/auth/n8n-register',
             { email, password }
         );
@@ -47,6 +47,8 @@ export const authService = {
     setSession: (token: string) => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('jwt_token', token);
+            // Set cookie for middleware/server-side checks (matches auth/callback logic)
+            document.cookie = `session_token=${token}; path=/; max-age=604800; SameSite=Lax`;
         }
     },
 

@@ -32,6 +32,8 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        // Disabled auto-redirect to prevent loops on dashboard load
+        /*
         if (error.response && error.response.status === 401) {
             if (typeof window !== 'undefined') {
                 // Clear token and redirect to login if 401
@@ -41,6 +43,7 @@ api.interceptors.response.use(
                 }
             }
         }
+        */
         return Promise.reject(error);
     }
 );

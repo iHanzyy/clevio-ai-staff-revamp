@@ -36,7 +36,12 @@ export default function LoginForm() {
             if (activeTab === 'register') {
                 const res = await authService.register(email, password);
                 if (res.message) {
-                    showToast("Registrasi berhasil! Silakan login.", "success");
+                    showToast("Registrasi berhasil! Mengarahkan ke login...", "success");
+
+                    if (res.redirect) {
+                        router.push(res.redirect);
+                    }
+
                     setActiveTab('login');
                     setPassword(""); // Clear password for safety
                 }
@@ -47,16 +52,20 @@ export default function LoginForm() {
 
                     // Check User Status & Redirect
                     try {
+                        console.log("Fetching user profile...");
                         const user = await authService.getMe();
-                        if (user.plan_code === 'GUEST') {
-                            showToast("Login berhasil! Mengarahkan ke dashboard...", "success");
-                            router.push('/dashboard');
-                        } else {
-                            showToast("Login berhasil! Mengarahkan ke dashboard...", "success");
-                            router.push('/dashboard');
-                        }
+                        console.log("User fetched:", user);
+
+                        showToast("Login berhasil! Mengarahkan ke dashboard...", "success");
+
+                        // Force redirect using window.location.replace to prevent history loop
+                        setTimeout(() => {
+                            window.location.replace('/dashboard');
+                        }, 500);
+
                     } catch (err) {
-                        router.push('/dashboard'); // Fallback
+                        console.error("Profile fetch failed, forcing redirect...", err);
+                        window.location.href = '/dashboard';
                     }
                 }
             }
