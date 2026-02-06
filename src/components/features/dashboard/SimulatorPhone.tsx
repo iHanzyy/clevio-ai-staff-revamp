@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { SendHorizontal } from "lucide-react";
+import { SendHorizontal, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Agent, agentService } from "@/services/agentService";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -175,9 +175,12 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
 
                 {/* --- CHAT BODY --- */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-transparent">
-                    {/* Top Disclaimer Bubble (Yellow) */}
-                    <div className="bg-[#FFF8B6] text-gray-800 rounded-lg px-3 py-2 shadow-sm mx-auto mb-2 text-center text-xs font-semibold w-fit max-w-[85%] leading-snug">
-                        Jika masih ada yang salah kamu bisa minta tolong ke Arthur
+                    {/* Disclaimer / System Message - Same design as ArthurPhone */}
+                    <div className="flex items-center justify-center gap-2 mx-auto mb-6 max-w-[85%]">
+                        <Info className="w-5 h-5 text-[#111827] stroke-[2px] shrink-0" />
+                        <span className="text-[#111827] text-sm font-semibold leading-tight text-left">
+                            Jika masih ada yang salah kamu bisa minta tolong ke Arthur
+                        </span>
                     </div>
 
                     {messages.map((msg) => (

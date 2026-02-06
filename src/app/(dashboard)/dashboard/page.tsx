@@ -163,7 +163,7 @@ export default function DashboardPage() {
                 <div
                     className={cn(
                         "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
-                        activeSection !== 'arthur' && hasAgent && "opacity-50"
+                        activeSection !== 'arthur' && hasAgent && "opacity-75"
                     )}
                     onClick={() => hasAgent && setActiveSection('arthur')}
                 >
@@ -192,7 +192,7 @@ export default function DashboardPage() {
                 <div
                     className={cn(
                         "lg:col-span-6 h-full flex flex-col min-h-0 relative transition-all duration-300 cursor-pointer",
-                        activeSection !== 'work_area' && hasAgent && "opacity-50"
+                        activeSection !== 'work_area' && hasAgent && "opacity-75"
                     )}
                     onClick={() => hasAgent && setActiveSection('work_area')}
                 >
@@ -225,7 +225,7 @@ export default function DashboardPage() {
                 <div
                     className={cn(
                         "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
-                        activeSection !== 'simulator' && hasAgent && "opacity-50"
+                        activeSection !== 'simulator' && hasAgent && "opacity-75"
                     )}
                     onClick={() => hasAgent && setActiveSection('simulator')}
                 >
