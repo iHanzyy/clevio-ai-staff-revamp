@@ -22,7 +22,7 @@ interface SimulatorPhoneProps {
     agentVersion?: number; // Increment this to trigger session reset
 }
 
-export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdate, agentVersion = 0 }: SimulatorPhoneProps) {
+export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdate, agentVersion = 0, isFocused = false }: SimulatorPhoneProps) {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
@@ -141,7 +141,7 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                 "rounded-4xl",
                 "rounded-4xl",
                 "bg-cover bg-center bg-no-repeat", // Use tailwind utility or style
-                "shadow-[0px_4px_63px_3px_rgba(65,205,93,1)]", // Green Glow
+                isFocused ? "shadow-[0px_4px_63px_3px_rgba(65,205,93,1)]" : "shadow-none", // Green Glow
                 "select-none"
             )}
                 style={{
@@ -179,11 +179,6 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                     <div className="bg-[#FFF8B6] text-gray-800 rounded-lg px-3 py-2 shadow-sm mx-auto mb-2 text-center text-xs font-semibold w-fit max-w-[85%] leading-snug">
                         Jika masih ada yang salah kamu bisa minta tolong ke Arthur
                     </div>
-                    {messages.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-400 text-xs text-center px-8">
-                            <p>Mulai percakapan dengan {agentName}.</p>
-                        </div>
-                    )}
 
                     {messages.map((msg) => (
                         <div key={msg.id} className={cn("flex flex-col max-w-[85%]", msg.isBot ? "items-start mr-auto" : "items-end ml-auto")}>
@@ -216,12 +211,6 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                         </div>
                     )}
                     <div ref={messagesEndRef} />
-
-                    {messages.length > 0 && (
-                        <div className="bg-white text-gray-800 rounded-2xl px-4 py-3 shadow-sm mx-auto mt-6 text-center text-xs font-medium w-fit max-w-[90%] leading-relaxed border border-gray-100">
-                            Jika sudah selesai mencobanya silahkan simpan di Pengaturan Lanjutan
-                        </div>
-                    )}
                 </div>
 
 

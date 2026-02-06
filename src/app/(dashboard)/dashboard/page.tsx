@@ -7,6 +7,7 @@ import PreviewPhone from "@/components/features/dashboard/PreviewPhone";
 import AgentWorkArea from "@/components/features/dashboard/AgentDetail";
 import AgentEmptyState from "@/components/features/dashboard/AgentEmptyState";
 import { useToast } from "@/components/ui/ToastProvider";
+import { cn } from "@/lib/utils";
 
 import { agentService, Agent } from "@/services/agentService";
 
@@ -23,6 +24,8 @@ export default function DashboardPage() {
     const [selectedSection, setSelectedSection] = useState<'name' | 'system_prompt' | 'capabilities' | null>(null);
     // Agent version to trigger simulator session reset on updates
     const [agentVersion, setAgentVersion] = useState(0);
+    // Focus interaction state
+    const [activeSection, setActiveSection] = useState<'arthur' | 'work_area' | 'simulator'>('arthur');
 
     const { showToast } = useToast();
 
@@ -157,10 +160,19 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
 
                 {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
-                <div className="lg:col-span-3 h-full flex flex-col min-h-0">
+                <div
+                    className={cn(
+                        "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
+                        activeSection !== 'arthur' && hasAgent && "opacity-50"
+                    )}
+                    onClick={() => hasAgent && setActiveSection('arthur')}
+                >
                     {/* Header: Arthur */}
                     <div className="flex justify-center mb-4">
-                        <div className="bg-[#2563EB] text-white px-8 py-2 rounded-full font-medium shadow-md cursor-pointer hover:opacity-90 transition-opacity select-none">
+                        <div className={cn(
+                            "px-8 py-2 rounded-full font-medium shadow-md cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
+                            activeSection === 'arthur' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
+                        )}>
                             Arthur
                         </div>
                     </div>
@@ -168,25 +180,31 @@ export default function DashboardPage() {
                         isActive={isArthurActive}
                         onAgentCreated={handleAgentCreated}
                         hasAgent={hasAgent}
-                        // isAutoMode removed
                         selectedSection={selectedSection}
                         selectedAgent={selectedAgent}
                         onSectionReset={() => setSelectedSection(null)}
-                        onSelectSection={setSelectedSection} // Pass setter for Dropdown
+                        onSelectSection={setSelectedSection}
+                        isFocused={activeSection === 'arthur' && hasAgent}
                     />
                 </div>
 
                 {/* COLUMN 2: Work Area - 6 Columns width */}
-                <div className="lg:col-span-6 h-full flex flex-col min-h-0 relative">
+                <div
+                    className={cn(
+                        "lg:col-span-6 h-full flex flex-col min-h-0 relative transition-all duration-300 cursor-pointer",
+                        activeSection !== 'work_area' && hasAgent && "opacity-50"
+                    )}
+                    onClick={() => hasAgent && setActiveSection('work_area')}
+                >
                     {/* Header: Pengaturan Lanjutan */}
                     <div className="flex justify-center mb-4">
-                        <div className="bg-[#E0E0E0] text-gray-700 px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:bg-gray-300 transition-colors select-none">
+                        <div className={cn(
+                            "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
+                            activeSection === 'work_area' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
+                        )}>
                             Pengaturan Lanjutan
                         </div>
                     </div>
-
-                    {/* Toggle Switch (Floating Top-Right) */}
-
 
                     {!hasAgent ? (
                         <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
@@ -198,15 +216,25 @@ export default function DashboardPage() {
                             onAgentUpdate={refreshAgents}
                             selectedSection={selectedSection}
                             onSelectSection={setSelectedSection}
+                            isFocused={activeSection === 'work_area'}
                         />
                     )}
                 </div>
 
                 {/* COLUMN 3: Simulator/Preview - 3 Columns width */}
-                <div className="lg:col-span-3 h-full flex flex-col min-h-0">
+                <div
+                    className={cn(
+                        "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
+                        activeSection !== 'simulator' && hasAgent && "opacity-50"
+                    )}
+                    onClick={() => hasAgent && setActiveSection('simulator')}
+                >
                     {/* Header: Coba */}
                     <div className="flex justify-center mb-4">
-                        <div className="bg-[#E0E0E0] text-gray-700 px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:bg-gray-300 transition-colors select-none">
+                        <div className={cn(
+                            "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
+                            activeSection === 'simulator' && hasAgent ? "bg-[#41CD5D] text-white" : "bg-[#E0E0E0] text-gray-700"
+                        )}>
                             Coba
                         </div>
                     </div>
@@ -217,6 +245,7 @@ export default function DashboardPage() {
                             selectedAgent={selectedAgent}
                             onMessagesRemainingUpdate={handleMessagesRemainingUpdate}
                             agentVersion={agentVersion}
+                            isFocused={activeSection === 'simulator'}
                         />
                     )}
                 </div>

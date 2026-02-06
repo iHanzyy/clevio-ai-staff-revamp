@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { cn } from "@/lib/utils";
 import AgentSelector from "./agent/AgentSelector";
 import AgentTask from "./agent/AgentTask";
 import AgentCapabilities from "./agent/AgentCapabilities";
@@ -19,14 +20,18 @@ interface AgentWorkAreaProps {
     // onToggleMode removed
     selectedSection?: SectionType;
     onSelectSection: (section: SectionType) => void;
+    isFocused?: boolean;
 }
 
-export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, onAgentUpdate, selectedSection, onSelectSection }: AgentWorkAreaProps) {
+export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, onAgentUpdate, selectedSection, onSelectSection, isFocused = false }: AgentWorkAreaProps) {
 
     // Click handler removed - context selection is now via Arthur Dropdown only
 
     return (
-        <div className="flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-5 relative rounded-4xl p-4 shadow-[0px_4px_63px_3px_rgba(37,99,235,0.6)]">
+        <div className={cn(
+            "flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-5 relative rounded-4xl p-4 transition-all duration-300",
+            isFocused ? "shadow-[0px_4px_63px_3px_rgba(37,99,235,0.6)]" : "shadow-none"
+        )}>
 
             {/* 1. AGENT SELECTOR (Context Highlight Only) */}
             <AgentSelector

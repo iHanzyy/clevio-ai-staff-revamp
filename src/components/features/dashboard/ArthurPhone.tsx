@@ -26,6 +26,7 @@ interface ArthurPhoneProps {
     selectedSection?: SectionType;
     selectedAgent?: Agent | null;
     onSectionReset?: () => void;
+    isFocused?: boolean;
 }
 
 const WELCOME_MESSAGES: Message[] = [
@@ -72,7 +73,8 @@ export default function ArthurPhone({
     selectedSection = null,
     selectedAgent = null,
     onSectionReset,
-    onSelectSection // New Prop
+    onSelectSection, // New Prop
+    isFocused = false
 }: ArthurPhoneProps & { onSelectSection?: (section: SectionType) => void }) {
     const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES);
     const [input, setInput] = useState("");
@@ -260,7 +262,7 @@ export default function ArthurPhone({
         <div className={cn(
             "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-4xl overflow-hidden",
             "bg-[linear-gradient(0deg,#FFFAF2_0%,#C3D2F4_100%)]",
-            "shadow-[0px_4px_63px_3px_rgba(37,99,235,1)]"
+            isFocused ? "shadow-[0px_4px_63px_3px_rgba(37,99,235,1)]" : "shadow-none"
         )}>
             {/* HEADER */}
             <div className="flex items-center justify-between px-6 py-5 bg-white/80 backdrop-blur-md border-b border-gray-100 z-10 transition-all">
