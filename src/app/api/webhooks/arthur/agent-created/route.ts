@@ -47,9 +47,17 @@ export async function POST(req: Request) {
             body = body[0];
         }
 
-        // 1. Parsing Payload from N8N (Flat structure based on user screenshot)
-        // Payload: { name, system_prompt, mcp_tools, google_tools, session_id }
-        const { name, system_prompt, mcp_tools, google_tools, session_id } = body;
+        // 1. Parsing Payload from N8N (supports both flat and nested structures)
+        // Flat: { name, system_prompt, mcp_tools, google_tools, session_id }
+        // Nested: { name, config: { system_prompt, llm_model, temperature }, mcp_tools, google_tools, session_id }
+        const { name, mcp_tools, google_tools, session_id, config } = body;
+
+        // Extract system_prompt from either top level or config.system_prompt
+        const system_prompt = body.system_prompt || config?.system_prompt;
+
+        // Extract llm_model and temperature from config if available
+        const llm_model = config?.llm_model || 'gpt-4.1-mini';
+        const temperature = config?.temperature ?? 0.1;
 
         if (!name || !system_prompt) {
             console.log('[Webhook: Arthur] Missing name or system_prompt');
@@ -61,11 +69,11 @@ export async function POST(req: Request) {
             "name": name,
             "google_tools": google_tools || [],
             "config": {
-                "llm_model": "gpt-4.1-mini",
-                "temperature": 0.1,
+                "llm_model": llm_model,
+                "temperature": temperature,
                 "system_prompt": system_prompt,
             },
-            "mcp_servers": {
+            "mcp_servers": body.mcp_servers || {
                 "calculator_sse": {
                     "transport": "sse",
                     "url": "http://194.238.23.242:8190/sse"

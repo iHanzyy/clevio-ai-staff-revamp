@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Agent, agentService } from "@/services/agentService";
 import { Pencil, Copy, Loader2, X } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
+import MarkdownRenderer from "@/components/ui/MarkdownRenderer";
 
 interface AgentTaskProps {
     selectedAgent: Agent | null;
@@ -71,9 +72,9 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
                     </div>
                 </div>
 
-                <p className={cn("text-gray-600 text-sm leading-relaxed", isTruncated && "line-clamp-3")}>
-                    {systemPrompt}
-                </p>
+                <div className={cn("text-gray-600 text-sm leading-relaxed", isTruncated && "line-clamp-3")}>
+                    <MarkdownRenderer content={systemPrompt} isBot={true} />
+                </div>
                 {isTruncated && (
                     <button
                         onClick={() => setIsPromptModalOpen(true)}
@@ -90,8 +91,8 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsPromptModalOpen(false)} />
                     <div className="relative bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl animate-fade-in-up">
                         <h3 className="text-2xl font-bold text-gray-900 mb-4">Tugas Agen</h3>
-                        <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl whitespace-pre-wrap">
-                            {systemPrompt}
+                        <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl">
+                            <MarkdownRenderer content={systemPrompt} isBot={true} />
                         </div>
                         <div className="mt-6 flex justify-end">
                             <button
