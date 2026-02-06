@@ -153,11 +153,17 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="w-full h-full p-6 md:p-10 overflow-hidden">
+        <div className="w-full h-full px-6 pb-6 pt-2 md:px-10 md:pb-10 md:pt-5 overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
 
                 {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
                 <div className="lg:col-span-3 h-full flex flex-col min-h-0">
+                    {/* Header: Arthur */}
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-[#2563EB] text-white px-8 py-2 rounded-full font-medium shadow-md cursor-pointer hover:opacity-90 transition-opacity select-none">
+                            Arthur
+                        </div>
+                    </div>
                     <ArthurPhone
                         isActive={isArthurActive}
                         onAgentCreated={handleAgentCreated}
@@ -172,6 +178,12 @@ export default function DashboardPage() {
 
                 {/* COLUMN 2: Work Area - 6 Columns width */}
                 <div className="lg:col-span-6 h-full flex flex-col min-h-0 relative">
+                    {/* Header: Pengaturan Lanjutan */}
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-[#E0E0E0] text-gray-700 px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:bg-gray-300 transition-colors select-none">
+                            Pengaturan Lanjutan
+                        </div>
+                    </div>
 
                     {/* Toggle Switch (Floating Top-Right) */}
 
@@ -192,6 +204,12 @@ export default function DashboardPage() {
 
                 {/* COLUMN 3: Simulator/Preview - 3 Columns width */}
                 <div className="lg:col-span-3 h-full flex flex-col min-h-0">
+                    {/* Header: Coba */}
+                    <div className="flex justify-center mb-4">
+                        <div className="bg-[#E0E0E0] text-gray-700 px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:bg-gray-300 transition-colors select-none">
+                            Coba
+                        </div>
+                    </div>
                     {!hasAgent ? (
                         <PreviewPhone />
                     ) : (
