@@ -20,6 +20,7 @@ interface SimulatorPhoneProps {
     selectedAgent: Agent | null;
     onMessagesRemainingUpdate?: (remaining: number) => void;
     agentVersion?: number; // Increment this to trigger session reset
+    isFocused?: boolean;
 }
 
 export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdate, agentVersion = 0, isFocused = false }: SimulatorPhoneProps) {
