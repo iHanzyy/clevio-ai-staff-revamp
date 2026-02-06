@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {},
-  allowedDevOrigins: ["unlevelled-ariah-zoochemical.ngrok-free.dev"],
+  allowedDevOrigins: ["upright-planoblastic-wilbur.ngrok-free.dev"],
   images: {
     qualities: [75, 100],
   },

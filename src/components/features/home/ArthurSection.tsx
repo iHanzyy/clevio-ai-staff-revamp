@@ -104,8 +104,16 @@ export default function ArthurSection() {
         };
     }, []);
 
-    // Initialize session and credentials on mount
+    // Initialize session and credentials on mount (Check Storage First)
     useEffect(() => {
+        // Session restoration logic REMOVED as per request.
+        // Always generate new session on reload.
+
+        // try {
+        //     const storedSession = sessionStorage.getItem("arthur_session_data");
+        //     if (storedSession) { ... }
+        // } catch (e) { ... }
+
         // Generate random credentials
         const randomString = Math.random().toString(36).substring(2, 10);
         const generatedEmail = `${randomString}@clevio.staff`;
@@ -114,11 +122,20 @@ export default function ArthurSection() {
         // Generate random session ID
         const generatedSessionId = `arthur-session-${Math.random().toString(36).substring(2, 9)}`;
 
-        setCredentials({
-            email: generatedEmail,
-            password: generatedPassword
-        });
-        setSessionId(generatedSessionId);
+        const newSessionData = {
+            sessionId: generatedSessionId,
+            credentials: {
+                email: generatedEmail,
+                password: generatedPassword
+            }
+        };
+
+        setCredentials(newSessionData.credentials);
+        setSessionId(newSessionData.sessionId);
+
+        // Save to sessionStorage
+        sessionStorage.setItem("arthur_session_data", JSON.stringify(newSessionData));
+        persistLog("🆕 Created new session", generatedSessionId);
     }, []);
 
 
@@ -168,18 +185,41 @@ export default function ArthurSection() {
         };
     }, []);
 
+    // Helper function to persist logs to localStorage (survives page reload)
+    const persistLog = (message: string, data?: any) => {
+        const timestamp = new Date().toISOString();
+        const logEntry = `[${timestamp}] ${message}${data ? ': ' + JSON.stringify(data) : ''}`;
+        console.log(logEntry);
+        try {
+            const existingLogs = localStorage.getItem('arthur_debug_logs') || '';
+            localStorage.setItem('arthur_debug_logs', existingLogs + '\n' + logEntry);
+        } catch (e) { /* ignore storage errors */ }
+    };
+
     // Start polling for agent data from webhook
     const startPollingForAgentData = () => {
-        if (pollingIntervalRef.current) return; // Already polling
+        if (pollingIntervalRef.current) {
+            persistLog("Polling already running, skipping");
+            return; // Already polling
+        }
+
+        // Clear previous logs for new session - REMOVED to keep history
+        // localStorage.removeItem('arthur_debug_logs');
+        persistLog("🚀 Starting polling for session", sessionId);
 
         let pollCount = 0;
         const maxPolls = 120; // 120 * 2s = 4 minutes max
 
         pollingIntervalRef.current = setInterval(async () => {
             pollCount++;
+            // Only log every 5th poll to avoid spam
+            if (pollCount % 5 === 1 || pollCount <= 3) {
+                persistLog(`🔍 Poll #${pollCount} for session`, sessionId);
+            }
 
             if (pollCount > maxPolls) {
                 // Timeout - stop polling
+                persistLog("⏰ Polling timeout reached, stopping");
                 if (pollingIntervalRef.current) {
                     clearInterval(pollingIntervalRef.current);
                     pollingIntervalRef.current = null;
@@ -189,12 +229,14 @@ export default function ArthurSection() {
             }
 
             try {
-                const res = await fetch(`/api/webhooks/arthur/agent-created?session_id=${sessionId}`);
+                // Add timestamp to prevent browser caching of 404 responses
+                const res = await fetch(`/api/webhooks/arthur/agent-created?session_id=${sessionId}&t=${Date.now()}`);
 
                 if (res.ok) {
                     const agentData = await res.json();
 
                     if (agentData && agentData.name) {
+                        persistLog("✅ Agent data found!", agentData.name);
                         // Stop polling
                         if (pollingIntervalRef.current) {
                             clearInterval(pollingIntervalRef.current);
@@ -203,98 +245,114 @@ export default function ArthurSection() {
 
                         // Save to localStorage
                         localStorage.setItem('agent_payload', JSON.stringify(agentData));
-
-                        // Show success message
-                        // REMOVED: User requested to replace text with animation
-                        // setMessages(prev => [...prev, {
-                        //     id: Date.now(),
-                        //     from: "arthur",
-                        //     text: "Agen Anda berhasil dibuat! Sedang memproses akun Anda..."
-                        // }]);
+                        persistLog("💾 Saved agent_payload to localStorage");
 
                         setIsTyping(false);
                         setIsProcessingFinal(true);
+                        persistLog("🎬 Calling handleFinalRegistration");
 
                         // Proceed to registration and agent creation
                         await handleFinalRegistration(agentData);
                     }
                 }
             } catch (err) {
-                console.error("[ArthurSection] Polling error:", err);
+                persistLog("❌ Polling error", String(err));
             }
         }, 2000); // Poll every 2 seconds
     };
 
+    // Auto-restart polling when sessionId changes/restores
+    useEffect(() => {
+        // Cleanup old polling to prevent stale session usage
+        if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+            persistLog("♻️ Session changed/restored, restarting polling logic");
+        }
+
+        // Only auto-start if we have a session but NO agent data yet
+        if (sessionId && !localStorage.getItem('agent_payload')) {
+            startPollingForAgentData();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [sessionId]);
+
     const handleFinalRegistration = async (agentData: any) => {
+        persistLog("🎯 handleFinalRegistration started", agentData?.name);
         try {
-            // Step 1: Hit register webhook and get access_token
-            const registerResponse = await fetch('/api/arthur/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: credentials.email,
-                    password: credentials.password
-                })
-            });
+            // NEW FLOW: N8N sends access_token INSIDE the agent-created payload!
+            // No need to poll payment/status separately.
+            persistLog("🔍 Checking for Access Token in agent payload...");
 
-            const registerData = await registerResponse.json();
-            console.log("[ArthurSection] Register response:", registerData);
+            let accessToken = agentData?.access_token;
 
-            // Step 2: Extract and save access_token (Handle Array or Object)
-            let accessToken;
-            if (Array.isArray(registerData) && registerData.length > 0) {
-                accessToken = registerData[0].access_token;
-            } else {
-                accessToken = registerData.access_token;
+            if (!accessToken) {
+                // Fallback: Maybe token is nested differently?
+                accessToken = agentData?.token || agentData?.accessToken;
             }
 
-            const tokenToUse = accessToken; // alias for clarity
+            persistLog("🔑 Access Token", accessToken ? "✅ Found in payload!" : "❌ Not found in payload");
 
-            if (accessToken) {
-                // Save to localStorage (for API calls)
-                localStorage.setItem('jwt_token', accessToken);
+            if (!accessToken) {
+                persistLog("❌ No access_token in agent payload from N8N");
+                setMessages(prev => [...prev, {
+                    id: Date.now(),
+                    from: "arthur",
+                    text: "Maaf, terjadi kesalahan sistem (token missing). Mohon coba lagi."
+                }]);
+                setIsProcessingFinal(false);
+                return;
+            }
 
-                // Save to cookie (for middleware protection)
-                document.cookie = `session_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
+            const tokenToUse = accessToken;
 
-                console.log("[ArthurSection] Access token saved successfully");
+            // Save to localStorage (for API calls)
+            localStorage.setItem('jwt_token', accessToken);
 
-                // Step 3: Create agent using Proxy (to avoid CORS)
-                try {
-                    console.log("[ArthurSection] Creating agent via Proxy...");
-                    const createAgentResponse = await fetch('/api/agents/create', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            payload: agentData,
-                            token: tokenToUse
-                        })
-                    });
+            // Save to cookie (for middleware protection)
+            document.cookie = `session_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
 
-                    if (!createAgentResponse.ok) {
-                        throw new Error("Failed to create agent via proxy");
-                    }
+            persistLog("🔑 Token saved to localStorage and cookie");
 
-                    console.log("[ArthurSection] Agent created successfully via Proxy");
+            // Step 3: Create agent using Proxy (to avoid CORS)
+            try {
+                persistLog("🤖 Step 3: Creating agent via Proxy");
+                const createAgentResponse = await fetch('/api/agents/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        payload: agentData,
+                        token: tokenToUse
+                    })
+                });
 
-                } catch (agentError) {
-                    console.error("[ArthurSection] Failed to create agent:", agentError);
-                    // Still redirect even if agent creation fails
+                persistLog("🤖 Agent create status", createAgentResponse.status);
+
+                if (!createAgentResponse.ok) {
+                    const errorData = await createAgentResponse.json().catch(() => ({}));
+                    persistLog("❌ Failed to create agent", errorData);
+                    throw new Error("Failed to create agent via proxy");
                 }
-            } else {
-                console.warn("[ArthurSection] No access_token received from register webhook");
+
+                persistLog("✅ Agent created successfully!");
+
+            } catch (agentError) {
+                persistLog("❌ Agent creation error", String(agentError));
+                // Still redirect even if agent creation fails
             }
+            // Step 4: Redirect to dashboard
 
             // Step 4: Redirect to dashboard
+            persistLog("🚀 Step 4: Calling router.push('/dashboard')");
             router.push('/dashboard');
+            persistLog("✅ router.push called - should redirect now!");
 
         } catch (error) {
-            console.error("[ArthurSection] Registration error:", error);
+            persistLog("❌ Registration error", String(error));
             // Still try to redirect
+            persistLog("🚀 Redirecting despite error");
             router.push('/dashboard');
         }
     };
@@ -308,6 +366,13 @@ export default function ArthurSection() {
         setMessage("");
         setIsTyping(true);
 
+        // Always start polling immediately in background (resilience)
+        startPollingForAgentData();
+
+        // Setup timeout for chat request (25 seconds) to prevent browser hang/reload issues
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+
         try {
             const response = await fetch('/api/arthur/landing-chat', {
                 method: 'POST',
@@ -319,8 +384,11 @@ export default function ArthurSection() {
                     chatInput: userMsg.text,
                     email: credentials.email,
                     password: credentials.password
-                })
+                }),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId); // Clear timeout if successful
 
             const data = await response.json();
             console.log("[ArthurSection] Chat response:", data);
@@ -332,12 +400,7 @@ export default function ArthurSection() {
                 // Direct agent data response - process immediately
                 console.log("[ArthurSection] Direct agent data received");
                 localStorage.setItem('agent_payload', JSON.stringify(data[0]));
-                // REMOVED: User requested to replace text with animation
-                // setMessages(prev => [...prev, {
-                //     id: Date.now() + 1,
-                //     from: "arthur",
-                //     text: "Agen Anda berhasil dibuat! Sedang memproses..."
-                // }]);
+
                 setIsTyping(false);
                 setIsProcessingFinal(true);
                 await handleFinalRegistration(data[0]);
@@ -362,23 +425,31 @@ export default function ArthurSection() {
                 text: responseText
             }]);
 
-            // ALWAYS start polling after every response (runs in background)
-            // Polling will check if N8N has posted agent data to webhook
-            startPollingForAgentData();
+        } catch (error: any) {
+            clearTimeout(timeoutId);
 
-        } catch (error) {
-            console.error("[ArthurSection] Chat error:", error);
-            setIsTyping(false);
-            setMessages(prev => [...prev, {
-                id: Date.now() + 1,
-                from: "arthur",
-                text: "Maaf, terjadi kesalahan koneksi. Silakan coba lagi."
-            }]);
+            if (error.name === 'AbortError') {
+                console.log("[ArthurSection] Chat request timed out (expected), continuing polling...");
+                // Don't show error to user, just let polling handle it. 
+                // Keep typing indicator on? No, maybe show "Processing..." logic?
+                // Or just let typing indicator run until polling succeeds?
+                // Let's keep typing indicator ON, because N8N is still working.
+                // We trust polling to finish the job.
+            } else {
+                console.error("[ArthurSection] Chat error:", error);
+                setIsTyping(false);
+                setMessages(prev => [...prev, {
+                    id: Date.now() + 1,
+                    from: "arthur",
+                    text: "Maaf, terjadi kesalahan koneksi. Namun saya tetap memproses permintaan Anda di background."
+                }]);
+            }
         }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
+            e.preventDefault(); // Prevent accidental form submission
             handleSendMessage();
         }
     };
@@ -515,9 +586,13 @@ export default function ArthurSection() {
                                 className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base disabled:opacity-50"
                                 style={{ fontSize: '16px' }} // Prevent iOS zoom
                             />
-                            {/* Button INSIDE input */}
+                            {/* Button INSIDE input - Explicitly type="button" to prevent form submit */}
                             <button
-                                onClick={handleSendMessage}
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    handleSendMessage();
+                                }}
                                 disabled={!message.trim() || isTyping || isProcessingFinal}
                                 className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-[#2563EB] rounded-full flex items-center justify-center hover:bg-[#1d4ed8] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                                 aria-label="Send Message"

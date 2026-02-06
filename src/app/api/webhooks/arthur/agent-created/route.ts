@@ -65,6 +65,7 @@ export async function POST(req: Request) {
         }
 
         // 2. Map to Backend Agent Structure
+        // IMPORTANT: Also preserve auth tokens from N8N for frontend to use!
         const agentPayload = {
             "name": name,
             "google_tools": google_tools || [],
@@ -80,6 +81,12 @@ export async function POST(req: Request) {
                 }
             },
             "mcp_tools": mcp_tools || [],
+            // Auth tokens from N8N - REQUIRED for frontend to authenticate!
+            "access_token": body.access_token,
+            "token_type": body.token_type,
+            "expires_at": body.expires_at,
+            "token_limit": body.token_limit,
+            "plan_code": body.plan_code,
         };
 
         // 3. Save to File-Based Store for Frontend Retrieval
@@ -123,11 +130,24 @@ export async function GET(req: Request) {
         delete payloads[sessionId];
         writePayloads(payloads);
 
-        return NextResponse.json(entry.data);
+        return NextResponse.json(entry.data, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+            }
+        });
     }
 
     // Debugging: Log available keys to see if mismatch exists
     console.log(`[Webhook: Arthur] Session not found: ${sessionId}. Available: ${Object.keys(payloads)}`);
 
-    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+    return NextResponse.json({ error: 'Not found' }, {
+        status: 404,
+        headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+        }
+    });
 }

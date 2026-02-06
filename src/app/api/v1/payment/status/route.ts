@@ -24,28 +24,38 @@ if (typeof setInterval !== 'undefined') {
 }
 
 /**
- * GET /api/v1/payment/status?order_id=xxx
+ * GET /api/v1/payment/status?order_id=xxx OR ?session_id=xxx
  * Poll payment status (called by frontend)
  * Returns status, and access_token if available (after N8N sets it)
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const orderId = searchParams.get('order_id');
+  const sessionId = searchParams.get('session_id');
 
-  if (!orderId) {
+  const key = orderId || sessionId;
+
+  if (!key) {
     return NextResponse.json(
-      { status: 'unknown', message: 'Missing order_id' },
+      { status: 'unknown', message: 'Missing order_id or session_id' },
       { status: 400 }
     );
   }
 
-  const data = paymentDataStore.get(orderId);
+  const data = paymentDataStore.get(key);
 
+  // Add headers to prevent caching of polling results
   return NextResponse.json({
     status: data?.status || 'pending',
-    order_id: orderId,
+    key: key,
     access_token: data?.access_token,
     plan_code: data?.plan_code,
+  }, {
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    }
   });
 }
 
@@ -54,16 +64,33 @@ export async function GET(request: NextRequest) {
  * Set payment status (called by n8n after Midtrans callback OR for trial activation)
  * 
  * For PAID: Receives order_id, status, access_token, plan_code from N8N
- * For TRIAL: Receives access_token, plan_code (no order_id/status needed)
+ * For TRIAL/GUEST: Receives access_token, plan_code, session_id (optional)
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { order_id, status, access_token, plan_code } = body;
+    // Allow both snake_case and camelCase for session_id
+    const { order_id, status, access_token, plan_code, session_id, sessionId } = body;
+    const finalSessionId = session_id || sessionId;
 
-    // GUEST flow: no order_id/status required, just return success with token info
+    console.log(`[PaymentStatus] Received POST:`, { order_id, status, plan_code, session_id: finalSessionId, has_token: !!access_token });
+
+    // GUEST flow: no order_id/status required, BUT we need session_id to store it for frontend polling
     if (plan_code === 'GUEST') {
-      console.log(`[PaymentStatus] GUEST activation - access_token received`);
+
+      if (finalSessionId && access_token) {
+        // STORE IT so frontend polling can find it!
+        paymentDataStore.set(finalSessionId, {
+          status: 'success',
+          access_token,
+          plan_code,
+          timestamp: Date.now()
+        });
+        console.log(`[PaymentStatus] GUEST token stored for session: ${finalSessionId}`);
+      } else {
+        console.warn(`[PaymentStatus] GUEST token received but missing session_id - cannot store for polling!`);
+      }
+
       return NextResponse.json({
         success: true,
         plan_code: 'GUEST',
@@ -95,7 +122,8 @@ export async function POST(request: NextRequest) {
       access_token: access_token,
       plan_code,
     });
-  } catch {
+  } catch (e) {
+    console.error("[PaymentStatus] Error:", e);
     return NextResponse.json(
       { success: false, message: 'Invalid request body' },
       { status: 400 }
