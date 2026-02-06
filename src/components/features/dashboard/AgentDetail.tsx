@@ -26,7 +26,7 @@ export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, on
     // Click handler removed - context selection is now via Arthur Dropdown only
 
     return (
-        <div className="flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-5 relative">
+        <div className="flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-5 relative rounded-4xl p-4 shadow-[0px_4px_63px_3px_rgba(37,99,235,0.6)]">
 
             {/* 1. AGENT SELECTOR (Context Highlight Only) */}
             <AgentSelector
