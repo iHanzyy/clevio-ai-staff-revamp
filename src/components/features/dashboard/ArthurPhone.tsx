@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { SendHorizontal, Lock, Sparkles } from "lucide-react";
+import { SendHorizontal, Lock, Sparkles, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { arthurService } from "@/services/arthurService";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -278,9 +278,12 @@ export default function ArthurPhone({
 
             {/* CHAT BODY */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-transparent">
-                {/* Disclaimer / System Message */}
-                <div className="bg-white text-gray-800 rounded-2xl px-2 py-3 shadow-sm mx-auto mb-6 text-center text-sm font-semibold w-fit max-w-[80%] leading-snug">
-                    Arthur siap membantumu membuat staf AI yang kamu inginkan
+                {/* Disclaimer / System Message - Updated Design */}
+                <div className="flex items-center justify-center gap-2 mx-auto mb-6 max-w-[85%]">
+                    <Info className="w-5 h-5 text-[#111827] stroke-[2px] shrink-0" />
+                    <span className="text-[#111827] text-sm font-semibold leading-tight text-left">
+                        Arthur siap membantumu membuat staf AI yang kamu inginkan
+                    </span>
                 </div>
 
                 {messages.map((msg) => {
