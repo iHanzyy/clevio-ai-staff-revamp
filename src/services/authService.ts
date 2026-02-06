@@ -1,4 +1,5 @@
 import api from './api';
+import axios from 'axios';
 
 export interface User {
     id: string;
@@ -32,11 +33,12 @@ export const authService = {
         return response.data;
     },
 
-    // Email/Password Register
+    // Email/Password Register (via N8N Proxy)
     register: async (email: string, password: string) => {
-        // API requires Query params
-        const response = await api.post<{ message: string, user_id: string, email: string }>(
-            `/auth/register?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        // Now using internal proxy to N8N with JSON body
+        const response = await axios.post<{ message: string, data: any }>(
+            '/api/auth/n8n-register',
+            { email, password }
         );
         return response.data;
     },
