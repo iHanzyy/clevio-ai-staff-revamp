@@ -51,19 +51,23 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
 
     return (
         <>
-            <nav className="w-full h-20 px-6 md:px-12 flex items-center justify-between bg-[#02457A] text-white">
+            <nav className="relative w-full h-20 px-6 md:px-12 flex items-center justify-between bg-[#02457A] text-white">
                 {/* LEFT: Logo & Brand */}
                 <div className="flex items-center gap-3">
-                    <div className="relative w-8 h-8 md:w-10 md:h-10">
+                    <div className="relative w-12 h-12 md:w-16 md:h-16">
                         <Image
-                            src="/clevioLogo.webp"
+                            src="/clevioLogo_figma.png"
                             alt="Clevio Logo"
                             fill
                             className="object-contain"
                         />
                     </div>
-                    <span className="text-xl md:text-2xl font-bold font-sans tracking-wide text-white">
-                        Clevio AI Staff
+                </div>
+
+                {/* CENTER: Title */}
+                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">
+                    <span className="font-sans font-semibold text-2xl md:text-4xl text-white tracking-tight selection:bg-white/20">
+                        Atur Staf AI mu
                     </span>
                 </div>
 
@@ -73,8 +77,8 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                     {/* Label: Paket Aktif */}
                     <div className={cn(
                         "hidden md:flex items-center px-5 py-2.5 rounded-full font-medium text-sm",
-                        "bg-[#2A2E37] text-gray-300 border border-white/5",
-                        "shadow-inner",
+                        "bg-white text-black", // User Req: White background
+                        "shadow-lg",
                         "select-none"
                     )}>
                         Paket aktif tersisa: {user?.api_expires_at
@@ -88,12 +92,10 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                         <button
                             onClick={() => setIsProfileOpen(!isProfileOpen)}
                             className={cn(
-                                "w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95",
-                                "bg-[#2A2E37] hover:bg-[#353A45] text-white",
-                                // Dark Claymorphism: Subtle Inner Highlight + Deep Inner Shadow + Drop Shadow
-                                "shadow-[inset_2px_2px_4px_rgba(255,255,255,0.05),inset_-2px_-2px_4px_rgba(0,0,0,0.4),0_4px_8px_rgba(0,0,0,0.4)]",
-                                "hover:shadow-[inset_2px_2px_6px_rgba(255,255,255,0.08),inset_-2px_-2px_6px_rgba(0,0,0,0.5),0_6px_12px_rgba(0,0,0,0.5)]",
-                                "border border-white/5",
+                                "w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center transition-all duration-300 active:scale-95",
+                                "bg-white hover:bg-gray-100 text-black", // User Req: White background
+                                "shadow-lg",
+                                "border border-black/5",
                                 "cursor-pointer"
                             )}
                         >
@@ -102,14 +104,14 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
 
                         {/* Dropdown Menu */}
                         {isProfileOpen && (
-                            <div className="absolute right-0 mt-3 w-48 bg-[#1C1F26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-100 animate-fade-in-down origin-top-right">
+                            <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden z-100 animate-fade-in-down origin-top-right text-black">
                                 <div className="py-1">
                                     <button
                                         onClick={() => {
                                             setIsSettingsOpen(true);
                                             setIsProfileOpen(false);
                                         }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                                     >
                                         <Settings className="w-4 h-4" />
                                         Settings
@@ -123,15 +125,15 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                                             }
                                             setIsProfileOpen(false);
                                         }}
-                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors cursor-pointer"
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
                                     >
                                         <Puzzle className="w-4 h-4" />
                                         Add-Ons
                                     </button>
-                                    <div className="h-px bg-white/10 mx-2" />
+                                    <div className="h-px bg-gray-100 mx-2" />
                                     <button
                                         onClick={handleLogout}
-                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
+                                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                                     >
                                         <LogOut className="w-4 h-4" />
                                         Logout
