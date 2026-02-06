@@ -258,9 +258,9 @@ export default function ArthurPhone({
 
     return (
         <div className={cn(
-            "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-4xl overflow-hidden border-8 border-[#1C1F26]",
-            "bg-[#F9F9F9]",
-            "shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+            "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-4xl overflow-hidden",
+            "bg-[linear-gradient(0deg,#FFFAF2_0%,#C3D2F4_100%)]",
+            "shadow-[0px_4px_63px_3px_rgba(37,99,235,1)]"
         )}>
             {/* HEADER */}
             <div className="flex items-center justify-between px-6 py-5 bg-white/80 backdrop-blur-md border-b border-gray-100 z-10 transition-all">
@@ -269,20 +269,25 @@ export default function ArthurPhone({
                         <Image src="/arthurProfile.webp" alt="Arthur" fill className="object-cover" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-gray-900 text-lg leading-tight">Arthur</h3>
-                        <p className="text-xs text-gray-500 font-medium">{isSending ? "Mengetik..." : "AI Assistant"}</p>
+                        <h3 className="font-bold text-[#2563EB] text-lg leading-tight">Arthur</h3>
+                        <p className="text-xs text-[#111827] font-medium">{isSending ? "Mengetik..." : "AI Assistant"}</p>
                     </div>
                 </div>
                 <button onClick={handleClear} className="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors cursor-pointer">Clear</button>
             </div>
 
             {/* CHAT BODY */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-[#F9F9F9]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-apple bg-transparent">
+                {/* Disclaimer / System Message */}
+                <div className="bg-white text-gray-800 rounded-2xl px-2 py-3 shadow-sm mx-auto mb-6 text-center text-sm font-semibold w-fit max-w-[80%] leading-snug">
+                    Arthur siap membantumu membuat staf AI yang kamu inginkan
+                </div>
+
                 {messages.map((msg) => {
                     const isArthur = msg.sender === "Arthur";
                     return (
                         <div key={msg.id} className={cn("flex flex-col max-w-[85%]", isArthur ? "items-start mr-auto" : "items-end ml-auto")}>
-                            <div className={cn("px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm relative wrap-break-word", isArthur ? "bg-[#2A2E37] text-white rounded-tl-none" : "bg-[#E5E7EB] text-gray-800 rounded-tr-none")}>
+                            <div className={cn("px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm relative wrap-break-word", isArthur ? "bg-[#2563EB] text-white rounded-tl-none" : "bg-[#02457A] text-white rounded-tr-none")}>
                                 <MarkdownRenderer content={msg.message} isBot={isArthur} />
                             </div>
                             <div className={cn("text-[10px] text-gray-400 mt-1 flex items-center gap-1", isArthur ? "ml-1" : "mr-1 justify-end")}>{msg.time}</div>
@@ -395,7 +400,7 @@ export default function ArthurPhone({
                     <button
                         onClick={handleSend}
                         disabled={!isArthurFullyActive || isSending || !input.trim()}
-                        className="w-10 h-10 mb-0.5 bg-[#2A2E37] hover:bg-[#353A45] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                        className="w-10 h-10 mb-0.5 bg-[#2563EB] hover:bg-[#1d4ed8] rounded-full flex items-center justify-center text-white shadow-lg transition-transform active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
                     >
                         <SendHorizontal className="w-5 h-5 ml-0.5" />
                     </button>
