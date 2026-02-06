@@ -156,100 +156,189 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="w-full h-full px-6 pb-6 pt-2 md:px-10 md:pb-10 md:pt-5 overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full">
-
-                {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
-                <div
+        <div className="w-full h-full flex flex-col overflow-hidden">
+            {/* MOBILE TAB BAR - Fixed at top, only visible < lg */}
+            <div className="lg:hidden sticky top-0 z-50 bg-gradient-to-b from-[#C3D2F4] to-[#C3D2F4]/90 px-4 py-3 flex gap-2 justify-center">
+                <button
+                    onClick={() => setActiveSection('arthur')}
                     className={cn(
-                        "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
-                        activeSection !== 'arthur' && hasAgent && "opacity-75"
+                        "px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 select-none",
+                        activeSection === 'arthur' ? "bg-[#2563EB] text-white shadow-md" : "bg-[#E0E0E0] text-gray-500"
                     )}
-                    onClick={() => hasAgent && setActiveSection('arthur')}
                 >
-                    {/* Header: Arthur */}
-                    <div className="flex justify-center mb-4">
-                        <div className={cn(
-                            "px-8 py-2 rounded-full font-medium shadow-md cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
-                            activeSection === 'arthur' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
-                        )}>
-                            Arthur
-                        </div>
-                    </div>
-                    <ArthurPhone
-                        isActive={isArthurActive}
-                        onAgentCreated={handleAgentCreated}
-                        hasAgent={hasAgent}
-                        selectedSection={selectedSection}
-                        selectedAgent={selectedAgent}
-                        onSectionReset={() => setSelectedSection(null)}
-                        onSelectSection={setSelectedSection}
-                        isFocused={activeSection === 'arthur' && hasAgent}
-                    />
-                </div>
-
-                {/* COLUMN 2: Work Area - 6 Columns width */}
-                <div
+                    Arthur
+                </button>
+                <button
+                    onClick={() => setActiveSection('work_area')}
                     className={cn(
-                        "lg:col-span-6 h-full flex flex-col min-h-0 relative transition-all duration-300 cursor-pointer",
-                        activeSection !== 'work_area' && hasAgent && "opacity-75"
+                        "px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 select-none",
+                        activeSection === 'work_area' ? "bg-[#2563EB] text-white shadow-md" : "bg-[#E0E0E0] text-gray-500"
                     )}
-                    onClick={() => hasAgent && setActiveSection('work_area')}
                 >
-                    {/* Header: Pengaturan Lanjutan */}
-                    <div className="flex justify-center mb-4">
-                        <div className={cn(
-                            "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
-                            activeSection === 'work_area' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
-                        )}>
-                            Pengaturan Lanjutan
-                        </div>
-                    </div>
+                    Pengaturan Lanjutan
+                </button>
+                <button
+                    onClick={() => setActiveSection('simulator')}
+                    className={cn(
+                        "px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 select-none",
+                        activeSection === 'simulator' ? "bg-[#41CD5D] text-white shadow-md" : "bg-[#E0E0E0] text-gray-500"
+                    )}
+                >
+                    Coba
+                </button>
+            </div>
 
-                    {!hasAgent ? (
-                        <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
-                    ) : (
-                        <AgentWorkArea
-                            agents={agents}
-                            selectedAgent={selectedAgent}
-                            onSelectAgent={handleSelectAgent}
-                            onAgentUpdate={refreshAgents}
+            {/* MAIN CONTENT */}
+            <div className="flex-1 overflow-hidden px-4 pb-4 lg:px-10 lg:pb-10 lg:pt-5">
+                {/* DESKTOP GRID - Only visible >= lg */}
+                <div className="hidden lg:grid lg:grid-cols-12 gap-6 h-full">
+
+                    {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
+                    <div
+                        className={cn(
+                            "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
+                            activeSection !== 'arthur' && hasAgent && "opacity-75"
+                        )}
+                        onClick={() => hasAgent && setActiveSection('arthur')}
+                    >
+                        {/* Header: Arthur */}
+                        <div className="flex justify-center mb-4">
+                            <div className={cn(
+                                "px-8 py-2 rounded-full font-medium shadow-md cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
+                                activeSection === 'arthur' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
+                            )}>
+                                Arthur
+                            </div>
+                        </div>
+                        <ArthurPhone
+                            isActive={isArthurActive}
+                            onAgentCreated={handleAgentCreated}
+                            hasAgent={hasAgent}
                             selectedSection={selectedSection}
-                            onSelectSection={setSelectedSection}
-                            isFocused={activeSection === 'work_area'}
-                        />
-                    )}
-                </div>
-
-                {/* COLUMN 3: Simulator/Preview - 3 Columns width */}
-                <div
-                    className={cn(
-                        "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
-                        activeSection !== 'simulator' && hasAgent && "opacity-75"
-                    )}
-                    onClick={() => hasAgent && setActiveSection('simulator')}
-                >
-                    {/* Header: Coba */}
-                    <div className="flex justify-center mb-4">
-                        <div className={cn(
-                            "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
-                            activeSection === 'simulator' && hasAgent ? "bg-[#41CD5D] text-white" : "bg-[#E0E0E0] text-gray-700"
-                        )}>
-                            Coba
-                        </div>
-                    </div>
-                    {!hasAgent ? (
-                        <PreviewPhone />
-                    ) : (
-                        <SimulatorPhone
                             selectedAgent={selectedAgent}
-                            onMessagesRemainingUpdate={handleMessagesRemainingUpdate}
-                            agentVersion={agentVersion}
-                            isFocused={activeSection === 'simulator'}
+                            onSectionReset={() => setSelectedSection(null)}
+                            onSelectSection={setSelectedSection}
+                            isFocused={activeSection === 'arthur' && hasAgent}
                         />
-                    )}
+                    </div>
+
+                    {/* COLUMN 2: Work Area - 6 Columns width */}
+                    <div
+                        className={cn(
+                            "lg:col-span-6 h-full flex flex-col min-h-0 relative transition-all duration-300 cursor-pointer",
+                            activeSection !== 'work_area' && hasAgent && "opacity-75"
+                        )}
+                        onClick={() => hasAgent && setActiveSection('work_area')}
+                    >
+                        {/* Header: Pengaturan Lanjutan */}
+                        <div className="flex justify-center mb-4">
+                            <div className={cn(
+                                "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
+                                activeSection === 'work_area' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
+                            )}>
+                                Pengaturan Lanjutan
+                            </div>
+                        </div>
+
+                        {!hasAgent ? (
+                            <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
+                        ) : (
+                            <AgentWorkArea
+                                agents={agents}
+                                selectedAgent={selectedAgent}
+                                onSelectAgent={handleSelectAgent}
+                                onAgentUpdate={refreshAgents}
+                                selectedSection={selectedSection}
+                                onSelectSection={setSelectedSection}
+                                isFocused={activeSection === 'work_area'}
+                            />
+                        )}
+                    </div>
+
+                    {/* COLUMN 3: Simulator/Preview - 3 Columns width */}
+                    <div
+                        className={cn(
+                            "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
+                            activeSection !== 'simulator' && hasAgent && "opacity-75"
+                        )}
+                        onClick={() => hasAgent && setActiveSection('simulator')}
+                    >
+                        {/* Header: Coba */}
+                        <div className="flex justify-center mb-4">
+                            <div className={cn(
+                                "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
+                                activeSection === 'simulator' && hasAgent ? "bg-[#41CD5D] text-white" : "bg-[#E0E0E0] text-gray-700"
+                            )}>
+                                Coba
+                            </div>
+                        </div>
+                        {!hasAgent ? (
+                            <PreviewPhone />
+                        ) : (
+                            <SimulatorPhone
+                                selectedAgent={selectedAgent}
+                                onMessagesRemainingUpdate={handleMessagesRemainingUpdate}
+                                agentVersion={agentVersion}
+                                isFocused={activeSection === 'simulator'}
+                            />
+                        )}
+                    </div>
+
                 </div>
 
+                {/* MOBILE SECTIONS - Only visible < lg, show only active section */}
+                <div className="lg:hidden h-full overflow-y-auto">
+                    {/* Arthur Section */}
+                    {activeSection === 'arthur' && (
+                        <div className="h-full flex flex-col">
+                            <ArthurPhone
+                                isActive={isArthurActive}
+                                onAgentCreated={handleAgentCreated}
+                                hasAgent={hasAgent}
+                                selectedSection={selectedSection}
+                                selectedAgent={selectedAgent}
+                                onSectionReset={() => setSelectedSection(null)}
+                                onSelectSection={setSelectedSection}
+                                isFocused={false}
+                            />
+                        </div>
+                    )}
+
+                    {/* Work Area Section */}
+                    {activeSection === 'work_area' && (
+                        <div className="h-full flex flex-col overflow-y-auto">
+                            {!hasAgent ? (
+                                <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
+                            ) : (
+                                <AgentWorkArea
+                                    agents={agents}
+                                    selectedAgent={selectedAgent}
+                                    onSelectAgent={handleSelectAgent}
+                                    onAgentUpdate={refreshAgents}
+                                    selectedSection={selectedSection}
+                                    onSelectSection={setSelectedSection}
+                                    isFocused={false}
+                                />
+                            )}
+                        </div>
+                    )}
+
+                    {/* Simulator Section */}
+                    {activeSection === 'simulator' && (
+                        <div className="h-full flex flex-col">
+                            {!hasAgent ? (
+                                <PreviewPhone />
+                            ) : (
+                                <SimulatorPhone
+                                    selectedAgent={selectedAgent}
+                                    onMessagesRemainingUpdate={handleMessagesRemainingUpdate}
+                                    agentVersion={agentVersion}
+                                    isFocused={false}
+                                />
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
