@@ -73,7 +73,7 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
                 </div>
 
                 <div className={cn("text-gray-600 text-sm leading-relaxed", isTruncated && "line-clamp-3")}>
-                    <MarkdownRenderer content={systemPrompt} isBot={true} />
+                    <MarkdownRenderer content={systemPrompt} isBot={false} />
                 </div>
                 {isTruncated && (
                     <button
@@ -92,7 +92,7 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
                     <div className="relative bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl animate-fade-in-up">
                         <h3 className="text-2xl font-bold text-gray-900 mb-4">Tugas Agen</h3>
                         <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl">
-                            <MarkdownRenderer content={systemPrompt} isBot={true} />
+                            <MarkdownRenderer content={systemPrompt} isBot={false} />
                         </div>
                         <div className="mt-6 flex justify-end">
                             <button
