@@ -5,6 +5,8 @@ const nextConfig = {
   images: {
     qualities: [75, 100],
   },
+  },
+  output: 'standalone',
 };
 
 export default nextConfig;

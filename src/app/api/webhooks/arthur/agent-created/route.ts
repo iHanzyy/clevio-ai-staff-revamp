@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         const system_prompt = body.system_prompt || config?.system_prompt;
 
         // Extract llm_model and temperature from config if available
-        const llm_model = config?.llm_model || 'gpt-4.1-mini';
+        const llm_model = config?.llm_model || 'gpt-4o-mini';
         const temperature = config?.temperature ?? 0.1;
 
         if (!name || !system_prompt) {

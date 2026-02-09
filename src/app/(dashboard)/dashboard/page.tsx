@@ -72,6 +72,8 @@ export default function DashboardPage() {
         try {
 
 
+            console.log('[Dashboard] rawAgentData:', JSON.stringify(rawAgentData, null, 2));
+
             const agentPayload = {
                 name: rawAgentData.name,
 
@@ -81,7 +83,7 @@ export default function DashboardPage() {
 
                 config: {
                     system_prompt: rawAgentData.system_prompt || rawAgentData.config?.system_prompt,
-                    llm_model: rawAgentData.llm_model || 'gpt-4.1-mini',
+                    llm_model: rawAgentData.llm_model || 'gpt-4o-mini',
                     temperature: 0.1,
                 },
 
@@ -90,8 +92,17 @@ export default function DashboardPage() {
                         "transport": "sse",
                         "url": "http://194.238.23.242:8190/sse"
                     }
-                }
+                },
+
+                // Pass through additional fields if present (for backend validation/limits)
+                token_limit: rawAgentData.token_limit,
+                plan_code: rawAgentData.plan_code,
+                access_token: rawAgentData.access_token,
+                token_type: rawAgentData.token_type,
+                expires_at: rawAgentData.expires_at
             };
+
+            console.log('[Dashboard] agentPayload to send:', JSON.stringify(agentPayload, null, 2));
 
             const newAgent = await agentService.createAgent(agentPayload);
 

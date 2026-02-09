@@ -1,0 +1,17 @@
+services:
+  app:
+    container_name: clevio-ai-staff
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # Copy from .env.local
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      # Add other necessary env vars here
+      # For production, it's safer to use an env_file
+    env_file:
+      - .env.production
