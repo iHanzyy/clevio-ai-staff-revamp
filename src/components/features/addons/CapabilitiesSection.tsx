@@ -99,11 +99,11 @@ export default function CapabilitiesSection({ agents, selectedAgent, onSelectAge
                             "cursor-pointer"
                         )}
                     >
-                        <span className="truncate">
+                        <span className="truncate min-w-0 flex-1">
                             {selectedAgent?.name || "Pilih agen..."}
                         </span>
                         <ChevronDown className={cn(
-                            "w-4 h-4 text-gray-500 transition-transform",
+                            "w-4 h-4 text-gray-500 transition-transform flex-shrink-0",
                             isDropdownOpen && "rotate-180"
                         )} />
                     </button>

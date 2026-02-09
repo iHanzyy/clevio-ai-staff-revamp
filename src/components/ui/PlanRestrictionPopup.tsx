@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/ToastProvider";
 interface PlanRestrictionPopupProps {
     isOpen: boolean;
     onClose: () => void;
-    type: "timer" | "feature"; // 'timer' for 5-min warning, 'feature' for locked feature
+    type: "timer" | "feature";
     message?: string;
 }
 

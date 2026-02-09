@@ -208,7 +208,7 @@ export default function ArthurSection() {
         persistLog("🚀 Starting polling for session", sessionId);
 
         let pollCount = 0;
-        const maxPolls = 120; // 120 * 2s = 4 minutes max
+        const maxPolls = 480; // 480 * 2s = 16 minutes max
 
         pollingIntervalRef.current = setInterval(async () => {
             pollCount++;
