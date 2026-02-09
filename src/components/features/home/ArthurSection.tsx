@@ -506,17 +506,20 @@ export default function ArthurSection() {
                 </div>
             </div>
 
-            {/* Chat Section - Gradient Background */}
+            {/* Chat Section - Cream Background, Gradient only on chat container */}
             <div
                 className="relative py-8 px-0 sm:px-8 md:px-12 lg:px-16"
                 style={{
-                    background: 'linear-gradient(to bottom, #C3D2F4 0%, #FFFAF2 100%)'
+                    background: '#FFFAF2'
                 }}
             >
-                {/* Chat Messages Container - Full Height/Page Scroll */}
+                {/* Chat Messages Container - Gradient applied here */}
                 <div
                     ref={chatContainerRef}
-                    className="max-w-3xl mx-auto mb-4 space-y-4 px-6 sm:px-0 min-h-[300px]"
+                    className="max-w-4xl mx-auto mb-4 space-y-4 px-6 sm:px-8 min-h-[300px] rounded-3xl pt-8 -mt-5"
+                    style={{
+                        background: 'linear-gradient(to bottom, #C3D2F4 0%, #FFFAF2 100%)'
+                    }}
                 >
                     {messages.map((msg) => (
                         <div
