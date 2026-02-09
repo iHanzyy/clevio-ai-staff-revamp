@@ -25,7 +25,7 @@ export default function DashboardPage() {
     // Agent version to trigger simulator session reset on updates
     const [agentVersion, setAgentVersion] = useState(0);
     // Focus interaction state
-    const [activeSection, setActiveSection] = useState<'arthur' | 'work_area' | 'simulator'>('arthur');
+    const [activeSection, setActiveSection] = useState<'arthur' | 'work_area' | 'simulator'>('simulator');
 
     const { showToast } = useToast();
 
