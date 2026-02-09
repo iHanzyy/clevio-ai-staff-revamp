@@ -11,6 +11,20 @@ interface Message {
     text: string;
 }
 
+// Pool of suggestion prompts
+const SUGGESTION_POOL = [
+    "Buatkan agent customer service untuk travel umroh",
+    "Buatkan personal assistant untuk jadwal meeting",
+    "Buatkan agent sales untuk jualan properti",
+    "Buatkan agent support untuk toko online",
+    "Buatkan agent untuk FAQ produk skincare",
+    "Buatkan assistant untuk booking restaurant",
+    "Buatkan agent konsultasi kesehatan dasar",
+    "Buatkan agent untuk follow up leads",
+    "Buatkan assistant untuk reminder tagihan",
+    "Buatkan agent untuk handling komplain pelanggan",
+];
+
 export default function ArthurSection() {
     const router = useRouter();
     const [message, setMessage] = useState("");
@@ -21,6 +35,9 @@ export default function ArthurSection() {
     const [isProcessingFinal, setIsProcessingFinal] = useState(false);
     const [showLongWaitMessage, setShowLongWaitMessage] = useState(false);
     const [showInfoInsteadOfDots, setShowInfoInsteadOfDots] = useState(false);
+
+    // Random suggestions (picked on mount)
+    const [suggestions, setSuggestions] = useState<string[]>([]);
 
     // State to hold session and credentials
     const [sessionId, setSessionId] = useState("");
@@ -98,10 +115,76 @@ export default function ArthurSection() {
         window.addEventListener('scrollToArthur', handleScrollToArthur);
         window.addEventListener('sendToArthur', handleSendToArthur as EventListener);
 
+        // Handle suggestion chip clicks
+        const handleSuggestionClick = async (e: CustomEvent<{ message: string }>) => {
+            const suggestionText = e.detail.message;
+            // Start polling immediately
+            startPollingForAgentData();
+
+            // Setup timeout for chat request
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+            try {
+                const response = await fetch('/api/arthur/landing-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        chatInput: suggestionText,
+                        email: credentials.email,
+                        password: credentials.password
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+                const data = await response.json();
+
+                // Handle response (same logic as handleSendMessage)
+                let responseText = "";
+                if (Array.isArray(data) && data.length > 0 && data[0].system_prompt) {
+                    localStorage.setItem('agent_payload', JSON.stringify(data[0]));
+                    setIsTyping(false);
+                    setIsProcessingFinal(true);
+                    await handleFinalRegistration(data[0]);
+                    return;
+                } else if (data.output) {
+                    responseText = data.output;
+                } else if (data.text) {
+                    responseText = data.text;
+                } else if (typeof data === 'string') {
+                    responseText = data;
+                } else if (data.message) {
+                    responseText = data.message;
+                } else {
+                    responseText = "Saya mengerti. Bisa Anda jelaskan lebih lanjut?";
+                }
+
+                setIsTyping(false);
+                setMessages(prev => [...prev, { id: Date.now() + 1, from: "arthur", text: responseText }]);
+            } catch (error: any) {
+                clearTimeout(timeoutId);
+                if (error.name !== 'AbortError') {
+                    setIsTyping(false);
+                    setMessages(prev => [...prev, { id: Date.now() + 1, from: "arthur", text: "Maaf, terjadi kesalahan koneksi." }]);
+                }
+            }
+        };
+
+        window.addEventListener('sendArthurSuggestion', handleSuggestionClick as EventListener);
+
         return () => {
             window.removeEventListener('scrollToArthur', handleScrollToArthur);
             window.removeEventListener('sendToArthur', handleSendToArthur as EventListener);
+            window.removeEventListener('sendArthurSuggestion', handleSuggestionClick as EventListener);
         };
+    }, []);
+
+    // Pick 3 random suggestions on mount
+    useEffect(() => {
+        const shuffled = [...SUGGESTION_POOL].sort(() => Math.random() - 0.5);
+        setSuggestions(shuffled.slice(0, 3));
     }, []);
 
     // Initialize session and credentials on mount (Check Storage First)
@@ -611,6 +694,33 @@ export default function ArthurSection() {
                                 </div>
                             </button>
                         </div>
+
+                        {/* Suggestion Chips - Only show when chat is empty */}
+                        {messages.length === 1 && !isTyping && !isProcessingFinal && (
+                            <div className="flex flex-wrap justify-center gap-2 mt-4">
+                                {suggestions.map((suggestion, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={() => {
+                                            setMessage(suggestion);
+                                            // Trigger send after state update
+                                            setTimeout(() => {
+                                                const userMsg: Message = { id: Date.now(), from: "user", text: suggestion };
+                                                setMessages(prev => [...prev, userMsg]);
+                                                setMessage("");
+                                                setIsTyping(true);
+                                                // Send via existing logic
+                                                window.dispatchEvent(new CustomEvent('sendArthurSuggestion', { detail: { message: suggestion } }));
+                                            }, 50);
+                                        }}
+                                        className="px-4 py-2 bg-white/80 hover:bg-white border border-blue-200 rounded-full text-sm text-gray-700 hover:text-blue-600 transition-all shadow-sm hover:shadow-md cursor-pointer"
+                                    >
+                                        {suggestion}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
