@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import GlobalErrorHandler from "@/components/GlobalErrorHandler";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -35,6 +36,7 @@ export default function RootLayout({
       >
         {/* Persistent Content Wrapper */}
         <div className="relative z-10 flex flex-col items-center w-full h-full">
+          <GlobalErrorHandler />
           <ToastProvider>
             {children}
           </ToastProvider>

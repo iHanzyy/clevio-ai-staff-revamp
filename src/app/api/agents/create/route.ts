@@ -44,12 +44,31 @@ export async function POST(req: Request) {
         // Log full error for server-side debugging
         const upstreamStatus = error.response?.status;
         const upstreamData = error.response?.data;
+        const errorMessage = upstreamData?.detail || upstreamData?.error || error.message || 'Failed to create agent';
         console.error(`[AgentCreateProxy] Error (${upstreamStatus}):`, upstreamData || error.message);
+
+        // Send error to N8N webhook (server-side, fire-and-forget)
+        const errorWebhookUrl = process.env.NEXT_PUBLIC_ERROR_WEBHOOK_URL;
+        if (errorWebhookUrl) {
+            fetch(errorWebhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    source: 'api/agents/create',
+                    error_type: 'agent_create_error',
+                    message: errorMessage,
+                    status_code: upstreamStatus,
+                    url: '/api/agents/create',
+                    extra: { upstream_data: upstreamData }
+                })
+            }).catch(() => { }); // Fire-and-forget
+        }
 
         // Return meaningful error to client with upstream details
         return NextResponse.json(
             {
-                error: upstreamData?.detail || upstreamData?.error || error.message || 'Failed to create agent',
+                error: errorMessage,
                 upstream_status: upstreamStatus,
                 details: typeof upstreamData === 'object' ? upstreamData : undefined
             },

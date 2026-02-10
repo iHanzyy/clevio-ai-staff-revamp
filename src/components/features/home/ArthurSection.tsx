@@ -342,14 +342,53 @@ export default function ArthurSection() {
 
             // Step 3: Create agent using Proxy (to avoid CORS)
             try {
-                persistLog("🤖 Step 3: Creating agent via Proxy");
+                // Sanitize payload to match Dashboard implementation and avoid "Invalid tools" error
+                // N8N might receive specific tools in 'tools' field which backend rejects if they are MCP tools
+                const validMcpTools = ['web_search', 'deep_research']; // Add known legitimate MCP tools
+
+                // Extract and clean tools
+                let mcpTools = agentData.mcp_tools || [];
+
+                // If N8N put MCP tools in 'tools' (legacy), move them to mcp_tools
+                if (Array.isArray(agentData.tools)) {
+                    const legacyTools = agentData.tools.filter((t: string) => validMcpTools.includes(t));
+                    mcpTools = [...new Set([...mcpTools, ...legacyTools])]; // Merge unique
+                }
+
+                const cleanPayload = {
+                    name: agentData.name,
+
+                    // Top Level Fields
+                    google_tools: agentData.google_tools || [],
+                    mcp_tools: mcpTools,
+
+                    config: {
+                        system_prompt: agentData.system_prompt || agentData.config?.system_prompt,
+                        llm_model: agentData.llm_model || agentData.config?.llm_model || 'gpt-4o-mini',
+                        temperature: agentData.config?.temperature ?? 0.1,
+                    },
+
+                    mcp_servers: agentData.mcp_servers || {
+                        "calculator_sse": {
+                            "transport": "sse",
+                            "url": "http://194.238.23.242:8190/sse"
+                        }
+                    },
+
+                    // Pass through specific fields only
+                    token_limit: agentData.token_limit,
+                    plan_code: agentData.plan_code
+                };
+
+                persistLog("🤖 Step 3: Creating agent via Proxy", JSON.stringify(cleanPayload, null, 2));
+
                 const createAgentResponse = await fetch('/api/agents/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        payload: agentData,
+                        payload: cleanPayload,
                         token: tokenToUse
                     })
                 });

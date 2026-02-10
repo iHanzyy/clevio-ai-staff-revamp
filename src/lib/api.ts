@@ -30,15 +30,27 @@ api.interceptors.request.use(
     }
 );
 
+import { logError } from '@/lib/errorLogger';
+
 // Add a response interceptor to handle auth errors
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        const status = error.response?.status;
+        const url = error.config?.url || 'unknown';
+        const method = error.config?.method?.toUpperCase() || 'UNKNOWN';
+        const detail = error.response?.data?.detail || error.response?.data?.error || error.message;
+
+        logError('lib/api', 'api_error', `${method} ${url} → ${status || 'NETWORK'}: ${detail}`, {
+            status_code: status,
+            request_url: url,
+            method,
+        });
+
         // Disabled auto-redirect to prevent loops on dashboard load
         /*
         if (error.response && error.response.status === 401) {
             if (typeof window !== 'undefined') {
-                // Clear token and redirect to login if 401
                 if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
                     localStorage.removeItem('jwt_token');
                     window.location.href = '/login';

@@ -1,0 +1,192 @@
+{
+  "name": "Error Log Web AI STAFF",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "error-log-web",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [48, -64],
+      "id": "6fad6e2b-07a4-4ac7-a8ff-299ad4ea966b",
+      "name": "Webhook",
+      "webhookId": "130cd18b-600c-47d9-9a33-167c05cf03ff"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "field-timestamp",
+              "name": "timestamp",
+              "type": "string",
+              "value": "={{ $json.body.timestamp }}"
+            },
+            {
+              "id": "field-source",
+              "name": "source",
+              "type": "string",
+              "value": "={{ $json.body.source }}"
+            },
+            {
+              "id": "field-error_type",
+              "name": "error_type",
+              "type": "string",
+              "value": "={{ $json.body.error_type }}"
+            },
+            {
+              "id": "field-message",
+              "name": "message",
+              "type": "string",
+              "value": "={{ $json.body.message }}"
+            },
+            {
+              "id": "field-status_code",
+              "name": "status_code",
+              "type": "string",
+              "value": "={{ $json.body.status_code || 'N/A' }}"
+            },
+            {
+              "id": "field-url",
+              "name": "url",
+              "type": "string",
+              "value": "={{ $json.body.url }}"
+            },
+            {
+              "id": "field-user_agent",
+              "name": "user_agent",
+              "type": "string",
+              "value": "={{ $json.body.user_agent }}"
+            },
+            {
+              "id": "field-stack",
+              "name": "stack",
+              "type": "string",
+              "value": "={{ $json.body.stack || 'N/A' }}"
+            },
+            {
+              "id": "field-extra",
+              "name": "extra",
+              "type": "string",
+              "value": "={{ JSON.stringify($json.body.extra || {}) }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [288, -64],
+      "id": "a1b2c3d4-set-node-format",
+      "name": "Format Data"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $json.timestamp }}",
+            "source": "={{ $json.source }}",
+            "error_type": "={{ $json.error_type }}",
+            "message": "={{ $json.message }}",
+            "status_code": "={{ $json.status_code }}",
+            "url": "={{ $json.url }}",
+            "user_agent": "={{ $json.user_agent }}",
+            "stack": "={{ $json.stack }}",
+            "extra": "={{ $json.extra }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            { "id": "col-timestamp", "displayName": "timestamp", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-source", "displayName": "source", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-error_type", "displayName": "error_type", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-message", "displayName": "message", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-status_code", "displayName": "status_code", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-url", "displayName": "url", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-user_agent", "displayName": "user_agent", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-stack", "displayName": "stack", "type": "string", "required": false, "display": true, "defaultMatch": false },
+            { "id": "col-extra", "displayName": "extra", "type": "string", "required": false, "display": true, "defaultMatch": false }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [528, -64],
+      "id": "f7af16bf-300a-4618-a6f1-c6e0ba18f838",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Error logged' }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [768, -64],
+      "id": "e5f6a7b8-respond-webhook",
+      "name": "Respond OK"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "32f67db7-d2c2-48b3-bf9f-598b1a0eee43",
+  "meta": {
+    "instanceId": "8375f922d57f9f9748aa2105251cdbe49aa3f212930d8f777d91112a84ba85e0"
+  },
+  "id": "IYU7immNEl4AOlXP_JAxb",
+  "tags": []
+}

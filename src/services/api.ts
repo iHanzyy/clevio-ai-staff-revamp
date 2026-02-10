@@ -27,10 +27,23 @@ api.interceptors.request.use(
     }
 );
 
+import { logError } from '@/lib/errorLogger';
+
 // Response Interceptor: Handle Errors (e.g., 401 Logout)
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        const status = error.response?.status;
+        const url = error.config?.url || 'unknown';
+        const method = error.config?.method?.toUpperCase() || 'UNKNOWN';
+        const detail = error.response?.data?.detail || error.response?.data?.error || error.message;
+
+        logError('services/api', 'api_error', `${method} ${url} → ${status || 'NETWORK'}: ${detail}`, {
+            status_code: status,
+            request_url: url,
+            method,
+        });
+
         if (error.response && (error.response.status === 401 || error.response.status === 403)) {
             // Optional: Auto-logout on token expiration
             // localStorage.removeItem('jwt_token');
