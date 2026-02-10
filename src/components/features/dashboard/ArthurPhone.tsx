@@ -225,7 +225,7 @@ export default function ArthurPhone({
             // If not in response, poll the webhook for agent data
             // N8N sends to webhook separately, so we need to poll
             const pollForAgentData = async () => {
-                const maxAttempts = 15; // 30 seconds total (15 * 2s)
+                const maxAttempts = 30; // 60 seconds total (30 * 2s)
                 const pollInterval = 2000; // 2 seconds
 
                 for (let attempt = 0; attempt < maxAttempts; attempt++) {

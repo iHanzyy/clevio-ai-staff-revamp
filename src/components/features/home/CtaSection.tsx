@@ -34,7 +34,10 @@ export default function CtaSection() {
 
                 {/* CTA Button */}
                 <button
-                    className="px-8 py-3 md:px-12 md:py-4 text-white font-medium text-[15px] md:text-[18px] transition-all duration-300 hover:opacity-90 mb-6 md:mb-8"
+                    onClick={() => {
+                        window.dispatchEvent(new CustomEvent('scrollToArthur'));
+                    }}
+                    className="px-8 py-3 md:px-12 md:py-4 text-white font-medium text-[15px] md:text-[18px] transition-all duration-300 hover:opacity-90 mb-6 md:mb-8 cursor-pointer"
                     style={{
                         borderRadius: '59px',
                         background: 'linear-gradient(0deg, #2563EB 0%, #2563EB 100%), #FFF',

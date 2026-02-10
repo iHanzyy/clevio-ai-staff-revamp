@@ -29,8 +29,8 @@ export default function DashboardPage() {
 
     const { showToast } = useToast();
 
-    // Fetch Agents on Mount
-    const fetchAgents = async () => {
+    // Fetch Agents on Mount (with retry for newly registered users)
+    const fetchAgents = async (retryCount = 0) => {
         try {
             const fetchedAgents = await agentService.getAgents();
             setAgents(fetchedAgents);
@@ -53,9 +53,21 @@ export default function DashboardPage() {
             } else {
                 setHasAgent(false);
             }
-        } catch (error) {
-            console.error("Failed to fetch agents", error);
-            showToast("Gagal memuat data agen.", "error");
+        } catch (error: any) {
+            console.error(`Failed to fetch agents (attempt ${retryCount + 1})`, error);
+
+            // Retry once after 2s for newly registered users whose backend data may not be ready
+            if (retryCount < 2) {
+                console.log(`Retrying fetchAgents in 2s... (attempt ${retryCount + 2})`);
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                return fetchAgents(retryCount + 1);
+            }
+
+            // Only show error toast on final failure, and only for non-401 errors
+            const status = error.response?.status;
+            if (status !== 401 && status !== 403) {
+                showToast("Gagal memuat data agen.", "error");
+            }
         } finally {
             setIsLoading(false);
         }

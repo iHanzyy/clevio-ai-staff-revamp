@@ -2,9 +2,15 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-// File-based storage for pending payloads (works across serverless invocations)
-// File-based storage for pending payloads (works across serverless invocations)
-// NOTE: On Vercel, this is ephemeral. For production, use Vercel KV or Database.
+// ============================================================
+// PRIMARY: In-memory store (instant, no race conditions)
+// BACKUP: File-based store (survives process restarts)
+// ============================================================
+
+// In-memory store - survives across requests in the same process
+const memoryStore = new Map<string, { data: any; timestamp: number }>();
+
+// File-based backup storage
 const STORAGE_DIR = process.env.VERCEL || process.env.NODE_ENV === 'production'
     ? '/tmp'
     : path.join(process.cwd(), '.tmp');
@@ -17,8 +23,8 @@ const ensureStorageDir = () => {
     }
 };
 
-// Helper to read payloads from file
-const readPayloads = (): Record<string, any> => {
+// Helper to read payloads from file (backup)
+const readPayloadsFromFile = (): Record<string, any> => {
     ensureStorageDir();
     if (!fs.existsSync(STORAGE_FILE)) {
         return {};
@@ -31,10 +37,80 @@ const readPayloads = (): Record<string, any> => {
     }
 };
 
-// Helper to write payloads to file
-const writePayloads = (payloads: Record<string, any>) => {
-    ensureStorageDir();
-    fs.writeFileSync(STORAGE_FILE, JSON.stringify(payloads, null, 2));
+// Helper to write payloads to file (backup)
+const writePayloadsToFile = (payloads: Record<string, any>) => {
+    try {
+        ensureStorageDir();
+        fs.writeFileSync(STORAGE_FILE, JSON.stringify(payloads, null, 2));
+    } catch (err) {
+        console.error('[Webhook: Arthur] File write error:', err);
+    }
+};
+
+// Save to BOTH memory and file
+const savePayload = (sessionId: string, data: any) => {
+    const entry = { data, timestamp: Date.now() };
+
+    // Primary: in-memory
+    memoryStore.set(sessionId, entry);
+    console.log(`[Webhook: Arthur] Saved to memory for session: ${sessionId} (total entries: ${memoryStore.size})`);
+
+    // Backup: file
+    try {
+        const payloads = readPayloadsFromFile();
+        payloads[sessionId] = entry;
+        writePayloadsToFile(payloads);
+        console.log(`[Webhook: Arthur] Saved to file for session: ${sessionId}`);
+    } catch (err) {
+        console.error('[Webhook: Arthur] File backup failed:', err);
+    }
+};
+
+// Retrieve from memory first, then file fallback
+const retrievePayload = (sessionId: string): any | null => {
+    // Try memory first (instant)
+    const memEntry = memoryStore.get(sessionId);
+    if (memEntry && memEntry.data) {
+        console.log(`[Webhook: Arthur] Found in memory for session: ${sessionId}`);
+        memoryStore.delete(sessionId);
+        // Also clean file backup
+        try {
+            const payloads = readPayloadsFromFile();
+            delete payloads[sessionId];
+            writePayloadsToFile(payloads);
+        } catch { /* ignore */ }
+        return memEntry.data;
+    }
+
+    // Fallback: try file
+    try {
+        const payloads = readPayloadsFromFile();
+        const fileEntry = payloads[sessionId];
+        if (fileEntry && fileEntry.data) {
+            console.log(`[Webhook: Arthur] Found in file for session: ${sessionId}`);
+            delete payloads[sessionId];
+            writePayloadsToFile(payloads);
+            return fileEntry.data;
+        }
+    } catch (err) {
+        console.error('[Webhook: Arthur] File read error:', err);
+    }
+
+    // Log debugging info
+    const memKeys = Array.from(memoryStore.keys());
+    console.log(`[Webhook: Arthur] Session NOT found: ${sessionId}. Memory keys: [${memKeys.join(', ')}]`);
+
+    return null;
+};
+
+// Cleanup old entries (>30 minutes) from memory to prevent leaks
+const cleanupOldEntries = () => {
+    const thirtyMinutesAgo = Date.now() - 30 * 60 * 1000;
+    for (const [key, entry] of memoryStore.entries()) {
+        if (entry.timestamp < thirtyMinutesAgo) {
+            memoryStore.delete(key);
+        }
+    }
 };
 
 export async function POST(req: Request) {
@@ -47,15 +123,9 @@ export async function POST(req: Request) {
             body = body[0];
         }
 
-        // 1. Parsing Payload from N8N (supports both flat and nested structures)
-        // Flat: { name, system_prompt, mcp_tools, google_tools, session_id }
-        // Nested: { name, config: { system_prompt, llm_model, temperature }, mcp_tools, google_tools, session_id }
+        // 1. Parse Payload from N8N
         const { name, mcp_tools, google_tools, session_id, config } = body;
-
-        // Extract system_prompt from either top level or config.system_prompt
         const system_prompt = body.system_prompt || config?.system_prompt;
-
-        // Extract llm_model and temperature from config if available
         const llm_model = config?.llm_model || 'gpt-4o-mini';
         const temperature = config?.temperature ?? 0.1;
 
@@ -65,7 +135,6 @@ export async function POST(req: Request) {
         }
 
         // 2. Map to Backend Agent Structure
-        // IMPORTANT: Also preserve auth tokens from N8N for frontend to use!
         const agentPayload = {
             "name": name,
             "google_tools": google_tools || [],
@@ -81,7 +150,7 @@ export async function POST(req: Request) {
                 }
             },
             "mcp_tools": mcp_tools || [],
-            // Auth tokens from N8N - REQUIRED for frontend to authenticate!
+            // Auth tokens from N8N
             "access_token": body.access_token,
             "token_type": body.token_type,
             "expires_at": body.expires_at,
@@ -89,15 +158,11 @@ export async function POST(req: Request) {
             "plan_code": body.plan_code,
         };
 
-        // 3. Save to File-Based Store for Frontend Retrieval
+        // 3. Save to BOTH memory and file
         if (session_id) {
-            const payloads = readPayloads();
-            payloads[session_id] = {
-                data: agentPayload,
-                timestamp: Date.now()
-            };
-            writePayloads(payloads);
-            console.log(`[Webhook: Arthur] Saved payload for session: ${session_id}`);
+            savePayload(session_id, agentPayload);
+            // Cleanup old entries periodically
+            cleanupOldEntries();
         }
 
         return NextResponse.json({
@@ -120,17 +185,10 @@ export async function GET(req: Request) {
         return NextResponse.json({ error: 'Missing session_id' }, { status: 400 });
     }
 
-    const payloads = readPayloads();
-    const entry = payloads[sessionId];
+    const data = retrievePayload(sessionId);
 
-    if (entry && entry.data) {
-        console.log(`[Webhook: Arthur] Retrieving payload for session: ${sessionId}`);
-
-        // Remove from storage after retrieval
-        delete payloads[sessionId];
-        writePayloads(payloads);
-
-        return NextResponse.json(entry.data, {
+    if (data) {
+        return NextResponse.json(data, {
             headers: {
                 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
                 'Pragma': 'no-cache',
@@ -138,9 +196,6 @@ export async function GET(req: Request) {
             }
         });
     }
-
-    // Debugging: Log available keys to see if mismatch exists
-    console.log(`[Webhook: Arthur] Session not found: ${sessionId}. Available: ${Object.keys(payloads)}`);
 
     return NextResponse.json({ error: 'Not found' }, {
         status: 404,
