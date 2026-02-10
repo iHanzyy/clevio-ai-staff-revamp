@@ -330,6 +330,9 @@ export default function ArthurSection() {
             const tokenToUse = accessToken;
 
             // Save to localStorage (for API calls)
+            // Store as access_token (primary for CRUD)
+            localStorage.setItem('access_token', accessToken);
+            // Store as jwt_token (for login session compatibility)
             localStorage.setItem('jwt_token', accessToken);
 
             // Save to cookie (for middleware protection)

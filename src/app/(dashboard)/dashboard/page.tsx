@@ -82,9 +82,27 @@ export default function DashboardPage() {
         showToast("Sedang membuat agent...", "info");
 
         try {
-
-
             console.log('[Dashboard] rawAgentData:', JSON.stringify(rawAgentData, null, 2));
+
+            // CRITICAL: If N8N sent an access_token in webhook, store it for future use
+            // This happens when user registered via email and N8N provides the real backend token.
+            if (rawAgentData.access_token) {
+                console.log('[Dashboard] Found access_token in webhook data, updating storage');
+                // Store as access_token (primary for CRUD)
+                localStorage.setItem('access_token', rawAgentData.access_token);
+                // Also update cookie for middleware resilience
+                document.cookie = `session_token=${rawAgentData.access_token}; path=/; max-age=604800; SameSite=Lax`;
+            }
+
+            // api.ts now automatically uses access_token if available, falling back to jwt_token
+            // We just need to ensure one exists to pass to the proxy
+            const token = localStorage.getItem('access_token') || localStorage.getItem('jwt_token');
+
+            if (!token) {
+                console.error('[Dashboard] No access_token or jwt_token found!');
+                showToast("Error: Token autentikasi tidak ditemukan. Silakan login ulang.", "error");
+                return;
+            }
 
             const agentPayload = {
                 name: rawAgentData.name,
@@ -95,8 +113,8 @@ export default function DashboardPage() {
 
                 config: {
                     system_prompt: rawAgentData.system_prompt || rawAgentData.config?.system_prompt,
-                    llm_model: rawAgentData.llm_model || 'gpt-4o-mini',
-                    temperature: 0.1,
+                    llm_model: rawAgentData.llm_model || rawAgentData.config?.llm_model || 'gpt-4o-mini',
+                    temperature: rawAgentData.config?.temperature ?? 0.1,
                 },
 
                 mcp_servers: rawAgentData.mcp_servers || {
@@ -109,14 +127,31 @@ export default function DashboardPage() {
                 // Pass through additional fields if present (for backend validation/limits)
                 token_limit: rawAgentData.token_limit,
                 plan_code: rawAgentData.plan_code,
-                access_token: rawAgentData.access_token,
-                token_type: rawAgentData.token_type,
-                expires_at: rawAgentData.expires_at
             };
 
             console.log('[Dashboard] agentPayload to send:', JSON.stringify(agentPayload, null, 2));
+            console.log('[Dashboard] Using token:', token.substring(0, 20) + '...');
 
-            const newAgent = await agentService.createAgent(agentPayload);
+            // Use proxy route (same as landing page) to avoid CORS and for consistent auth
+            const createResponse = await fetch('/api/agents/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    payload: agentPayload,
+                    token: token
+                })
+            });
+
+            if (!createResponse.ok) {
+                const errorData = await createResponse.json().catch(() => ({}));
+                const errorMsg = errorData.error || errorData.detail || `Status ${createResponse.status}`;
+                console.error(`[Dashboard] Agent creation failed (${createResponse.status}):`, errorData);
+                showToast(`Gagal membuat agent: ${errorMsg} (${createResponse.status})`, "error");
+                return;
+            }
+
+            const newAgent = await createResponse.json();
+            console.log('[Dashboard] Agent created successfully:', newAgent.id);
 
             // Fetch full details (including auth_required)
             const fullAgentData = await agentService.getAgent(newAgent.id);
@@ -128,9 +163,11 @@ export default function DashboardPage() {
             setIsArthurActive(false); // Reset Arthur flow
 
             showToast("Agent berhasil dibuat!", "success");
-        } catch (error) {
-            console.error("Failed to create agent", error);
-            showToast("Gagal membuat agent. Silakan coba lagi.", "error");
+        } catch (error: any) {
+            const errMsg = error.response?.data?.detail || error.response?.data?.error || error.message || 'Unknown error';
+            const status = error.response?.status || '';
+            console.error(`[Dashboard] Failed to create agent:`, error);
+            showToast(`Gagal membuat agent: ${errMsg} ${status ? `(${status})` : ''}`, "error");
         }
     };
 

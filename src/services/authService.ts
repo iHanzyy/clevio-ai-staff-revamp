@@ -33,6 +33,31 @@ export const authService = {
         return response.data;
     },
 
+    // Get Access Token for CRUD operations (separate from jwt_token which is login-only)
+    // This calls /auth/api-key which returns the access_token needed for all agent operations
+    getAccessToken: async (email: string, password: string, planCode: string = 'TRIAL'): Promise<string | null> => {
+        try {
+            const response = await api.post<{ access_token: string, token_type: string, expires_at?: string }>(
+                '/auth/api-key',
+                {
+                    username: email,
+                    password: password,
+                    plan_code: planCode
+                }
+            );
+            const accessToken = response.data?.access_token;
+            if (accessToken) {
+                localStorage.setItem('access_token', accessToken);
+                console.log('[AuthService] access_token obtained and stored');
+                return accessToken;
+            }
+            return null;
+        } catch (error) {
+            console.error('[AuthService] Failed to get access_token:', error);
+            return null;
+        }
+    },
+
     // Email/Password Register (via N8N Proxy)
     register: async (email: string, password: string) => {
         // Now using internal proxy to N8N with JSON body
@@ -43,7 +68,7 @@ export const authService = {
         return response.data;
     },
 
-    // Helper to store token
+    // Helper to store jwt_token (login token)
     setSession: (token: string) => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('jwt_token', token);
@@ -52,10 +77,19 @@ export const authService = {
         }
     },
 
+    // Helper to store access_token (CRUD token from N8N or /auth/api-key)
+    setAccessToken: (token: string) => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('access_token', token);
+            console.log('[AuthService] access_token stored');
+        }
+    },
+
     // Logout Helper
     logout: () => {
         if (typeof window !== 'undefined') {
             localStorage.removeItem('jwt_token');
+            localStorage.removeItem('access_token');
             document.cookie = 'session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             window.location.href = '/login';
         }

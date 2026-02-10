@@ -41,13 +41,19 @@ export async function POST(req: Request) {
         return NextResponse.json(response.data);
 
     } catch (error: any) {
-        // 3. Sanitize Error Response (Don't leak upstream details)
-        console.error('[AgentCreateProxy] Error:', error.response?.data || error.message);
+        // Log full error for server-side debugging
+        const upstreamStatus = error.response?.status;
+        const upstreamData = error.response?.data;
+        console.error(`[AgentCreateProxy] Error (${upstreamStatus}):`, upstreamData || error.message);
 
-        // Return generic error to client
+        // Return meaningful error to client with upstream details
         return NextResponse.json(
-            { error: 'Failed to create agent. Please try again later.' },
-            { status: error.response?.status || 500 }
+            {
+                error: upstreamData?.detail || upstreamData?.error || error.message || 'Failed to create agent',
+                upstream_status: upstreamStatus,
+                details: typeof upstreamData === 'object' ? upstreamData : undefined
+            },
+            { status: upstreamStatus || 500 }
         );
     }
 }

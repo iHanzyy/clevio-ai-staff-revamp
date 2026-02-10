@@ -50,6 +50,14 @@ export default function LoginForm() {
                 if (res.jwt_token) {
                     authService.setSession(res.jwt_token);
 
+                    // CRITICAL: Get access_token for CRUD operations (agents, tools, etc.)
+                    // jwt_token is login-only, access_token is what backend needs for API calls
+                    console.log('[Login] Getting access_token via /auth/api-key...');
+                    const accessToken = await authService.getAccessToken(email, password);
+                    if (!accessToken) {
+                        console.warn('[Login] Could not get access_token, CRUD operations may fail');
+                    }
+
                     // Check User Status & Redirect
                     try {
                         console.log("Fetching user profile...");

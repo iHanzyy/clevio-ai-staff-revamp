@@ -13,7 +13,9 @@ api.interceptors.request.use(
     (config) => {
         // Get token from localStorage (only on client side)
         if (typeof window !== 'undefined') {
-            const token = localStorage.getItem('jwt_token');
+            // IMPORTANT: access_token = CRUD token (from /auth/api-key or N8N webhook)
+            // jwt_token = login-only token (fallback for backward compat)
+            const token = localStorage.getItem('access_token') || localStorage.getItem('jwt_token');
             if (token) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
