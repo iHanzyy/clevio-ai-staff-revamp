@@ -79,7 +79,7 @@ export default function ArthurSection() {
     const sectionRef = useRef<HTMLElement>(null);
 
     // Ref for input focus
-    const inputRef = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLTextAreaElement>(null);
 
     // Polling ref
     const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -510,9 +510,9 @@ export default function ArthurSection() {
         }
     };
 
-    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            e.preventDefault(); // Prevent accidental form submission
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
             handleSendMessage();
         }
     };
@@ -640,17 +640,21 @@ export default function ArthurSection() {
                 {/* Input Field - Normal Flow (Not Sticky) */}
                 <div className="p-4 pb-8 -mx-1 sm:-mx-8 md:-mx-12 lg:-mx-16 z-30">
                     <div className="max-w-3xl mx-auto">
-                        <div className="relative bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 pl-6 pr-14 py-4 transition-transform duration-200 focus-within:scale-[1.01]">
-                            <input
+                        <div className="relative bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 pl-6 pr-14 py-3 transition-all duration-200 focus-within:scale-[1.01]">
+                            <textarea
                                 ref={inputRef}
-                                type="text"
+                                rows={1}
                                 placeholder="Ketik disini......."
                                 value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                onKeyPress={handleKeyPress}
+                                onChange={(e) => {
+                                    setMessage(e.target.value);
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = Math.min(e.target.scrollHeight, 144) + 'px';
+                                }}
+                                onKeyDown={handleKeyDown}
                                 disabled={isTyping || isProcessingFinal}
-                                className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base disabled:opacity-50"
-                                style={{ fontSize: '16px' }} // Prevent iOS zoom
+                                className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base disabled:opacity-50 resize-none min-h-[28px] max-h-[144px] scrollbar-hide py-1"
+                                style={{ fontSize: '16px', height: '28px' }}
                             />
                             {/* Button INSIDE input - Explicitly type="button" to prevent form submit */}
                             <button
@@ -660,7 +664,7 @@ export default function ArthurSection() {
                                     handleSendMessage();
                                 }}
                                 disabled={!message.trim() || isTyping || isProcessingFinal}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-[#2563EB] rounded-full flex items-center justify-center hover:bg-[#1d4ed8] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                className="absolute right-2 bottom-1.5 h-10 w-10 bg-[#2563EB] rounded-full flex items-center justify-center hover:bg-[#1d4ed8] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
                                 aria-label="Send Message"
                             >
                                 <div className="h-5 w-5 relative">
