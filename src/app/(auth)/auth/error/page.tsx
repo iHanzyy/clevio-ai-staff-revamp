@@ -20,14 +20,14 @@ function AuthErrorContent() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+        <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100 p-4">
             {/* Claymorphism Card */}
             <div className="
                 relative
                 w-full max-w-md
                 bg-white/80
                 backdrop-blur-sm
-                rounded-[2rem]
+                rounded-4xl
                 p-8
                 shadow-[8px_8px_24px_rgba(0,0,0,0.08),-8px_-8px_24px_rgba(255,255,255,0.9)]
                 border border-white/50
@@ -75,7 +75,7 @@ function AuthErrorContent() {
                     className="
                         w-full
                         flex items-center justify-center gap-2
-                        bg-gradient-to-br from-lime-600 to-lime-500
+                        bg-linear-to-br from-lime-600 to-lime-500
                         hover:from-lime-700 hover:to-lime-600
                         text-white
                         font-semibold
@@ -98,7 +98,7 @@ function AuthErrorContent() {
 export default function AuthErrorPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
+            <div className="min-h-screen w-full flex items-center justify-center bg-linear-to-br from-slate-50 to-slate-100">
                 <div className="loader" />
             </div>
         }>

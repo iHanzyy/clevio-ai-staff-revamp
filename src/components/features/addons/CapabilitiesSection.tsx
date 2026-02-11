@@ -103,7 +103,7 @@ export default function CapabilitiesSection({ agents, selectedAgent, onSelectAge
                             {selectedAgent?.name || "Pilih agen..."}
                         </span>
                         <ChevronDown className={cn(
-                            "w-4 h-4 text-gray-500 transition-transform flex-shrink-0",
+                            "w-4 h-4 text-gray-500 transition-transform shrink-0",
                             isDropdownOpen && "rotate-180"
                         )} />
                     </button>
