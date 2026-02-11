@@ -60,6 +60,26 @@ body {
     animation: fadeIn 0.5s ease-out forwards;
 }
 
+/* ChatGPT-style thinking shimmer */
+.animate-thinking-shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(255, 255, 255, 1) 50%,
+        rgba(255, 255, 255, 0.7) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: thinkingShimmer 2s ease-in-out infinite;
+}
+
+@keyframes thinkingShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

@@ -170,10 +170,7 @@ export default function ArthurSection() {
             // Start timer when typing begins - after 10s, start alternating
             longWaitTimerRef.current = setTimeout(() => {
                 setShowLongWaitMessage(true);
-                // Start alternating between dots and info every 3 seconds
-                toggleIntervalRef.current = setInterval(() => {
-                    setShowInfoInsteadOfDots(prev => !prev);
-                }, 3000);
+                setShowInfoInsteadOfDots(true); // Stay on thinking text, no toggle back
             }, 10000); // 10 seconds
         } else {
             // Reset everything when typing completes
@@ -614,7 +611,7 @@ export default function ArthurSection() {
                                         <span className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
                                     </div>
                                 ) : (
-                                    <span className="text-sm animate-fade-in italic">⏳ Mohon menunggu sekitar 1-2 menit...</span>
+                                    <span className="text-sm animate-thinking-shimmer font-medium">Sedang berpikir...</span>
                                 )}
                             </div>
                         </div>

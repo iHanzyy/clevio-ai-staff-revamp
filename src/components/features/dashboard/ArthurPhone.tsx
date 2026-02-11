@@ -124,9 +124,7 @@ export default function ArthurPhone({
         if (isSending) {
             longWaitTimerRef.current = setTimeout(() => {
                 setShowLongWaitMessage(true);
-                toggleIntervalRef.current = setInterval(() => {
-                    setShowInfoInsteadOfDots(prev => !prev);
-                }, 3000);
+                setShowInfoInsteadOfDots(true); // Stay on thinking text, no toggle back
             }, 10000);
         } else {
             if (longWaitTimerRef.current) clearTimeout(longWaitTimerRef.current);
@@ -345,7 +343,7 @@ export default function ArthurPhone({
                                     <div className="w-1.5 h-1.5 bg-white/50 rounded-full animate-bounce"></div>
                                 </>
                             ) : (
-                                <span className="text-sm animate-fade-in italic">⏳ Mohon menunggu sekitar 1-2 menit...</span>
+                                <span className="text-sm animate-thinking-shimmer font-medium">Sedang berpikir...</span>
                             )}
                         </div>
                     </div>
