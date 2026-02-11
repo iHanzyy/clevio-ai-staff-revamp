@@ -143,7 +143,7 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
                 "rounded-4xl",
                 "bg-cover bg-center bg-no-repeat", // Use tailwind utility or style
                 isFocused ? "shadow-[0px_4px_63px_3px_rgba(65,205,93,1)]" : "shadow-none", // Green Glow
-                "select-none"
+                "select-text"
             )}
                 style={{
                     backgroundImage: "url('/whatsapp_background.png')",
