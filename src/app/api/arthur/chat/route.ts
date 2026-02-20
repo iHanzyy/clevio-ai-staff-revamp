@@ -15,10 +15,10 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const n8nUrl = process.env.NEXT_N8N_PROCESS_AGENT;
+        const n8nUrl = process.env.N8N_CHAT_WEBHOOK_URL;
 
         if (!n8nUrl) {
-            console.error("[ArthurProxy] Error: NEXT_N8N_PROCESS_AGENT is missing.");
+            console.error("[ArthurProxy] Error: N8N_CHAT_WEBHOOK_URL is missing.");
             return NextResponse.json({ error: 'Service Unavailable' }, { status: 503 });
         }
 

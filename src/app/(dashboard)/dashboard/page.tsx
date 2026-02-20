@@ -84,14 +84,21 @@ export default function DashboardPage() {
         try {
             console.log('[Dashboard] rawAgentData:', JSON.stringify(rawAgentData, null, 2));
 
-            // CRITICAL: If N8N sent an access_token in webhook, store it for future use
-            // This happens when user registered via email and N8N provides the real backend token.
+            // CRITICAL: If N8N sent tokens in webhook, store them for future use
+            // This happens when user passes through Arthur / N8N
             if (rawAgentData.access_token) {
-                console.log('[Dashboard] Found access_token in webhook data, updating storage');
+                console.log('[Dashboard] Found tokens in webhook data, updating storage');
                 // Store as access_token (primary for CRUD)
                 localStorage.setItem('access_token', rawAgentData.access_token);
-                // Also update cookie for middleware resilience
-                document.cookie = `session_token=${rawAgentData.access_token}; path=/; max-age=604800; SameSite=Lax`;
+                
+                // Prioritize JWT Token for session cookie if provided by N8N
+                if (rawAgentData.jwt_token) {
+                    localStorage.setItem('jwt_token', rawAgentData.jwt_token);
+                    document.cookie = `session_token=${rawAgentData.jwt_token}; path=/; max-age=604800; SameSite=Lax`;
+                } else {
+                    // Fallback to access_token if no jwt_token
+                    document.cookie = `session_token=${rawAgentData.access_token}; path=/; max-age=604800; SameSite=Lax`;
+                }
             }
 
             // api.ts now automatically uses access_token if available, falling back to jwt_token

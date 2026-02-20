@@ -13,11 +13,21 @@ api.interceptors.request.use(
     (config) => {
         // Get token from localStorage (only on client side)
         if (typeof window !== 'undefined') {
-            // IMPORTANT: access_token = CRUD token (from /auth/api-key or N8N webhook)
-            // jwt_token = login-only token (fallback for backward compat)
-            const token = localStorage.getItem('access_token') || localStorage.getItem('jwt_token');
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
+            const jwtToken = localStorage.getItem('jwt_token');
+            const accessToken = localStorage.getItem('access_token');
+            
+            // TENTUKAN TOKEN BERDASARKAN ENDPOINT
+            let tokenToUse = accessToken || jwtToken; // default prioritas
+            
+            // Endpoint yang strictly mewajibkan User JWT Token (auth-related)
+            const isAuthEndpoint = config.url?.includes('/auth/me') || config.url?.includes('/auth/refresh') || config.url?.includes('/auth/google');
+            
+            if (isAuthEndpoint && jwtToken) {
+                tokenToUse = jwtToken; // Paksa gunakan JWT untuk validasi login/profil
+            }
+
+            if (tokenToUse) {
+                config.headers.Authorization = `Bearer ${tokenToUse}`;
             }
         }
         return config;

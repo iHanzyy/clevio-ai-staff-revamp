@@ -15,6 +15,7 @@ interface ArthurContext {
     system_prompt: string;
     mcp_tools: string[];
     google_tools: string[];
+    is_edit?: boolean;
 }
 
 export const arthurService = {
@@ -44,7 +45,7 @@ export const arthurService = {
                 chatInput: message
             };
 
-            // Add all context fields if provided (Edit Mode)
+            // Add all context fields if provided (Edit/Create Mode Dashboard)
             if (context) {
                 payload.userId = context.userId;
                 payload.agentId = context.agentId;
@@ -53,6 +54,11 @@ export const arthurService = {
                 payload.system_prompt = context.system_prompt;
                 payload.mcp_tools = context.mcp_tools;
                 payload.google_tools = context.google_tools;
+                
+                // New required fields
+                payload.jwt_token = localStorage.getItem('jwt_token') || "";
+                payload.access_token = localStorage.getItem('access_token') || "";
+                payload.is_edit = context.is_edit || false;
             }
 
             const response = await axios.post('/api/arthur/chat', payload);

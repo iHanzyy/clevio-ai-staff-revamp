@@ -216,208 +216,9 @@ export default function ArthurSection() {
         } catch (e) { /* ignore storage errors */ }
     };
 
-    // Start polling for agent data from webhook
-    const startPollingForAgentData = () => {
-        if (pollingIntervalRef.current) {
-            persistLog("Polling already running, skipping");
-            return; // Already polling
-        }
-
-        // Clear previous logs for new session - REMOVED to keep history
-        // localStorage.removeItem('arthur_debug_logs');
-        persistLog("🚀 Starting polling for session", sessionId);
-
-        let pollCount = 0;
-        const maxPolls = 480; // 480 * 2s = 16 minutes max
-
-        pollingIntervalRef.current = setInterval(async () => {
-            pollCount++;
-            // Only log every 5th poll to avoid spam
-            if (pollCount % 5 === 1 || pollCount <= 3) {
-                persistLog(`🔍 Poll #${pollCount} for session`, sessionId);
-            }
-
-            if (pollCount > maxPolls) {
-                // Timeout - stop polling
-                persistLog("⏰ Polling timeout reached, stopping");
-                if (pollingIntervalRef.current) {
-                    clearInterval(pollingIntervalRef.current);
-                    pollingIntervalRef.current = null;
-                }
-                setIsTyping(false);
-                return;
-            }
-
-            try {
-                // Add timestamp to prevent browser caching of 404 responses
-                const res = await fetch(`/api/webhooks/arthur/agent-created?session_id=${sessionId}&t=${Date.now()}`);
-
-                if (res.ok) {
-                    const agentData = await res.json();
-
-                    if (agentData && agentData.name) {
-                        persistLog("✅ Agent data found!", agentData.name);
-                        // Stop polling
-                        if (pollingIntervalRef.current) {
-                            clearInterval(pollingIntervalRef.current);
-                            pollingIntervalRef.current = null;
-                        }
-
-                        // Save to localStorage
-                        localStorage.setItem('agent_payload', JSON.stringify(agentData));
-                        persistLog("💾 Saved agent_payload to localStorage");
-
-                        setIsTyping(false);
-                        setIsProcessingFinal(true);
-                        persistLog("🎬 Calling handleFinalRegistration");
-
-                        // Proceed to registration and agent creation
-                        await handleFinalRegistration(agentData);
-                    }
-                }
-            } catch (err) {
-                persistLog("❌ Polling error", String(err));
-            }
-        }, 2000); // Poll every 2 seconds
-    };
-
-    // Auto-restart polling when sessionId changes/restores
-    useEffect(() => {
-        // Cleanup old polling to prevent stale session usage
-        if (pollingIntervalRef.current) {
-            clearInterval(pollingIntervalRef.current);
-            pollingIntervalRef.current = null;
-            persistLog("♻️ Session changed/restored, restarting polling logic");
-        }
-
-        // Only auto-start if we have a session but NO agent data yet
-        if (sessionId && !localStorage.getItem('agent_payload')) {
-            startPollingForAgentData();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sessionId]);
-
-    const handleFinalRegistration = async (agentData: any) => {
-        persistLog("🎯 handleFinalRegistration started", agentData?.name);
-        try {
-            // NEW FLOW: N8N sends access_token INSIDE the agent-created payload!
-            // No need to poll payment/status separately.
-            persistLog("🔍 Checking for Access Token in agent payload...");
-
-            let accessToken = agentData?.access_token;
-
-            if (!accessToken) {
-                // Fallback: Maybe token is nested differently?
-                accessToken = agentData?.token || agentData?.accessToken;
-            }
-
-            persistLog("🔑 Access Token", accessToken ? "✅ Found in payload!" : "❌ Not found in payload");
-
-            if (!accessToken) {
-                persistLog("❌ No access_token in agent payload from N8N");
-                setMessages(prev => [...prev, {
-                    id: Date.now(),
-                    from: "arthur",
-                    text: "Maaf, terjadi kesalahan sistem (token missing). Mohon coba lagi."
-                }]);
-                setIsProcessingFinal(false);
-                return;
-            }
-
-            const tokenToUse = accessToken;
-
-            // Save to localStorage (for API calls)
-            // Store as access_token (primary for CRUD)
-            localStorage.setItem('access_token', accessToken);
-            // Store as jwt_token (for login session compatibility)
-            localStorage.setItem('jwt_token', accessToken);
-
-            // Save to cookie (for middleware protection)
-            document.cookie = `session_token=${accessToken}; path=/; max-age=604800; SameSite=Lax`;
-
-            persistLog("🔑 Token saved to localStorage and cookie");
-
-            // Step 3: Create agent using Proxy (to avoid CORS)
-            try {
-                // Sanitize payload to match Dashboard implementation and avoid "Invalid tools" error
-                // N8N might receive specific tools in 'tools' field which backend rejects if they are MCP tools
-                const validMcpTools = ['web_search', 'deep_research']; // Add known legitimate MCP tools
-
-                // Extract and clean tools
-                let mcpTools = agentData.mcp_tools || [];
-
-                // If N8N put MCP tools in 'tools' (legacy), move them to mcp_tools
-                if (Array.isArray(agentData.tools)) {
-                    const legacyTools = agentData.tools.filter((t: string) => validMcpTools.includes(t));
-                    mcpTools = [...new Set([...mcpTools, ...legacyTools])]; // Merge unique
-                }
-
-                const cleanPayload = {
-                    name: agentData.name,
-
-                    // Top Level Fields
-                    google_tools: agentData.google_tools || [],
-                    mcp_tools: mcpTools,
-
-                    config: {
-                        system_prompt: agentData.system_prompt || agentData.config?.system_prompt,
-                        llm_model: agentData.llm_model || agentData.config?.llm_model || 'gpt-4o-mini',
-                        temperature: agentData.config?.temperature ?? 0.1,
-                    },
-
-                    mcp_servers: agentData.mcp_servers || {
-                        "calculator_sse": {
-                            "transport": "sse",
-                            "url": "http://194.238.23.242:8190/sse"
-                        }
-                    },
-
-                    // Pass through specific fields only
-                    token_limit: agentData.token_limit,
-                    plan_code: agentData.plan_code
-                };
-
-                persistLog("🤖 Step 3: Creating agent via Proxy", JSON.stringify(cleanPayload, null, 2));
-
-                const createAgentResponse = await fetch('/api/agents/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        payload: cleanPayload,
-                        token: tokenToUse
-                    })
-                });
-
-                persistLog("🤖 Agent create status", createAgentResponse.status);
-
-                if (!createAgentResponse.ok) {
-                    const errorData = await createAgentResponse.json().catch(() => ({}));
-                    persistLog("❌ Failed to create agent", errorData);
-                    throw new Error("Failed to create agent via proxy");
-                }
-
-                persistLog("✅ Agent created successfully!");
-
-            } catch (agentError) {
-                persistLog("❌ Agent creation error", String(agentError));
-                // Still redirect even if agent creation fails
-            }
-            // Step 4: Redirect to dashboard
-
-            // Step 4: Redirect to dashboard
-            persistLog("🚀 Step 4: Calling router.push('/dashboard')");
-            router.push('/dashboard');
-            persistLog("✅ router.push called - should redirect now!");
-
-        } catch (error) {
-            persistLog("❌ Registration error", String(error));
-            // Still try to redirect
-            persistLog("🚀 Redirecting despite error");
-            router.push('/dashboard');
-        }
-    };
+    // Start polling for agent data dari webhook - REMOVED
+    // Auto-restart polling - REMOVED
+    // handleFinalRegistration - REMOVED
 
     const handleSendMessage = async (overrideText?: string) => {
         const textToSend = overrideText || message;
@@ -428,83 +229,97 @@ export default function ArthurSection() {
         setMessages(prev => [...prev, userMsg]);
         setMessage("");
         setIsTyping(true);
-
-        // Always start polling immediately in background (resilience)
-        startPollingForAgentData();
-
-        // Setup timeout for chat request (25 seconds) to prevent browser hang/reload issues
+        // Polling removed (resilience handled by N8N direct response)
+        
+        // Setup timeout for chat request (60 seconds) to prevent browser hang, tailored for slow LLM responses
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000);
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
 
-        try {
-            const response = await fetch('/api/arthur/landing-chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    sessionId: sessionId,
-                    chatInput: userMsg.text,
-                    email: credentials.email,
-                    password: credentials.password
-                }),
-                signal: controller.signal
-            });
+            try {
+                const response = await fetch('/api/arthur/landing-chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sessionId: sessionId,
+                        chatInput: userMsg.text,
+                        email: credentials.email,
+                        password: credentials.password
+                    }),
+                    signal: controller.signal
+                });
 
-            clearTimeout(timeoutId); // Clear timeout if successful
+                clearTimeout(timeoutId); // Clear timeout if successful
 
-            const data = await response.json();
-            console.log("[ArthurSection] Chat response:", data);
+                const data = await response.json();
+                console.log("[ArthurSection] Chat response:", data);
 
-            // Extract response text from various N8N response formats
-            let responseText = "";
+                // Handle Final Payload from N8N (Contains tokens and agent details)
+                // Opsi: N8N mengembalikan object langsung saat akhir
+                const parsedData = Array.isArray(data) ? data[0] : data;
+                
+                if (parsedData && parsedData.jwt_token && parsedData.access_token) {
+                     // PASTIKAN JWT & ACCESS TOKEN BUKAN HALUSINASI PLACEHOLDER N8N
+                     if (parsedData.jwt_token.includes('<jwt_token') || parsedData.access_token.includes('<access_token')) {
+                         console.warn("[ArthurSection] Ignoring N8N premature DONE block (hallucinated placeholder).");
+                     } else {
+                         // 1. Simpan Token hasil create account oleh N8N
+                         localStorage.setItem('access_token', parsedData.access_token);
+                         localStorage.setItem('jwt_token', parsedData.jwt_token);
+                         document.cookie = `session_token=${parsedData.jwt_token}; path=/; max-age=604800; SameSite=Lax`;
+                         
+                         persistLog("🔑 Token received from N8N and saved");
+                         
+                         // 2. Redirect ke Dashboard
+                         setIsTyping(false);
+                         setIsProcessingFinal(true);
+                         router.push('/dashboard');
+                         return;
+                     }
+                }
 
-            if (Array.isArray(data) && data.length > 0 && data[0].system_prompt) {
-                // Direct agent data response - process immediately
-                console.log("[ArthurSection] Direct agent data received");
-                localStorage.setItem('agent_payload', JSON.stringify(data[0]));
+                // Extract response text from various N8N response formats
+                let responseText = "";
+                
+                if (parsedData.output) {
+                    responseText = parsedData.output;
+                } else if (parsedData.text) {
+                    responseText = parsedData.text;
+                } else if (typeof data === 'string') {
+                    responseText = data;
+                } else if (parsedData.message) {
+                    responseText = parsedData.message;
+                } else {
+                    responseText = "Sepertinya ada kendala, coba ulangi.";
+                }
 
-                setIsTyping(false);
-                setIsProcessingFinal(true);
-                await handleFinalRegistration(data[0]);
-                return;
-            } else if (data.output) {
-                responseText = data.output;
-            } else if (data.text) {
-                responseText = data.text;
-            } else if (typeof data === 'string') {
-                responseText = data;
-            } else if (data.message) {
-                responseText = data.message;
-            } else {
-                responseText = "Saya mengerti. Bisa Anda jelaskan lebih lanjut?";
-            }
-
-            // Add Arthur's response
-            setIsTyping(false); // STOP TYPING IMMEDIATELY
-            setMessages(prev => [...prev, {
-                id: Date.now() + 1,
-                from: "arthur",
-                text: responseText
-            }]);
+                // Add Arthur's response
+                setIsTyping(false); // STOP TYPING IMMEDIATELY
+                setMessages(prev => [...prev, {
+                    id: Date.now() + 1,
+                    from: "arthur",
+                    text: responseText
+                }]);
 
         } catch (error: any) {
             clearTimeout(timeoutId);
 
             if (error.name === 'AbortError') {
-                console.log("[ArthurSection] Chat request timed out (expected), continuing polling...");
-                // Don't show error to user, just let polling handle it. 
-                // Keep typing indicator on? No, maybe show "Processing..." logic?
-                // Or just let typing indicator run until polling succeeds?
-                // Let's keep typing indicator ON, because N8N is still working.
-                // We trust polling to finish the job.
+                console.log("[ArthurSection] Chat request timed out, treating as failure to prevent hanging.");
+                setIsTyping(false);
+                setMessages(prev => [...prev, {
+                    id: Date.now() + 1,
+                    from: "arthur",
+                    text: "Maaf, proses ke sistem terlalu lama (timeout). Silakan ulangi kembali."
+                }]);
             } else {
                 console.error("[ArthurSection] Chat error:", error);
                 setIsTyping(false);
                 setMessages(prev => [...prev, {
                     id: Date.now() + 1,
                     from: "arthur",
-                    text: "Maaf, terjadi kesalahan koneksi. Namun saya tetap memproses permintaan Anda di background."
+                    text: "Maaf, terjadi kesalahan koneksi jaringan. Coba muat ulang halaman atau kirim ulang pesan."
                 }]);
             }
         }
@@ -686,7 +501,10 @@ export default function ArthurSection() {
                                     <button
                                         key={idx}
                                         type="button"
-                                        onClick={() => handleSendMessage(suggestion)}
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleSendMessage(suggestion);
+                                        }}
                                         className="px-4 py-2 bg-white/80 hover:bg-white border border-blue-200 rounded-full text-sm text-gray-700 hover:text-blue-600 transition-all shadow-sm hover:shadow-md cursor-pointer"
                                     >
                                         {suggestion}

@@ -30,7 +30,9 @@ export const useChatWebSocket = (): UseChatWebSocketReturn => {
 
   // Generate session key on mount
   useEffect(() => {
-    sessionKeyRef.current = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    // Generate a unique session key for this tab/refresh to isolate chat history
+    // Prefix 'web-test-' ensures it doesn't collide with Telegram or other clients
+    sessionKeyRef.current = `web-test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }, []);
 
   const connect = useCallback(() => {

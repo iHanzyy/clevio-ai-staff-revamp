@@ -213,57 +213,21 @@ export default function ArthurPhone({
         setIsSending(false);
 
         if (isCreateMode) {
-            // First check if agentData is directly in response (backward compatibility)
+            // First check if agentData is directly in response
             const agentData = response.agentData || response;
             if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
                 onAgentCreated(agentData);
                 return;
             }
-
-            // If not in response, poll the webhook for agent data
-            // N8N sends to webhook separately, so we need to poll
-            const pollForAgentData = async () => {
-                const maxAttempts = 30; // 60 seconds total (30 * 2s)
-                const pollInterval = 2000; // 2 seconds
-
-                for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                    try {
-                        const webhookResponse = await fetch(
-                            `/api/webhooks/arthur/agent-created?session_id=${sessionId}&t=${Date.now()}`
-                        );
-
-                        if (webhookResponse.ok) {
-                            const webhookData = await webhookResponse.json();
-                            if (webhookData.name && (webhookData.system_prompt || webhookData.config?.system_prompt)) {
-                                console.log('[ArthurPhone] Agent data retrieved from webhook:', webhookData.name);
-                                if (onAgentCreated) {
-                                    onAgentCreated(webhookData);
-                                }
-                                return; // Success!
-                            }
-                        }
-                    } catch (error) {
-                        console.error('[ArthurPhone] Polling error:', error);
-                    }
-
-                    // Wait before next attempt
-                    await new Promise(resolve => setTimeout(resolve, pollInterval));
-                }
-
-                console.log('[ArthurPhone] Polling timeout - no agent data found');
-            };
-
-            // Start polling in background
-            pollForAgentData();
+        } else if (isEditMode) {
+            // DETEKSI EDIT SELESAI DARI N8N
+            // N8N harus mengembalikan is_done: true di akhir workflow saat update agent selesai
+            if (response.is_done === true && onAgentCreated) {
+                console.log('[ArthurPhone] Edit process completed by N8N. Refreshing agent data...');
+                onAgentCreated(response.agentData || response);
+                return;
+            }
         }
-
-        // Removed automatic onSectionReset() to keep context active during conversation
-        // if (isEditMode && onSectionReset) {
-        //     if (response.success !== false) {
-        //         onSectionReset();
-        //         showToast("Perubahan berhasil diterapkan!", "success");
-        //     }
-        // }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
