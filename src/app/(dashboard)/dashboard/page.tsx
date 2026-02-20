@@ -86,18 +86,36 @@ export default function DashboardPage() {
 
             // CRITICAL: If N8N sent tokens in webhook, store them for future use
             // This happens when user passes through Arthur / N8N
-            if (rawAgentData.access_token) {
-                console.log('[Dashboard] Found tokens in webhook data, updating storage');
+            if (rawAgentData.access_token || rawAgentData.jwt_token) {
+                // Handle swapped keys from N8N webhook
+                let realApiToken = rawAgentData.access_token;
+                let realUserToken = rawAgentData.jwt_token;
+
+                try {
+                    const parseJwt = (token: string) => JSON.parse(atob(token.split('.')[1]));
+                    const token1Payload = rawAgentData.jwt_token ? parseJwt(rawAgentData.jwt_token) : null;
+                    const token2Payload = rawAgentData.access_token ? parseJwt(rawAgentData.access_token) : null;
+                    
+                    if (token1Payload?.type === 'agent' || token2Payload?.type === 'user') {
+                        realApiToken = rawAgentData.jwt_token; // Agent API Key
+                        realUserToken = rawAgentData.access_token; // User JWT
+                    }
+                } catch (e) {
+                    console.warn("[Dashboard] Failed to decode raw tokens, falling back to raw keys.");
+                }
+
                 // Store as access_token (primary for CRUD)
-                localStorage.setItem('access_token', rawAgentData.access_token);
+                if (realApiToken) {
+                    localStorage.setItem('access_token', realApiToken);
+                }
                 
                 // Prioritize JWT Token for session cookie if provided by N8N
-                if (rawAgentData.jwt_token) {
-                    localStorage.setItem('jwt_token', rawAgentData.jwt_token);
-                    document.cookie = `session_token=${rawAgentData.jwt_token}; path=/; max-age=604800; SameSite=Lax`;
-                } else {
+                if (realUserToken) {
+                    localStorage.setItem('jwt_token', realUserToken);
+                    document.cookie = `session_token=${realUserToken}; path=/; max-age=604800; SameSite=Lax`;
+                } else if (realApiToken) {
                     // Fallback to access_token if no jwt_token
-                    document.cookie = `session_token=${rawAgentData.access_token}; path=/; max-age=604800; SameSite=Lax`;
+                    document.cookie = `session_token=${realApiToken}; path=/; max-age=604800; SameSite=Lax`;
                 }
             }
 

@@ -264,12 +264,31 @@ export default function ArthurSection() {
                      if (parsedData.jwt_token.includes('<jwt_token') || parsedData.access_token.includes('<access_token')) {
                          console.warn("[ArthurSection] Ignoring N8N premature DONE block (hallucinated placeholder).");
                      } else {
-                         // 1. Simpan Token hasil create account oleh N8N
-                         localStorage.setItem('access_token', parsedData.access_token);
-                         localStorage.setItem('jwt_token', parsedData.jwt_token);
-                         document.cookie = `session_token=${parsedData.jwt_token}; path=/; max-age=604800; SameSite=Lax`;
+                         // 1. Simpan Token hasil create account oleh N8N. 
+                         // IMPORTANT: N8N webhook returns swapped keys ('jwt_token' holds API KEY [type: agent], 'access_token' holds User JWT [type: user])
+                         // We use smart-decode to ensure the correct token goes to the correct localStorage key.
+                         let realApiToken = parsedData.access_token;
+                         let realUserToken = parsedData.jwt_token;
+
+                         try {
+                             const parseJwt = (token: string) => JSON.parse(atob(token.split('.')[1]));
+                             const token1Payload = parseJwt(parsedData.jwt_token);
+                             const token2Payload = parseJwt(parsedData.access_token);
+                             
+                             if (token1Payload?.type === 'agent' || token2Payload?.type === 'user') {
+                                 realApiToken = parsedData.jwt_token; // Agent API Key
+                                 realUserToken = parsedData.access_token; // User JWT
+                             }
+                         } catch (e) {
+                             console.warn("Failed to decode tokens, falling back to raw payload keys.");
+                         }
+
+                         localStorage.setItem('access_token', realApiToken);
+                         localStorage.setItem('jwt_token', realUserToken);
+                         // Middleware dan interceptor memerlukan konsistensi
+                         document.cookie = `session_token=${realUserToken}; path=/; max-age=604800; SameSite=Lax`;
                          
-                         persistLog("🔑 Token received from N8N and saved");
+                         persistLog("🔑 Real Tokens matched and saved to Storage");
                          
                          // 2. Redirect ke Dashboard
                          setIsTyping(false);
