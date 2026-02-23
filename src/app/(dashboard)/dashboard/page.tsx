@@ -107,9 +107,11 @@ export default function DashboardPage() {
                 // Store as access_token (primary for CRUD)
                 if (realApiToken) {
                     localStorage.setItem('access_token', realApiToken);
+                    // api_token cookie untuk SSR proxy (Google Workspace dll)
+                    document.cookie = `api_token=${realApiToken}; path=/; max-age=604800; SameSite=Lax`;
                 }
                 
-                // Prioritize JWT Token for session cookie if provided by N8N
+                // JWT User Token untuk profil auth
                 if (realUserToken) {
                     localStorage.setItem('jwt_token', realUserToken);
                     document.cookie = `session_token=${realUserToken}; path=/; max-age=604800; SameSite=Lax`;

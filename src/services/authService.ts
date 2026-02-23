@@ -81,7 +81,9 @@ export const authService = {
     setAccessToken: (token: string) => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('access_token', token);
-            console.log('[AuthService] access_token stored');
+            // Set api_token cookie for SSR proxy (Google Workspace, etc.)
+            document.cookie = `api_token=${token}; path=/; max-age=604800; SameSite=Lax`;
+            console.log('[AuthService] access_token stored + api_token cookie set');
         }
     },
 
@@ -91,6 +93,7 @@ export const authService = {
             localStorage.removeItem('jwt_token');
             localStorage.removeItem('access_token');
             document.cookie = 'session_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+            document.cookie = 'api_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             window.location.href = '/login';
         }
     }

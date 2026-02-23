@@ -17,12 +17,12 @@ api.interceptors.request.use(
             const accessToken = localStorage.getItem('access_token');
             
             // TENTUKAN TOKEN BERDASARKAN ENDPOINT
-            let tokenToUse = accessToken || jwtToken; // default prioritas
+            let tokenToUse = accessToken || jwtToken; // default: access_token untuk CRUD/agents/google
             
-            // Endpoint yang strictly mewajibkan User JWT Token (auth-related)
-            const isAuthEndpoint = config.url?.includes('/auth/me') || config.url?.includes('/auth/refresh') || config.url?.includes('/auth/google');
+            // HANYA /auth/me yang butuh User JWT Token untuk validasi profil
+            const isProfileEndpoint = config.url?.includes('/auth/me');
             
-            if (isAuthEndpoint && jwtToken) {
+            if (isProfileEndpoint && jwtToken) {
                 tokenToUse = jwtToken; // Paksa gunakan JWT untuk validasi login/profil
             }
 

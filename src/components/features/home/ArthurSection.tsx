@@ -285,10 +285,12 @@ export default function ArthurSection() {
 
                          localStorage.setItem('access_token', realApiToken);
                          localStorage.setItem('jwt_token', realUserToken);
-                         // Middleware dan interceptor memerlukan konsistensi
+                         // session_token = JWT User (untuk /auth/me via SSR)
                          document.cookie = `session_token=${realUserToken}; path=/; max-age=604800; SameSite=Lax`;
+                         // api_token = Access Token / API Key (untuk /agents, /auth/google via SSR proxy)
+                         document.cookie = `api_token=${realApiToken}; path=/; max-age=604800; SameSite=Lax`;
                          
-                         persistLog("🔑 Real Tokens matched and saved to Storage");
+                         persistLog("🔑 Real Tokens matched and saved to Storage + Cookies");
                          
                          // 2. Redirect ke Dashboard
                          setIsTyping(false);

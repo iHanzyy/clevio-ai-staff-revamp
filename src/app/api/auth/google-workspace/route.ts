@@ -16,10 +16,13 @@ export async function POST(req: NextRequest) {
         }
 
         // Get auth token from cookies or headers
+        // Priority: Authorization header > api_token cookie (access_token/API Key) > session_token cookie (jwt_token)
+        // Google OAuth endpoints require access_token (API Key), NOT jwt_token
         const cookieStore = await cookies();
+        const apiTokenCookie = cookieStore.get('api_token')?.value;
         const sessionToken = cookieStore.get('session_token')?.value;
         const authHeader = req.headers.get('Authorization');
-        const token = authHeader?.replace('Bearer ', '') || sessionToken;
+        const token = authHeader?.replace('Bearer ', '') || apiTokenCookie || sessionToken;
 
         if (!token) {
             return NextResponse.json(
