@@ -21,6 +21,7 @@ type SectionType = 'name' | 'system_prompt' | 'capabilities' | null;
 interface ArthurPhoneProps {
     isActive?: boolean;
     onAgentCreated?: (agentData: any) => void;
+    onAgentUpdated?: () => void;
     hasAgent?: boolean;
     // isAutoMode removed
     selectedSection?: SectionType;
@@ -68,6 +69,7 @@ const SECTION_LABELS: Record<string, string> = {
 export default function ArthurPhone({
     isActive = false,
     onAgentCreated,
+    onAgentUpdated,
     hasAgent = false,
     // isAutoMode removed (implicitly true)
     selectedSection = null,
@@ -207,24 +209,35 @@ export default function ArthurPhone({
     };
 
     const handleArthurResponse = async (response: any) => {
-        const responseText = response.output || response.message || JSON.stringify(response);
+        // N8N returns array format: [{ _responseType, is_done, output }]
+        const parsed = Array.isArray(response) ? response[0] : response;
+
+        const responseText = parsed.output || parsed.message || JSON.stringify(parsed);
         const botMsg: Message = { id: Date.now().toString(), sender: "Arthur", message: responseText, time: getCurrentTime() };
         setMessages(prev => [...prev, botMsg]);
         setIsSending(false);
 
+        // Handle _responseType from N8N
+        if (parsed._responseType === 'agent_updated' && parsed.is_done === true) {
+            console.log('[ArthurPhone] agent_updated detected. Refreshing dashboard data...');
+            if (onAgentUpdated) {
+                onAgentUpdated();
+            }
+            return;
+        }
+
         if (isCreateMode) {
             // First check if agentData is directly in response
-            const agentData = response.agentData || response;
+            const agentData = parsed.agentData || parsed;
             if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
                 onAgentCreated(agentData);
                 return;
             }
         } else if (isEditMode) {
-            // DETEKSI EDIT SELESAI DARI N8N
-            // N8N harus mengembalikan is_done: true di akhir workflow saat update agent selesai
-            if (response.is_done === true && onAgentCreated) {
+            // DETEKSI EDIT SELESAI DARI N8N (legacy fallback)
+            if (parsed.is_done === true && onAgentCreated) {
                 console.log('[ArthurPhone] Edit process completed by N8N. Refreshing agent data...');
-                onAgentCreated(response.agentData || response);
+                onAgentCreated(parsed.agentData || parsed);
                 return;
             }
         }

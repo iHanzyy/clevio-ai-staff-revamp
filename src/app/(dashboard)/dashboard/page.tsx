@@ -300,6 +300,7 @@ export default function DashboardPage() {
                         <ArthurPhone
                             isActive={isArthurActive}
                             onAgentCreated={handleAgentCreated}
+                            onAgentUpdated={refreshAgents}
                             hasAgent={hasAgent}
                             selectedSection={selectedSection}
                             selectedAgent={selectedAgent}
@@ -381,6 +382,7 @@ export default function DashboardPage() {
                             <ArthurPhone
                                 isActive={isArthurActive}
                                 onAgentCreated={handleAgentCreated}
+                                onAgentUpdated={refreshAgents}
                                 hasAgent={hasAgent}
                                 selectedSection={selectedSection}
                                 selectedAgent={selectedAgent}
