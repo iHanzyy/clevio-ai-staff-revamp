@@ -16,17 +16,14 @@ interface Message {
     time: string;
 }
 
-type SectionType = 'name' | 'system_prompt' | 'capabilities' | null;
+
 
 interface ArthurPhoneProps {
     isActive?: boolean;
     onAgentCreated?: (agentData: any) => void;
     onAgentUpdated?: () => void;
     hasAgent?: boolean;
-    // isAutoMode removed
-    selectedSection?: SectionType;
     selectedAgent?: Agent | null;
-    onSectionReset?: () => void;
     isFocused?: boolean;
 }
 
@@ -60,24 +57,16 @@ const AUTO_MODE_WELCOME: Message[] = [
     }
 ];
 
-const SECTION_LABELS: Record<string, string> = {
-    'name': 'Nama Agen',
-    'system_prompt': 'Tugas Agen',
-    'capabilities': 'Kemampuan Agen'
-};
+
 
 export default function ArthurPhone({
     isActive = false,
     onAgentCreated,
     onAgentUpdated,
     hasAgent = false,
-    // isAutoMode removed (implicitly true)
-    selectedSection = null,
     selectedAgent = null,
-    onSectionReset,
-    onSelectSection, // New Prop
     isFocused = false
-}: ArthurPhoneProps & { onSelectSection?: (section: SectionType) => void }) {
+}: ArthurPhoneProps) {
     const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES);
     const [input, setInput] = useState("");
     const [isSending, setIsSending] = useState(false);
@@ -86,9 +75,7 @@ export default function ArthurPhone({
     const [showLongWaitMessage, setShowLongWaitMessage] = useState(false);
     const [showInfoInsteadOfDots, setShowInfoInsteadOfDots] = useState(false);
 
-    // Dropdown State
-    const [isContextDropdownOpen, setIsContextDropdownOpen] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
+
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const longWaitTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -97,21 +84,11 @@ export default function ArthurPhone({
 
     // Determine Arthur's active state
     const isCreateMode = !hasAgent && isActive;
-    const isEditMode = hasAgent; // Always valid if agent exists
-    // Arthur is active if creating OR (Edit mode AND context selected)
-    const isArthurFullyActive = isCreateMode || (isEditMode && selectedSection !== null);
+    const isEditMode = hasAgent;
+    // Arthur is always active when agent exists or in create mode
+    const isArthurFullyActive = isCreateMode || isEditMode;
 
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsContextDropdownOpen(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+
 
     useEffect(() => {
         setSessionId(`arthur-session-${Math.random().toString(36).substring(7)}`);
@@ -193,7 +170,6 @@ export default function ArthurPhone({
                 isEditMode && selectedAgent ? {
                     userId: selectedAgent.user_id,
                     agentId: selectedAgent.id,
-                    konteks: selectedSection || '',
                     name: selectedAgent.name,
                     system_prompt: selectedAgent.config?.system_prompt || '',
                     mcp_tools: selectedAgent.mcp_tools || [],
@@ -342,54 +318,7 @@ export default function ArthurPhone({
                     </div>
                 )}
 
-                {/* CONTEXT DROPDOWN (Moved Above Input) */}
-                {hasAgent && (
-                    <div className="relative mb-2 px-1" ref={dropdownRef}>
-                        <button
-                            onClick={() => setIsContextDropdownOpen(!isContextDropdownOpen)}
-                            className={cn(
-                                "flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer border select-none w-fit",
-                                selectedSection
-                                    ? "bg-lime-100 text-lime-700 border-lime-200 hover:bg-lime-200"
-                                    : "bg-gray-100 text-gray-500 border-gray-200 hover:bg-gray-200"
-                            )}
-                        >
-                            <span className="opacity-70 font-medium">Konteks:</span>
-                            {selectedSection ? SECTION_LABELS[selectedSection] : "Pilih..."}
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={cn("transition-transform", isContextDropdownOpen && "rotate-180")}>
-                                <path d="m6 9 6 6 6-6" />
-                            </svg>
-                        </button>
 
-                        {/* Dropdown Menu */}
-                        {isContextDropdownOpen && (
-                            <div className="absolute bottom-full left-0 mb-2 w-56 bg-white rounded-xl shadow-xl border border-gray-100 p-1.5 z-50 animate-fade-in-up">
-                                <div className="text-[10px] font-bold text-gray-400 px-3 py-1.5 uppercase tracking-wider">
-                                    Pilih Konteks
-                                </div>
-
-                                {Object.entries(SECTION_LABELS).map(([key, label]) => (
-                                    <button
-                                        key={key}
-                                        onClick={() => {
-                                            onSelectSection?.(key as SectionType);
-                                            setIsContextDropdownOpen(false);
-                                        }}
-                                        className={cn(
-                                            "w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors flex items-center justify-between",
-                                            selectedSection === key
-                                                ? "bg-lime-50 text-lime-700"
-                                                : "text-gray-700 hover:bg-gray-50"
-                                        )}
-                                    >
-                                        {label}
-                                        {selectedSection === key && <div className="w-1.5 h-1.5 rounded-full bg-lime-500"></div>}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
 
                 <div className={cn(
                     "flex items-end gap-2 pl-4 pr-1.5 py-1.5 rounded-[24px]", // Reverted pl-2 to pl-4

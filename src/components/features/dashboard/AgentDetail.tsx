@@ -9,21 +9,17 @@ import AgentKnowledge from "./agent/AgentKnowledge";
 import AgentIntegrations from "./agent/AgentIntegrations";
 import { Agent } from "@/services/agentService";
 
-type SectionType = 'name' | 'system_prompt' | 'capabilities' | null;
+
 
 interface AgentWorkAreaProps {
     agents: Agent[];
     selectedAgent: Agent | null;
     onSelectAgent: (agent: Agent) => void;
     onAgentUpdate?: () => void;
-    // isAutoMode removed
-    // onToggleMode removed
-    selectedSection?: SectionType;
-    onSelectSection: (section: SectionType) => void;
     isFocused?: boolean;
 }
 
-export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, onAgentUpdate, selectedSection, onSelectSection, isFocused = false }: AgentWorkAreaProps) {
+export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, onAgentUpdate, isFocused = false }: AgentWorkAreaProps) {
 
     // Click handler removed - context selection is now via Arthur Dropdown only
 
@@ -39,28 +35,28 @@ export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, on
                 selectedAgent={selectedAgent}
                 onSelectAgent={onSelectAgent}
                 onAgentUpdate={onAgentUpdate}
-                isAutoMode={false} // Disabled interaction
-                onToggleMode={() => { }} // No-op
-                isSelected={selectedSection === 'name'}
-                onSectionClick={() => { }} // No-op
+                isAutoMode={false}
+                onToggleMode={() => { }}
+                isSelected={false}
+                onSectionClick={() => { }}
             />
 
             {/* 2. SYSTEM PROMPT / TUGAS AGEN (Context Highlight Only) */}
             <AgentTask
                 selectedAgent={selectedAgent}
                 onAgentUpdate={onAgentUpdate}
-                isAutoMode={false} // Disabled interaction
-                isSelected={selectedSection === 'system_prompt'}
-                onSectionClick={() => { }} // No-op
+                isAutoMode={false}
+                isSelected={false}
+                onSectionClick={() => { }}
             />
 
             {/* 3. CAPABILITIES / KEMAMPUAN AGEN (Context Highlight Only) */}
             <AgentCapabilities
                 selectedAgent={selectedAgent}
                 onAgentUpdate={onAgentUpdate}
-                isAutoMode={false} // Disabled interaction
-                isSelected={selectedSection === 'capabilities'}
-                onSectionClick={() => { }} // No-op
+                isAutoMode={false}
+                isSelected={false}
+                onSectionClick={() => { }}
             />
 
             {/* 4. GRID: KNOWLEDGE & INTEGRATIONS (Not selectable for Arthur) */}

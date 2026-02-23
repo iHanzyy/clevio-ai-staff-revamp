@@ -20,8 +20,7 @@ export default function DashboardPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isArthurActive, setIsArthurActive] = useState(false);
 
-    // Section selection for AUTO mode (Arthur context)
-    const [selectedSection, setSelectedSection] = useState<'name' | 'system_prompt' | 'capabilities' | null>(null);
+
     // Agent version to trigger simulator session reset on updates
     const [agentVersion, setAgentVersion] = useState(0);
     // Focus interaction state
@@ -302,10 +301,7 @@ export default function DashboardPage() {
                             onAgentCreated={handleAgentCreated}
                             onAgentUpdated={refreshAgents}
                             hasAgent={hasAgent}
-                            selectedSection={selectedSection}
                             selectedAgent={selectedAgent}
-                            onSectionReset={() => setSelectedSection(null)}
-                            onSelectSection={setSelectedSection}
                             isFocused={activeSection === 'arthur' && hasAgent}
                         />
                     </div>
@@ -336,8 +332,6 @@ export default function DashboardPage() {
                                 selectedAgent={selectedAgent}
                                 onSelectAgent={handleSelectAgent}
                                 onAgentUpdate={refreshAgents}
-                                selectedSection={selectedSection}
-                                onSelectSection={setSelectedSection}
                                 isFocused={activeSection === 'work_area'}
                             />
                         )}
@@ -384,10 +378,7 @@ export default function DashboardPage() {
                                 onAgentCreated={handleAgentCreated}
                                 onAgentUpdated={refreshAgents}
                                 hasAgent={hasAgent}
-                                selectedSection={selectedSection}
                                 selectedAgent={selectedAgent}
-                                onSectionReset={() => setSelectedSection(null)}
-                                onSelectSection={setSelectedSection}
                                 isFocused={false}
                             />
                         </div>
@@ -404,8 +395,6 @@ export default function DashboardPage() {
                                     selectedAgent={selectedAgent}
                                     onSelectAgent={handleSelectAgent}
                                     onAgentUpdate={refreshAgents}
-                                    selectedSection={selectedSection}
-                                    onSelectSection={setSelectedSection}
                                     isFocused={false}
                                 />
                             )}

@@ -10,7 +10,6 @@ interface ArthurChatResponse {
 interface ArthurContext {
     userId: string;
     agentId: string;
-    konteks: string;
     name: string;
     system_prompt: string;
     mcp_tools: string[];
@@ -49,7 +48,6 @@ export const arthurService = {
             if (context) {
                 payload.userId = context.userId;
                 payload.agentId = context.agentId;
-                payload.konteks = context.konteks;
                 payload.name = context.name;
                 payload.system_prompt = context.system_prompt;
                 payload.mcp_tools = context.mcp_tools;
