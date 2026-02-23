@@ -234,10 +234,12 @@ export default function ArthurPhone({
                 return;
             }
         } else if (isEditMode) {
-            // DETEKSI EDIT SELESAI DARI N8N (legacy fallback)
-            if (parsed.is_done === true && onAgentCreated) {
-                console.log('[ArthurPhone] Edit process completed by N8N. Refreshing agent data...');
-                onAgentCreated(parsed.agentData || parsed);
+            // DETEKSI EDIT SELESAI DARI N8N (legacy fallback tanpa _responseType)
+            if (parsed.is_done === true) {
+                console.log('[ArthurPhone] Edit completed (legacy). Refreshing dashboard data...');
+                if (onAgentUpdated) {
+                    onAgentUpdated();
+                }
                 return;
             }
         }
