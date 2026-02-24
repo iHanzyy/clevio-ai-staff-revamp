@@ -80,8 +80,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                             href="/payment"
                             className="flex items-center gap-1.5 px-2 py-2 text-sm font-semibold text-white/90 hover:text-white transition-colors duration-200 group"
                         >
-                            <span className="text-yellow-400">✨</span>
-                            <span className="group-hover:underline underline-offset-4 decoration-white/50">Upgrade Paket</span>
+                            <span className="underline underline-offset-4 decoration-white/50">Tingkatkan Paket</span>
                         </Link>
                     )}
 
