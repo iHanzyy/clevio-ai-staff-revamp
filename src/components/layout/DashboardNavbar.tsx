@@ -74,6 +74,17 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                 {/* RIGHT: Actions */}
                 <div className="flex items-center gap-4 md:gap-6">
 
+                    {/* Upgrade Plan Link */}
+                    {(user?.plan_code === 'GUEST' || user?.plan_code === 'TRIAL') && (
+                        <Link 
+                            href="/payment"
+                            className="flex items-center gap-1.5 px-2 py-2 text-sm font-semibold text-white/90 hover:text-white transition-colors duration-200 group"
+                        >
+                            <span className="text-yellow-400">✨</span>
+                            <span className="group-hover:underline underline-offset-4 decoration-white/50">Upgrade Paket</span>
+                        </Link>
+                    )}
+
                     {/* Label: Paket Aktif */}
                     <div className={cn(
                         "hidden md:flex items-center px-5 py-2.5 rounded-full font-medium text-sm",
