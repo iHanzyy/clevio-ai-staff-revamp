@@ -9,34 +9,15 @@ export default function PreviewPhone() {
     return (
         <div className="relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col items-center justify-center">
 
-            {/* FRAME ELEMENTS (Buttons) - Absolute to container */}
-            {/* Left Side: Mute & Volume */}
-            <div className="absolute top-24 -left-[2px] w-1 h-7 bg-[#2A2E37] rounded-l-md" /> {/* Mute */}
-            <div className="absolute top-36 -left-[2px] w-1 h-12 bg-[#2A2E37] rounded-l-md" /> {/* Vol Up */}
-            <div className="absolute top-52 -left-[2px] w-1 h-12 bg-[#2A2E37] rounded-l-md" /> {/* Vol Down */}
-
-            {/* Right Side: Power */}
-            <div className="absolute top-40 -right-[2px] w-1 h-16 bg-[#2A2E37] rounded-r-md" /> {/* Power */}
-
             {/* MAIN DEVICE BODY */}
             <div className={cn(
                 "relative w-full h-full flex flex-col overflow-hidden",
-                "rounded-4xl", // Extra rounded corners for iPhone look
-                "border-8 md:border-10 border-[#1C1F26]", // The Bezel
+                "rounded-[30px]",
                 "bg-[#F9F9F9]",
-                "shadow-[0_20px_50px_rgba(0,0,0,0.3)]",
+                "shadow-[0_20px_50px_rgba(0,0,0,0.1)]",
+                "border border-gray-100",
                 "select-none"
             )}>
-
-                {/* NOTCH (Dynamic Island style) */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120px] h-[25px] bg-[#1C1F26] rounded-b-3xl z-30 flex items-center justify-center">
-                    {/* Camera/Sensor dots */}
-                    <div className="flex gap-2">
-                        <div className="w-12 h-1.5 bg-[#0f1115] rounded-full opacity-60"></div>
-                        <div className="w-1.5 h-1.5 bg-blue-900/30 rounded-full"></div>
-                    </div>
-                </div>
-
                 {/* --- HEADER --- */}
                 <div className="flex items-center justify-between px-6 py-5 pt-9 bg-white/80 backdrop-blur-md border-b border-gray-100 z-20">
                     <div className="flex items-center gap-3">
@@ -72,12 +53,9 @@ export default function PreviewPhone() {
                 </div>
 
                 {/* --- DUMMY INPUT AREA (Visual Only) --- */}
-                <div className="p-4 pb-8 bg-white border-t border-gray-100 opacity-50 z-20">
+                <div className="p-4 pb-4 bg-white border-t border-gray-100 opacity-50 z-20">
                     <div className="w-full h-12 bg-gray-100 rounded-full" />
                 </div>
-
-                {/* HOME INDICATOR */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 rounded-full z-30"></div>
             </div>
         </div>
     );

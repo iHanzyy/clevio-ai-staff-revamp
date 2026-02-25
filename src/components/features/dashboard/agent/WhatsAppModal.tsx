@@ -169,7 +169,7 @@ export default function WhatsAppModal({
 
     return (
         <div className="fixed inset-0 z-999 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity rounded-[30px]" onClick={onClose} />
 
             <div className={cn(
                 "relative bg-[#F9FAFB] rounded-4xl p-8 max-w-sm w-full animate-fade-in-up flex flex-col items-center text-center",

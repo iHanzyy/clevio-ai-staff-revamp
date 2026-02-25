@@ -305,7 +305,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate }: AgentKn
             {
                 isFileSelectionModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleCancelSelection} />
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-[30px]" onClick={handleCancelSelection} />
                         <div className="relative bg-white rounded-3xl p-8 max-w-lg w-full max-h-[85vh] shadow-2xl animate-fade-in-up flex flex-col">
                             <h3 className="text-2xl font-bold text-gray-900 mb-2 shrink-0">Dokumen Dipilih</h3>
                             <p className="text-gray-500 text-sm mb-4">
@@ -367,7 +367,7 @@ export default function AgentKnowledge({ selectedAgent, onAgentUpdate }: AgentKn
             {
                 isFilesModalOpen && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsFilesModalOpen(false)} />
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-[30px]" onClick={() => setIsFilesModalOpen(false)} />
                         <div className="relative bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[85vh] shadow-2xl animate-fade-in-up flex flex-col">
                             <h3 className="text-2xl font-bold text-gray-900 mb-4 shrink-0">Knowledge Base Files</h3>
                             <div className="overflow-y-auto flex flex-col gap-4 pr-2">

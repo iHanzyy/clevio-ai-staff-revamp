@@ -24,7 +24,10 @@ export default function DashboardPage() {
     // Agent version to trigger simulator session reset on updates
     const [agentVersion, setAgentVersion] = useState(0);
     // Focus interaction state
-    const [activeSection, setActiveSection] = useState<'arthur' | 'work_area' | 'simulator'>('simulator');
+    const [activeSection, setActiveSection] = useState<'setting' | 'coba'>('setting');
+    
+    // NEW STATE: 3D Flip state for Setting column
+    const [isManualMode, setIsManualMode] = useState(false);
 
     const { showToast } = useToast();
 
@@ -51,6 +54,7 @@ export default function DashboardPage() {
                 }
             } else {
                 setHasAgent(false);
+                setIsManualMode(false); // Reset to auto mode if no agent
             }
         } catch (error: any) {
             console.error(`Failed to fetch agents (attempt ${retryCount + 1})`, error);
@@ -242,32 +246,27 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="w-full h-full flex flex-col overflow-hidden">
+        <div className="w-full h-full flex flex-col overflow-hidden bg-[linear-gradient(135deg,#f5f7fa_0%,#e4ecf7_100%)]">
             {/* MOBILE TAB BAR - Fixed at top, only visible < lg */}
-            <div className="lg:hidden sticky top-0 z-50 bg-linear-to-b from-[#C3D2F4] to-[#C3D2F4]/90 px-4 py-3 flex gap-2 justify-center">
+            <div className="lg:hidden sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/50 px-4 py-3 flex gap-3 justify-center shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)]">
                 <button
-                    onClick={() => setActiveSection('arthur')}
+                    onClick={() => setActiveSection('setting')}
                     className={cn(
-                        "px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 select-none",
-                        activeSection === 'arthur' ? "bg-[#2563EB] text-white shadow-md" : "bg-[#E0E0E0] text-gray-500"
+                        "px-8 py-2.5 rounded-full font-bold text-sm transition-all duration-300 select-none",
+                        activeSection === 'setting' 
+                            ? "bg-gradient-to-br from-[#2563EB] to-[#1d4ed8] text-white shadow-[0_8px_16px_-6px_rgba(37,99,235,0.5)] scale-105" 
+                            : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100"
                     )}
                 >
-                    Arthur
+                    Setting
                 </button>
                 <button
-                    onClick={() => setActiveSection('work_area')}
+                    onClick={() => setActiveSection('coba')}
                     className={cn(
-                        "px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 select-none",
-                        activeSection === 'work_area' ? "bg-[#2563EB] text-white shadow-md" : "bg-[#E0E0E0] text-gray-500"
-                    )}
-                >
-                    Pengaturan Lanjutan
-                </button>
-                <button
-                    onClick={() => setActiveSection('simulator')}
-                    className={cn(
-                        "px-6 py-2 rounded-full font-medium text-sm transition-all duration-200 select-none",
-                        activeSection === 'simulator' ? "bg-[#41CD5D] text-white shadow-md" : "bg-[#E0E0E0] text-gray-500"
+                        "px-8 py-2.5 rounded-full font-bold text-sm transition-all duration-300 select-none",
+                        activeSection === 'coba' 
+                            ? "bg-gradient-to-br from-[#41CD5D] to-[#36bf50] text-white shadow-[0_8px_16px_-6px_rgba(65,205,93,0.5)] scale-105" 
+                            : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100"
                     )}
                 >
                     Coba
@@ -275,135 +274,184 @@ export default function DashboardPage() {
             </div>
 
             {/* MAIN CONTENT */}
-            <div className="flex-1 overflow-hidden px-4 pb-4 lg:px-10 lg:pb-10 lg:pt-5">
-                {/* DESKTOP GRID - Only visible >= lg */}
-                <div className="hidden lg:grid lg:grid-cols-12 gap-6 h-full">
-
-                    {/* COLUMN 1: Arthur (Bot Creator) - 3 Columns width */}
-                    <div
-                        className={cn(
-                            "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
-                            activeSection !== 'arthur' && hasAgent && "opacity-75"
-                        )}
-                        onClick={() => hasAgent && setActiveSection('arthur')}
-                    >
-                        {/* Header: Arthur */}
-                        <div className="flex justify-center mb-4">
-                            <div className={cn(
-                                "px-8 py-2 rounded-full font-medium shadow-md cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
-                                activeSection === 'arthur' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
-                            )}>
-                                Arthur
-                            </div>
-                        </div>
-                        <ArthurPhone
-                            isActive={isArthurActive}
-                            onAgentCreated={handleAgentCreated}
-                            onAgentUpdated={refreshAgents}
-                            hasAgent={hasAgent}
-                            selectedAgent={selectedAgent}
-                            isFocused={activeSection === 'arthur' && hasAgent}
-                        />
-                    </div>
-
-                    {/* COLUMN 2: Work Area - 6 Columns width */}
-                    <div
-                        className={cn(
-                            "lg:col-span-6 h-full flex flex-col min-h-0 relative transition-all duration-300 cursor-pointer",
-                            activeSection !== 'work_area' && hasAgent && "opacity-75"
-                        )}
-                        onClick={() => hasAgent && setActiveSection('work_area')}
-                    >
-                        {/* Header: Pengaturan Lanjutan */}
-                        <div className="flex justify-center mb-4">
-                            <div className={cn(
-                                "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
-                                activeSection === 'work_area' && hasAgent ? "bg-[#2563EB] text-white" : "bg-[#E0E0E0] text-gray-700"
-                            )}>
-                                Pengaturan Lanjutan
+            <div className="flex-1 overflow-hidden px-4 pb-4 lg:px-10 lg:pb-10 lg:pt-6">
+                {/* 50:50 DESKTOP GRID */}
+                <div className="hidden lg:grid lg:grid-cols-2 gap-8 xl:gap-14 h-full max-w-[1600px] mx-auto">
+                    
+                    {/* COLUMN 1: Setting (3D Flip Container) */}
+                    <div className="relative w-full h-full [perspective:2500px] flex flex-col">
+                        
+                        {/* Tab Indicator - Absolute centered above card */}
+                        <div className="flex justify-center mb-6 z-20 pointer-events-none drop-shadow-sm">
+                            <div className="px-10 py-2.5 rounded-full font-bold shadow-[0_8px_20px_-6px_rgba(37,99,235,0.4)] bg-[#2563EB] text-white tracking-wide">
+                                Setting
                             </div>
                         </div>
 
-                        {!hasAgent ? (
-                            <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
-                        ) : (
-                            <AgentWorkArea
-                                agents={agents}
-                                selectedAgent={selectedAgent}
-                                onSelectAgent={handleSelectAgent}
-                                onAgentUpdate={refreshAgents}
-                                isFocused={activeSection === 'work_area'}
-                            />
-                        )}
+                        {/* 3D Flip Environment */}
+                        <div className={cn(
+                            "relative w-full flex-1 transition-all duration-[800ms] ease-[cubic-bezier(0.23,1,0.32,1)] [transform-style:preserve-3d]",
+                            isManualMode ? "[transform:rotateY(180deg)]" : "[transform:rotateY(0deg)]"
+                        )}>
+                            
+                            {/* FRONT FACE: Mode Otomatis (ArthurPhone) */}
+                            <div className={cn(
+                                "absolute inset-0 [backface-visibility:hidden]",
+                                isManualMode ? "pointer-events-none" : ""
+                            )}>
+                                <ArthurPhone
+                                    isActive={isArthurActive}
+                                    onAgentCreated={handleAgentCreated}
+                                    onAgentUpdated={refreshAgents}
+                                    hasAgent={hasAgent}
+                                    selectedAgent={selectedAgent}
+                                    isFocused={true}
+                                    isManualMode={isManualMode}
+                                    onToggleMode={() => setIsManualMode(true)}
+                                />
+                            </div>
+
+                            {/* BACK FACE: Mode Manual (AgentWorkArea) */}
+                            <div className={cn(
+                                "absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]",
+                                !isManualMode ? "pointer-events-none" : ""
+                            )}>
+                                <div className="h-full rounded-[30px] bg-gradient-to-b from-[#FDFDFE] to-[#F3F6FD] shadow-[0_20px_60px_-15px_rgba(37,99,235,0.25)] border-[3px] border-white/80 flex flex-col overflow-hidden relative group">
+                                    
+                                    {/* Manual Mode Header Bar - Matches ArthurPhone's style */}
+                                    <div className="w-full h-14 bg-gradient-to-r from-[#4285F4] to-[#2563EB] flex items-center justify-between px-8 shrink-0 relative z-10 shadow-md border-b-[2px] border-[#6ea0f7]/40">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-200 animate-pulse"></div>
+                                            <span className="text-white font-bold tracking-wider text-[11px] md:text-xs uppercase">Mode Manual</span>
+                                        </div>
+                                        <button 
+                                            onClick={() => setIsManualMode(false)}
+                                            className="h-8 px-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center gap-2 transition-all duration-300 outline-none border border-white/20 text-white cursor-pointer hover:shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                                        >
+                                            <span className="text-[10px] md:text-[11px] font-bold tracking-widest hidden sm:block">MODE OTOMATIS</span>
+                                            <svg className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:-rotate-180 transition-transform duration-700 ease-in-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    
+                                    <div className="flex-1 overflow-hidden relative bg-transparent scrollbar-apple">
+                                        {!hasAgent ? (
+                                            <AgentEmptyState onCreateClick={() => { setIsManualMode(false); setIsArthurActive(true); }} />
+                                        ) : (
+                                            <div className="h-full p-2">
+                                                <AgentWorkArea
+                                                    agents={agents}
+                                                    selectedAgent={selectedAgent}
+                                                    onSelectAgent={handleSelectAgent}
+                                                    onAgentUpdate={refreshAgents}
+                                                    isFocused={true}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
                     </div>
 
-                    {/* COLUMN 3: Simulator/Preview - 3 Columns width */}
-                    <div
-                        className={cn(
-                            "lg:col-span-3 h-full flex flex-col min-h-0 transition-all duration-300 cursor-pointer",
-                            activeSection !== 'simulator' && hasAgent && "opacity-75"
-                        )}
-                        onClick={() => hasAgent && setActiveSection('simulator')}
-                    >
-                        {/* Header: Coba */}
-                        <div className="flex justify-center mb-4">
-                            <div className={cn(
-                                "px-8 py-2 rounded-full font-medium shadow-sm cursor-pointer hover:opacity-90 transition-all duration-300 select-none",
-                                activeSection === 'simulator' && hasAgent ? "bg-[#41CD5D] text-white" : "bg-[#E0E0E0] text-gray-700"
-                            )}>
+                    {/* COLUMN 2: Coba (SimulatorPhone/PreviewPhone) */}
+                    <div className="h-full flex flex-col transition-all duration-300">
+                        
+                        {/* Tab Indicator */}
+                        <div className="flex justify-center mb-6 pt-0 drop-shadow-sm">
+                            <div className="px-10 py-2.5 rounded-full font-bold shadow-[0_8px_20px_-6px_rgba(65,205,93,0.4)] bg-[#41CD5D] text-white tracking-wide">
                                 Coba
                             </div>
                         </div>
+
                         {!hasAgent ? (
                             <PreviewPhone />
                         ) : (
-                            <SimulatorPhone
-                                selectedAgent={selectedAgent}
-                                onMessagesRemainingUpdate={handleMessagesRemainingUpdate}
-                                agentVersion={agentVersion}
-                                isFocused={activeSection === 'simulator'}
-                            />
+                            <div className="flex-1 w-full relative">
+                                <SimulatorPhone
+                                    selectedAgent={selectedAgent}
+                                    onMessagesRemainingUpdate={handleMessagesRemainingUpdate}
+                                    agentVersion={agentVersion}
+                                    isFocused={true}
+                                />
+                            </div>
                         )}
                     </div>
 
                 </div>
 
-                {/* MOBILE SECTIONS - Only visible < lg, show only active section */}
-                <div className="lg:hidden h-full overflow-y-auto">
-                    {/* Arthur Section */}
-                    {activeSection === 'arthur' && (
-                        <div className="h-full flex flex-col">
-                            <ArthurPhone
-                                isActive={isArthurActive}
-                                onAgentCreated={handleAgentCreated}
-                                onAgentUpdated={refreshAgents}
-                                hasAgent={hasAgent}
-                                selectedAgent={selectedAgent}
-                                isFocused={false}
-                            />
+                {/* MOBILE VIEW (Only visible < lg) */}
+                <div className="lg:hidden h-full overflow-y-auto pt-4 relative scrollbar-apple pb-8 flex flex-col">
+                    
+                    {/* Setting Section (Still has 3D Flip on Mobile) */}
+                    {activeSection === 'setting' && (
+                        <div className="w-full h-full flex-1 flex flex-col [perspective:2000px] relative min-h-[550px]">
+                            <div className={cn(
+                                "relative w-full h-full transition-all duration-[800ms] ease-[cubic-bezier(0.23,1,0.32,1)] [transform-style:preserve-3d]",
+                                isManualMode ? "[transform:rotateY(180deg)]" : "[transform:rotateY(0deg)]"
+                            )}>
+                                
+                                <div className={cn(
+                                    "absolute inset-0 [backface-visibility:hidden]",
+                                    isManualMode ? "pointer-events-none" : ""
+                                )}>
+                                    <ArthurPhone
+                                        isActive={isArthurActive}
+                                        onAgentCreated={handleAgentCreated}
+                                        onAgentUpdated={refreshAgents}
+                                        hasAgent={hasAgent}
+                                        selectedAgent={selectedAgent}
+                                        isFocused={false}
+                                        isManualMode={isManualMode}
+                                        onToggleMode={() => setIsManualMode(true)}
+                                    />
+                                </div>
+
+                                <div className={cn(
+                                    "absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]",
+                                    !isManualMode ? "pointer-events-none" : ""
+                                )}>
+                                    <div className="h-full rounded-[30px] bg-gradient-to-b from-[#FDFDFE] to-[#F3F6FD] shadow-[0_12px_40px_-10px_rgba(37,99,235,0.25)] border-[2px] border-white/80 flex flex-col overflow-hidden relative">
+                                        <div className="w-full h-12 bg-gradient-to-r from-[#4285F4] to-[#2563EB] flex items-center justify-between px-5 shrink-0 relative z-10 shadow-sm border-b border-blue-400">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse"></div>
+                                                <span className="text-white font-bold tracking-wide text-[10px] uppercase">Mode Manual</span>
+                                            </div>
+                                            <button 
+                                                onClick={() => setIsManualMode(false)}
+                                                className="h-7 px-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center gap-1.5 transition-all outline-none border border-white/20 text-white cursor-pointer active:scale-95 group"
+                                            >
+                                                <span className="text-[9px] font-bold tracking-wider">MODE OTOMATIS</span>
+                                                <svg className="w-3 h-3 group-hover:-rotate-180 transition-transform duration-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div className="flex-1 overflow-hidden relative p-1 pb-4">
+                                            {!hasAgent ? (
+                                                <AgentEmptyState onCreateClick={() => { setIsManualMode(false); setIsArthurActive(true); }} />
+                                            ) : (
+                                                <AgentWorkArea
+                                                    agents={agents}
+                                                    selectedAgent={selectedAgent}
+                                                    onSelectAgent={handleSelectAgent}
+                                                    onAgentUpdate={refreshAgents}
+                                                    isFocused={false}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
                     )}
 
-                    {/* Work Area Section */}
-                    {activeSection === 'work_area' && (
-                        <div className="h-full flex flex-col overflow-y-auto">
-                            {!hasAgent ? (
-                                <AgentEmptyState onCreateClick={() => setIsArthurActive(true)} />
-                            ) : (
-                                <AgentWorkArea
-                                    agents={agents}
-                                    selectedAgent={selectedAgent}
-                                    onSelectAgent={handleSelectAgent}
-                                    onAgentUpdate={refreshAgents}
-                                    isFocused={false}
-                                />
-                            )}
-                        </div>
-                    )}
-
-                    {/* Simulator Section */}
-                    {activeSection === 'simulator' && (
-                        <div className="h-full flex flex-col">
+                    {/* Coba Section */}
+                    {activeSection === 'coba' && (
+                        <div className="h-full flex-1 min-h-[550px] flex flex-col relative w-full pt-1">
                             {!hasAgent ? (
                                 <PreviewPhone />
                             ) : (

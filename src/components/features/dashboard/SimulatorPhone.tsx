@@ -139,8 +139,7 @@ export default function SimulatorPhone({ selectedAgent, onMessagesRemainingUpdat
             {/* MAIN DEVICE BODY */}
             <div className={cn(
                 "relative w-full h-full flex flex-col overflow-hidden",
-                "rounded-4xl",
-                "rounded-4xl",
+                "rounded-[30px]",
                 "bg-cover bg-center bg-no-repeat", // Use tailwind utility or style
                 isFocused ? "shadow-[0px_4px_63px_3px_rgba(65,205,93,1)]" : "shadow-none", // Green Glow
                 "select-text"

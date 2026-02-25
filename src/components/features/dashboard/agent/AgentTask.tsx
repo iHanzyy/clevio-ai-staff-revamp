@@ -88,7 +88,7 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
             {/* Read More Modal (Standard) */}
             {isPromptModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsPromptModalOpen(false)} />
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-[30px]" onClick={() => setIsPromptModalOpen(false)} />
                     <div className="relative bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl animate-fade-in-up">
                         <h3 className="text-2xl font-bold text-gray-900 mb-4">Tugas Agen</h3>
                         <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl">
@@ -164,7 +164,7 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity rounded-[30px]" onClick={onClose} />
 
             {/* Claymorphism Modal */}
             <div className="relative w-full max-w-2xl bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
@@ -215,7 +215,7 @@ function EditTaskModal({ initialPrompt, onClose, agentId, agentData, onUpdate }:
 
                 {/* Confirmation Overlay */}
                 {showConfirm && (
-                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-4xl flex items-center justify-center p-4 animate-fade-in">
+                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-[30px] flex items-center justify-center p-4 animate-fade-in">
                         <div className="w-full max-w-sm text-center">
 
                             {/* Icon Container - Matching AdditionalToolModal */}

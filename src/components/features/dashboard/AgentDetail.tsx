@@ -25,8 +25,8 @@ export default function AgentWorkArea({ agents, selectedAgent, onSelectAgent, on
 
     return (
         <div className={cn(
-            "flex flex-col gap-6 h-full font-sans overflow-y-auto scrollbar-hide pb-5 relative rounded-4xl p-4 transition-all duration-300",
-            isFocused ? "shadow-[0px_4px_63px_3px_rgba(37,99,235,0.6)]" : "shadow-none"
+            "flex flex-col gap-5 h-full font-sans overflow-y-auto scrollbar-apple px-2 md:px-4 pb-6 relative transition-all duration-300",
+            // Removed redundant box shadow as it's handled by DashboardPage's flip container
         )}>
 
             {/* 1. AGENT SELECTOR (Context Highlight Only) */}

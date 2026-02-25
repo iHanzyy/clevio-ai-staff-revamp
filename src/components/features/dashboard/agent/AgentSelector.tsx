@@ -251,7 +251,7 @@ function EditNameModal({ initialName, onClose, agentId, agentData, onUpdate }: E
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity rounded-[30px]" onClick={onClose} />
 
             {/* Claymorphism Modal */}
             <div className="relative w-full max-w-lg bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50">
@@ -304,7 +304,7 @@ function EditNameModal({ initialName, onClose, agentId, agentData, onUpdate }: E
 
                 {/* Confirmation Overlay */}
                 {showConfirm && (
-                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-4xl flex items-center justify-center p-4 animate-fade-in">
+                    <div className="absolute inset-0 z-50 bg-white/95 backdrop-blur-sm rounded-[30px] flex items-center justify-center p-4 animate-fade-in">
                         <div className="w-full max-w-sm text-center">
 
                             {/* Icon Container - Matching AdditionalToolModal */}
@@ -357,7 +357,7 @@ interface DeleteConfirmModalProps {
 function DeleteConfirmModal({ agentName, isDeleting, onClose, onConfirm }: DeleteConfirmModalProps) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={onClose} />
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity rounded-[30px]" onClick={onClose} />
 
             <div className="relative w-full max-w-sm bg-[#FDFDFD] rounded-4xl p-6 animate-scale-up shadow-[inset_0_4px_8px_rgba(255,255,255,0.8),0_20px_40px_rgba(0,0,0,0.1)] border border-white/50 text-center">
                 {/* Icon */}

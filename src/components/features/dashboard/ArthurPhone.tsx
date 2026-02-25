@@ -25,6 +25,8 @@ interface ArthurPhoneProps {
     hasAgent?: boolean;
     selectedAgent?: Agent | null;
     isFocused?: boolean;
+    isManualMode?: boolean;
+    onToggleMode?: () => void;
 }
 
 const WELCOME_MESSAGES: Message[] = [
@@ -60,12 +62,14 @@ const AUTO_MODE_WELCOME: Message[] = [
 
 
 export default function ArthurPhone({
-    isActive = false,
+    isActive = true,
     onAgentCreated,
     onAgentUpdated,
     hasAgent = false,
     selectedAgent = null,
-    isFocused = false
+    isFocused = true,
+    isManualMode = false,
+    onToggleMode
 }: ArthurPhoneProps) {
     const [messages, setMessages] = useState<Message[]>(WELCOME_MESSAGES);
     const [input, setInput] = useState("");
@@ -249,22 +253,36 @@ export default function ArthurPhone({
 
     return (
         <div className={cn(
-            "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-4xl overflow-hidden",
+            "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-[30px] overflow-hidden",
             "bg-[linear-gradient(0deg,#FFFAF2_0%,#C3D2F4_100%)]",
             isFocused ? "shadow-[0px_4px_63px_3px_rgba(37,99,235,1)]" : "shadow-none"
         )}>
             {/* HEADER */}
-            <div className="flex items-center justify-between px-6 py-5 bg-white/80 backdrop-blur-md border-b border-gray-100 z-10 transition-all">
-                <div className="flex items-center gap-3">
-                    <div className="relative w-12 h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between px-5 md:px-6 py-4 md:py-5 bg-white/80 backdrop-blur-md border-b border-gray-100 z-10 transition-all shrink-0">
+                <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border border-gray-200 shadow-sm shrink-0">
                         <Image src="/arthurProfile.webp" alt="Arthur" fill className="object-cover" />
                     </div>
-                    <div>
-                        <h3 className="font-bold text-[#2563EB] text-lg leading-tight">Arthur</h3>
-                        <p className="text-xs text-[#111827] font-medium">{isSending ? "Mengetik..." : "AI Assistant"}</p>
+                    <div className="min-w-0 pr-2">
+                        <h3 className="font-bold text-[#2563EB] text-base md:text-lg leading-tight truncate">Arthur</h3>
+                        <p className="text-[11px] md:text-xs text-[#111827] font-medium truncate">{isSending ? "Mengetik..." : "AI Assistant"}</p>
                     </div>
                 </div>
-                <button onClick={handleClear} className="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors cursor-pointer">Clear</button>
+                
+                <div className="flex items-center gap-2 md:gap-3 shrink-0">
+                    {hasAgent && onToggleMode && (
+                        <button 
+                            onClick={onToggleMode}
+                            className="h-8 px-3 md:px-4 bg-gradient-to-r from-gray-50 to-white hover:from-white hover:to-gray-50 rounded-full flex items-center gap-1.5 md:gap-2 transition-all outline-none border border-gray-200 text-gray-700 cursor-pointer shadow-sm hover:shadow active:scale-95 group"
+                        >
+                            <span className="text-[9px] md:text-[11px] font-bold tracking-widest hidden sm:block">MODE MANUAL</span>
+                            <svg className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#2563EB] group-hover:rotate-180 transition-transform duration-700 ease-in-out" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        </button>
+                    )}
+                    <button onClick={handleClear} className="text-[11px] md:text-sm font-medium text-gray-400 hover:text-red-500 transition-colors cursor-pointer p-1.5 md:p-0">Clear</button>
+                </div>
             </div>
 
             {/* CHAT BODY */}
