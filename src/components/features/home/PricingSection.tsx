@@ -24,7 +24,7 @@ const pricingData = [
         id: 2,
         title: "Pro",
         subtitle: "Untuk bisnis yang sedang berkembang",
-        price: "Rp. 1.299.000",
+        price: "Rp. 800.000",
         features: [
             "5 staf AI",
             "Unlimited percakapan",
