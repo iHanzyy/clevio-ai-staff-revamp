@@ -87,19 +87,19 @@ export default function AgentTask({ selectedAgent, onAgentUpdate, isAutoMode = f
 
             {/* Read More Modal (Standard) */}
             {isPromptModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-5">
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-[30px]" onClick={() => setIsPromptModalOpen(false)} />
-                    <div className="relative bg-white rounded-3xl p-8 max-w-2xl w-full shadow-2xl animate-fade-in-up">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">Tugas Agen</h3>
-                        <div className="max-h-[60vh] overflow-y-auto text-gray-700 leading-relaxed text-sm p-4 bg-gray-50 rounded-xl">
+                    <div className="relative bg-white rounded-3xl p-6 md:p-8 w-full h-[calc(100%-40px)] max-h-[85vh] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] animate-scale-up flex flex-col border border-white/50">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4 shrink-0">Tugas Agen</h3>
+                        <div className="flex-1 overflow-y-auto scrollbar-apple text-gray-700 leading-relaxed text-sm p-5 bg-[#F9F9F9] rounded-2xl border border-gray-100 shadow-inner">
                             <MarkdownRenderer content={systemPrompt} isBot={false} />
                         </div>
-                        <div className="mt-6 flex justify-end">
+                        <div className="mt-6 flex justify-end shrink-0">
                             <button
                                 onClick={() => setIsPromptModalOpen(false)}
-                                className="px-6 py-2 bg-gray-900 text-white rounded-full font-bold hover:bg-gray-800 transition-colors cursor-pointer"
+                                className="px-8 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-colors cursor-pointer"
                             >
-                                Close
+                                Tutup
                             </button>
                         </div>
                     </div>
