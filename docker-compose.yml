@@ -12,10 +12,22 @@ services:
     restart: unless-stopped
     labels:
       - traefik.enable=true
+      # Main router (non-www)
       - traefik.http.routers.clevio.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.clevio.entrypoints=web,websecure
       - traefik.http.routers.clevio.tls=true
       - traefik.http.routers.clevio.tls.certresolver=mytlschallenge
+      # WWW router - redirect www to non-www
+      - traefik.http.routers.clevio-www.rule=Host(`www.${DOMAIN}`)
+      - traefik.http.routers.clevio-www.entrypoints=web,websecure
+      - traefik.http.routers.clevio-www.tls=true
+      - traefik.http.routers.clevio-www.tls.certresolver=mytlschallenge
+      - traefik.http.routers.clevio-www.middlewares=clevio-www-redirect
+      # Middleware: redirect www -> non-www
+      - traefik.http.middlewares.clevio-www-redirect.redirectregex.regex=^https?://www\.(.*)
+      - traefik.http.middlewares.clevio-www-redirect.redirectregex.replacement=https://$${1}
+      - traefik.http.middlewares.clevio-www-redirect.redirectregex.permanent=true
+      # Service
       - traefik.http.services.clevio.loadbalancer.server.port=${SERVICE_PORT}
       - traefik.docker.network=${TRAEFIK_NETWORK}
     env_file:
