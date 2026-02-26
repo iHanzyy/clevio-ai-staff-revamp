@@ -1,6 +1,14 @@
-"use client";
-
+import type { Metadata } from "next";
 import Footer from "@/components/features/home/Footer";
+
+export const metadata: Metadata = {
+    title: "Terms & Conditions",
+    description:
+        "Syarat dan Ketentuan penggunaan layanan Clevio AI Staff oleh PT. Clevio.",
+    alternates: {
+        canonical: "https://chiefaiofficer.id/terms",
+    },
+};
 
 export default function TermsPage() {
     return (
@@ -9,13 +17,13 @@ export default function TermsPage() {
             <div className="h-24"></div>
 
             <main className="max-w-4xl mx-auto px-6 py-12 font-google-sans-flex text-gray-800">
-                <h1 className="text-4xl font-bold mb-8 text-[#1E293B]">Terms & Conditions</h1>
+                <h1 className="text-4xl font-bold mb-8 text-[#1E293B]">Terms &amp; Conditions</h1>
                 <p className="mb-4 text-sm text-gray-500">Last Updated: February 3, 2026</p>
 
                 <section className="mb-8">
                     <h2 className="text-2xl font-semibold mb-4 text-[#1E293B]">1. Introduction</h2>
                     <p className="mb-4">
-                        Welcome to Clevio AI Staff. These Terms & Conditions ("Terms") govern your use of our website and services operated by PT. Clevio ("Company", "we", "us", or "our").
+                        Welcome to Clevio AI Staff. These Terms &amp; Conditions (&quot;Terms&quot;) govern your use of our website and services operated by PT. Clevio (&quot;Company&quot;, &quot;we&quot;, &quot;us&quot;, or &quot;our&quot;).
                     </p>
                     <p className="mb-4">
                         By accessing or using our Service, you agree to be bound by these Terms. If you disagree with any part of the terms, then you may not access the Service.
@@ -40,7 +48,7 @@ export default function TermsPage() {
                 </section>
 
                 <section className="mb-8">
-                    <h2 className="text-2xl font-semibold mb-4 text-[#1E293B]">4. AI Agents & Content</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-[#1E293B]">4. AI Agents &amp; Content</h2>
                     <p className="mb-4">
                         You retain rights to the content you create using our AI agents. However, you are responsible for ensuring that your use of the AI agents complies with applicable laws and does not infringe on the rights of others.
                     </p>

@@ -1,6 +1,14 @@
-"use client";
-
+import type { Metadata } from "next";
 import Footer from "@/components/features/home/Footer";
+
+export const metadata: Metadata = {
+    title: "Privacy Policy",
+    description:
+        "Kebijakan Privasi Clevio AI Staff — pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi data Anda.",
+    alternates: {
+        canonical: "https://chiefaiofficer.id/privacy",
+    },
+};
 
 export default function PrivacyPolicyPage() {
     return (
@@ -14,7 +22,7 @@ export default function PrivacyPolicyPage() {
 
                 <section className="mb-8">
                     <p className="mb-4">
-                        PT. Clevio ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website and services (collectively, the "Service").
+                        PT. Clevio (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website and services (collectively, the &quot;Service&quot;).
                     </p>
                 </section>
 
@@ -39,14 +47,14 @@ export default function PrivacyPolicyPage() {
                 </section>
 
                 <section className="mb-8">
-                    <h2 className="text-2xl font-semibold mb-4 text-[#1E293B]">3. Google OAuth & Limited Use Policy</h2>
+                    <h2 className="text-2xl font-semibold mb-4 text-[#1E293B]">3. Google OAuth &amp; Limited Use Policy</h2>
                     <p className="mb-4">
                         Our Service uses Google OAuth to authenticate users and may request access to specific Google user data (e.g., Google Drive, Gmail) if you enable integration features for your AI Agents.
                     </p>
                     <div className="bg-blue-50 border-l-4 border-[#2563EB] p-4 rounded-r mb-4">
                         <p className="text-sm text-blue-900 font-medium">
                             <strong>Google API Services User Data Policy Disclosure:</strong><br />
-                            Clevio's use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-700">Google API Services User Data Policy</a>, including the Limited Use requirements.
+                            Clevio&apos;s use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-700">Google API Services User Data Policy</a>, including the Limited Use requirements.
                         </p>
                     </div>
                     <p className="mb-2">We strictly adhere to the following:</p>

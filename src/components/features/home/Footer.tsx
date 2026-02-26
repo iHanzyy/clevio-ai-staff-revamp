@@ -1,6 +1,5 @@
-"use client";
-
 import Image from "next/image";
+import Link from "next/link";
 import { FaWhatsapp, FaInstagram } from "react-icons/fa";
 
 // Navigation links based on landing page sections
@@ -58,13 +57,23 @@ export default function Footer() {
                 {/* Navigation Links */}
                 <nav className="flex flex-col gap-3 mb-12">
                     {navLinks.map((link, index) => (
-                        <a
-                            key={index}
-                            href={link.href}
-                            className="text-white text-[15px] hover:underline transition-all"
-                        >
-                            {link.label}
-                        </a>
+                        link.href.startsWith('/') ? (
+                            <Link
+                                key={index}
+                                href={link.href}
+                                className="text-white text-[15px] hover:underline transition-all"
+                            >
+                                {link.label}
+                            </Link>
+                        ) : (
+                            <a
+                                key={index}
+                                href={link.href}
+                                className="text-white text-[15px] hover:underline transition-all"
+                            >
+                                {link.label}
+                            </a>
+                        )
                     ))}
                 </nav>
 

@@ -11,8 +11,47 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Clevio AI Staff",
-  description: "Clevio AI Staff",
+  metadataBase: new URL("https://chiefaiofficer.id"),
+  title: {
+    default: "Clevio AI Staff - Buat AI Agent untuk Bisnis Anda",
+    template: "%s | Clevio AI Staff",
+  },
+  description:
+    "Clevio AI Staff membantu Anda membuat AI agent custom untuk bisnis. Otomatisasi customer service, marketing, dan sales dengan teknologi AI terdepan.",
+  keywords: [
+    "AI agent",
+    "AI staff",
+    "customer service AI",
+    "chatbot bisnis",
+    "Clevio",
+    "otomatisasi bisnis",
+    "WhatsApp AI",
+  ],
+  authors: [{ name: "PT. Clevio" }],
+  creator: "PT. Clevio",
+  publisher: "PT. Clevio",
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://chiefaiofficer.id",
+    siteName: "Clevio AI Staff",
+    title: "Clevio AI Staff - Buat AI Agent untuk Bisnis Anda",
+    description:
+      "Buat AI agent custom untuk bisnis Anda. Otomatisasi customer service, marketing, dan sales dengan Clevio AI Staff.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Clevio AI Staff - Buat AI Agent untuk Bisnis Anda",
+    description:
+      "Buat AI agent custom untuk bisnis Anda. Otomatisasi customer service, marketing, dan sales.",
+  },
+  alternates: {
+    canonical: "https://chiefaiofficer.id",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
