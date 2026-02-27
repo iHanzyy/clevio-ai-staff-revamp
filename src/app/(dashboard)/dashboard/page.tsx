@@ -129,27 +129,24 @@ export default function DashboardPage() {
             // ====================================================================
             if (rawAgentData._responseType === 'agent_created') {
                 console.log('[Dashboard] Agent already created by N8N MCP. Refreshing agent list...');
-                showToast("Agent berhasil dibuat! Memuat data...", "success");
+                showToast("Agent berhasil dibuat! Merefresh dashboard...", "success");
 
                 // Small delay to allow backend to finalize
                 await new Promise(resolve => setTimeout(resolve, 1500));
 
                 // Refresh the full agent list from the backend
                 const fetchedAgents = await agentService.getAgents();
-                setAgents(fetchedAgents);
-
+                
+                // === SORT AGENTS BY CREATED AT DESCENDING (Newest First) ===
+                fetchedAgents.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                
                 if (fetchedAgents.length > 0) {
                     const newestAgent = fetchedAgents[0];
-                    const fullAgentData = await agentService.getAgent(newestAgent.id);
-                    setSelectedAgent(fullAgentData);
-                    setHasAgent(true);
-                    setIsArthurActive(false);
-
                     if (typeof window !== 'undefined') {
                         localStorage.setItem('selected_agent_id', newestAgent.id);
+                        window.location.reload(); // FORCE FULL RELOAD TO SATISFY "REFRESH DASHBOARD" REQUIREMENT
                     }
                 }
-
                 return;
             }
 
