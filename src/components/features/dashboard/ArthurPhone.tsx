@@ -39,7 +39,7 @@ const WELCOME_MESSAGES: Message[] = [
     {
         id: "welcome-2",
         sender: "Arthur",
-        message: "Klik tombol 'Buat Agent Baru' di tengah untuk memulai.",
+        message: "Silakan ketik tipe staf AI seperti apa yang ingin Anda buat untuk memulai.",
         time: "10:06 AM"
     }
 ];
@@ -87,10 +87,10 @@ export default function ArthurPhone({
     const { showToast } = useToast();
 
     // Determine Arthur's active state
-    const isCreateMode = !hasAgent && isActive;
+    const isCreateMode = !hasAgent;
     const isEditMode = hasAgent;
-    // Arthur is always active when agent exists or in create mode
-    const isArthurFullyActive = isCreateMode || isEditMode;
+    // Arthur is ALWAYS active now (unlocked by default)
+    const isArthurFullyActive = true;
 
 
 
@@ -135,7 +135,7 @@ export default function ArthurPhone({
     useEffect(() => {
         if (isCreateMode && !hasStarted && sessionId) {
             setHasStarted(true);
-            handleAutoStart();
+            // Auto start logic removed as per user request
         }
     }, [isCreateMode, hasStarted, sessionId]);
 
@@ -143,20 +143,7 @@ export default function ArthurPhone({
         return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     };
 
-    const handleAutoStart = async () => {
-        const startMsg = "Saya mau buat Agent AI";
-        const userMsg: Message = { id: Date.now().toString(), sender: "User", message: startMsg, time: getCurrentTime() };
-        setMessages(prev => [...prev, userMsg]);
-        setIsSending(true);
-        try {
-            const response = await arthurService.sendMessage(sessionId, startMsg);
-            handleArthurResponse(response);
-        } catch (error) {
-            console.error("Failed to start Arthur:", error);
-            showToast("Gagal menghubungkan ke Arthur.", "error");
-            setIsSending(false);
-        }
-    };
+    // handleAutoStart removed
 
     const handleSend = async () => {
         if (!input.trim() || isSending || !isArthurFullyActive) return;
@@ -244,8 +231,8 @@ export default function ArthurPhone({
 
     const getPlaceholder = () => "Ketik pesan...";
 
+    // Always completely unlocked
     const getOverlayMessage = () => {
-        if (!hasAgent && !isActive) return "Terkunci";
         return null;
     };
 
