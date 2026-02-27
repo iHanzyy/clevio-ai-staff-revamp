@@ -81,8 +81,6 @@ export default function DashboardPage() {
     }, []);
 
     const handleAgentCreated = async (rawAgentData: any) => {
-        // Show loading state or toast
-        showToast("Sedang membuat agent...", "info");
 
         try {
             console.log('[Dashboard] rawAgentData:', JSON.stringify(rawAgentData, null, 2));
@@ -124,8 +122,43 @@ export default function DashboardPage() {
                 }
             }
 
-            // api.ts now automatically uses access_token if available, falling back to jwt_token
-            // We just need to ensure one exists to pass to the proxy
+            // ====================================================================
+            // BRANCH A: N8N MCP already created the agent on the backend.
+            // The payload has _responseType but NO name/system_prompt.
+            // We just need to refresh the agent list from the API.
+            // ====================================================================
+            if (rawAgentData._responseType === 'agent_created') {
+                console.log('[Dashboard] Agent already created by N8N MCP. Refreshing agent list...');
+                showToast("Agent berhasil dibuat! Memuat data...", "success");
+
+                // Small delay to allow backend to finalize
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Refresh the full agent list from the backend
+                const fetchedAgents = await agentService.getAgents();
+                setAgents(fetchedAgents);
+
+                if (fetchedAgents.length > 0) {
+                    const newestAgent = fetchedAgents[0];
+                    const fullAgentData = await agentService.getAgent(newestAgent.id);
+                    setSelectedAgent(fullAgentData);
+                    setHasAgent(true);
+                    setIsArthurActive(false);
+
+                    if (typeof window !== 'undefined') {
+                        localStorage.setItem('selected_agent_id', newestAgent.id);
+                    }
+                }
+
+                return;
+            }
+
+            // ====================================================================
+            // BRANCH B: Legacy flow — rawAgentData contains name, system_prompt
+            // We need to POST it to /api/agents/create ourselves.
+            // ====================================================================
+            showToast("Sedang membuat agent...", "info");
+
             const token = localStorage.getItem('access_token') || localStorage.getItem('jwt_token');
 
             if (!token) {
