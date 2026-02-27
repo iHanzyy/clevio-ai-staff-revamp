@@ -16,15 +16,11 @@ export async function POST(req: Request) {
 
         const body = await req.json();
 
-        // Edit mode (has agentId) → NEXT_N8N_PROCESS_AGENT, Create mode → N8N_CHAT_WEBHOOK_URL
-        const isEditMode = !!body.agentId;
-        const n8nUrl = isEditMode
-            ? process.env.NEXT_N8N_PROCESS_AGENT
-            : process.env.N8N_CHAT_WEBHOOK_URL;
+        // In dashboard, Arthur phone always uses NEXT_N8N_PROCESS_AGENT
+        const n8nUrl = process.env.NEXT_N8N_PROCESS_AGENT;
 
         if (!n8nUrl) {
-            const envKey = isEditMode ? 'NEXT_N8N_PROCESS_AGENT' : 'N8N_CHAT_WEBHOOK_URL';
-            console.error(`[ArthurProxy] Error: ${envKey} is missing.`);
+            console.error(`[ArthurProxy] Error: NEXT_N8N_PROCESS_AGENT is missing.`);
             return NextResponse.json({ error: 'Service Unavailable' }, { status: 503 });
         }
 
