@@ -193,16 +193,16 @@ export default function ArthurPhone({
             return;
         }
 
-        if (isCreateMode) {
-            // Check for explicit _responseType from newer N8N versions
-            if (parsed._responseType === 'agent_created' && parsed.jwt_token) {
-                console.log('[ArthurPhone] agent_created detected. Refreshing dashboard data...');
-                if (onAgentCreated) {
-                    onAgentCreated(parsed);
-                }
-                return;
+        // TOP-LEVEL: Always check for agent_created regardless of isCreateMode/isEditMode
+        if (parsed._responseType === 'agent_created' && parsed.jwt_token) {
+            console.log('[ArthurPhone] agent_created detected. Triggering dashboard refresh...');
+            if (onAgentCreated) {
+                onAgentCreated(parsed);
             }
+            return;
+        }
 
+        if (isCreateMode) {
             // Fallback for older N8N webhook payload formats
             const agentData = parsed.agentData || parsed;
             if (agentData.name && (agentData.system_prompt || agentData.config?.system_prompt) && onAgentCreated) {
