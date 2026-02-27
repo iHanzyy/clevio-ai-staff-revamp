@@ -44,19 +44,38 @@ export const arthurService = {
                 chatInput: message
             };
 
-            // Add all context fields if provided (Edit/Create Mode Dashboard)
+            // Safely get tokens from storage
+            const jwt = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') || "" : "";
+            const accessToken = typeof window !== 'undefined' ? localStorage.getItem('access_token') || "" : "";
+            
+            payload.jwt_token = jwt;
+            payload.access_token = accessToken;
+
+            let extractedUserId = "";
+            try {
+                if (jwt) {
+                    const parsedData = JSON.parse(atob(jwt.split('.')[1]));
+                    extractedUserId = parsedData.sub || parsedData.userId || parsedData.id || "";
+                }
+            } catch (e) {
+                console.warn("[arthurService] Failed to parse jwt for userId extraction", e);
+            }
+
+            // Always provide a userId if possible
+            payload.userId = extractedUserId;
+
+            // Add all context fields if provided (Edit Mode Dashboard)
             if (context) {
-                payload.userId = context.userId;
+                payload.userId = context.userId || extractedUserId;
                 payload.agentId = context.agentId;
                 payload.name = context.name;
                 payload.system_prompt = context.system_prompt;
                 payload.mcp_tools = context.mcp_tools;
                 payload.google_tools = context.google_tools;
                 
-                // New required fields
-                payload.jwt_token = localStorage.getItem('jwt_token') || "";
-                payload.access_token = localStorage.getItem('access_token') || "";
                 payload.is_edit = context.is_edit || false;
+            } else {
+                payload.is_edit = false;
             }
 
             const response = await axios.post('/api/arthur/chat', payload);
