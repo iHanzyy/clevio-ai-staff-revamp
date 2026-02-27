@@ -217,6 +217,13 @@ export default function ArthurSection() {
         };
     }, [isTyping]);
 
+    // Auto-scroll to bottom instantly when messages change or typing starts
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+        }
+    }, [messages, isTyping]);
+
     // Cleanup polling on unmount
     useEffect(() => {
         return () => {
