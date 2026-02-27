@@ -75,6 +75,27 @@ body {
     animation: thinkingShimmer 2s ease-in-out infinite;
 }
 
+@layer utilities {
+  .text-border {
+    -webkit-text-stroke: 1px currentColor;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.5s ease-out forwards;
+}
+
 @keyframes thinkingShimmer {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }

@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { agentService } from "@/services/agentService";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
     id: number;
@@ -35,6 +37,7 @@ export default function ArthurSection() {
     const [isProcessingFinal, setIsProcessingFinal] = useState(false);
     const [showLongWaitMessage, setShowLongWaitMessage] = useState(false);
     const [showInfoInsteadOfDots, setShowInfoInsteadOfDots] = useState(false);
+    const [isSectionVisible, setIsSectionVisible] = useState(false);
 
     // Random suggestions (picked on mount)
     const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -118,6 +121,24 @@ export default function ArthurSection() {
         return () => {
             window.removeEventListener('scrollToArthur', handleScrollToArthur);
             window.removeEventListener('sendToArthur', handleSendToArthur as EventListener);
+        };
+    }, []);
+
+    // Intersection Observer for scroll animation
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsSectionVisible(entry.isIntersecting);
+            },
+            { threshold: 0.2 } // Trigger when 20% of section is visible
+        );
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current);
+        }
+
+        return () => {
+            if (sectionRef.current) observer.unobserve(sectionRef.current);
         };
     }, []);
 
@@ -415,26 +436,45 @@ export default function ArthurSection() {
                 {/* Chat Messages Container - Gradient applied here */}
                 <div
                     ref={chatContainerRef}
-                    className="max-w-4xl mx-auto mb-4 space-y-4 px-6 sm:px-8 min-h-[300px] rounded-3xl pt-8 -mt-5"
+                    className="max-w-4xl mx-auto mb-4 space-y-4 px-6 sm:px-8 max-h-[50vh] min-h-[300px] overflow-y-auto custom-scrollbar rounded-3xl pt-8 -mt-5"
                     style={{
                         background: 'linear-gradient(to bottom, #C3D2F4 0%, #FFFAF2 100%)'
                     }}
                 >
-                    {messages.map((msg) => (
-                        <div
-                            key={msg.id}
-                            className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"} animate-fade-in-up`}
-                        >
+                    {messages.map((msg, idx) => {
+                        // Determine animation classes
+                        let animClass = "animate-fade-in-up";
+                        
+                        // Apply slide-in-left ONLY to the very first Arthur message
+                        if (msg.id === 1 && msg.from === "arthur") {
+                            // If section is visible, trigger slide-in. If not, hidden, ready to slide in again
+                            animClass = isSectionVisible ? "animate-slide-in-left" : "opacity-0 translate-x-[-50px] transition-none";
+                        }
+
+                        return (
                             <div
-                                className={`max-w-[85%] sm:max-w-[80%] px-5 py-3.5 rounded-3xl shadow-md ${msg.from === "arthur"
-                                    ? "bg-[#2563EB] text-white"
-                                    : "bg-[#02457A] text-white"
-                                    }`}
+                                key={msg.id}
+                                className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"} ${animClass} transition-all duration-500`}
                             >
-                                <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                                <div
+                                    className={`max-w-[85%] sm:max-w-[80%] px-5 py-3.5 rounded-3xl shadow-md ${msg.from === "arthur"
+                                        ? "bg-[#2563EB] text-white overflow-hidden"
+                                        : "bg-[#02457A] text-white"
+                                        }`}
+                                >
+                                {msg.from === "user" ? (
+                                    <p className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                                ) : (
+                                    <div className="text-sm sm:text-base leading-relaxed prose prose-invert max-w-none prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-ol:my-1 prose-li:my-0">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                            {msg.text}
+                                        </ReactMarkdown>
+                                    </div>
+                                )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
 
                     {/* Typing Indicator with Long Wait Logic */}
                     {isTyping && (
@@ -488,8 +528,7 @@ export default function ArthurSection() {
                                     e.target.style.height = Math.min(e.target.scrollHeight, 144) + 'px';
                                 }}
                                 onKeyDown={handleKeyDown}
-                                disabled={isTyping || isProcessingFinal}
-                                className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base disabled:opacity-50 resize-none min-h-[28px] max-h-[144px] scrollbar-hide py-1"
+                                className="w-full bg-transparent border-none outline-none text-gray-700 placeholder:text-gray-400 text-base resize-none min-h-[28px] max-h-[144px] scrollbar-hide py-1"
                                 style={{ fontSize: '16px', height: '28px' }}
                             />
                             {/* Button INSIDE input - Explicitly type="button" to prevent form submit */}
