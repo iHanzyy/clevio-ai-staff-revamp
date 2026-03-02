@@ -124,11 +124,12 @@ export default function DashboardPage() {
 
             // ====================================================================
             // BRANCH A: N8N MCP already created the agent on the backend.
-            // The payload has _responseType but NO name/system_prompt.
-            // We just need to refresh the agent list from the API.
+            // N8N's Respond to Webhook strips _responseType. For agent_created,
+            // the HTTP response is: { jwt_token, access_token, output }
+            // So we detect by jwt_token + access_token presence.
             // ====================================================================
-            if (rawAgentData._responseType === 'agent_created') {
-                console.log('[Dashboard] Agent already created by N8N MCP. Refreshing agent list...');
+            if (rawAgentData.jwt_token && rawAgentData.access_token && !rawAgentData.is_done) {
+                console.log('[Dashboard] Agent already created by N8N MCP (jwt_token+access_token detected). Refreshing...');
                 showToast("Agent berhasil dibuat! Merefresh dashboard...", "success");
 
                 // Small delay to allow backend to finalize

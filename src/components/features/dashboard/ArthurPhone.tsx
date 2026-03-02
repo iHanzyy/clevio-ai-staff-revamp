@@ -193,9 +193,12 @@ export default function ArthurPhone({
             return;
         }
 
-        // TOP-LEVEL: Always check for agent_created regardless of isCreateMode/isEditMode
-        if (parsed._responseType === 'agent_created' && parsed.jwt_token) {
-            console.log('[ArthurPhone] agent_created detected. Triggering dashboard refresh...');
+        // TOP-LEVEL: Detect agent_created from N8N
+        // NOTE: N8N's 'Respond to Webhook' strips _responseType from HTTP response.
+        // For agent_created it returns: { jwt_token, access_token, output }
+        // So we detect by checking jwt_token + access_token presence.
+        if (parsed.jwt_token && parsed.access_token && !parsed.is_done) {
+            console.log('[ArthurPhone] agent_created detected (jwt_token+access_token present). Triggering dashboard refresh...');
             if (onAgentCreated) {
                 onAgentCreated(parsed);
             }
