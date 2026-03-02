@@ -160,11 +160,11 @@ export default function PaymentPage() {
         if (plan === 'pro') {
             handleProPayment();
         } else if (plan === 'trial') {
-            // Trial flow - to be implemented
-            alert('Trial flow akan diimplementasikan terpisah.');
+            // Redirect to landing page
+            router.push('/');
         } else if (plan === 'enterprise') {
             // Enterprise - contact sales
-            window.open('https://wa.me/6281234567890', '_blank');
+            window.open('https://wa.me/6282221118860', '_blank');
         }
     };
 
@@ -247,7 +247,7 @@ export default function PaymentPage() {
                 <p className="flex items-center justify-center gap-2">
                     Butuh bantuan memilih?
                     <span
-                        onClick={() => window.open('https://wa.me/6281234567890', '_blank')}
+                        onClick={() => window.open('https://wa.me/6282221118860', '_blank')}
                         className="flex items-center gap-1.5 text-[#25D366] font-semibold cursor-pointer hover:underline transition-all"
                     >
                         <Image
