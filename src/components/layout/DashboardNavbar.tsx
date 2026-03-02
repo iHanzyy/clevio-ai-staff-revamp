@@ -65,14 +65,14 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                 </div>
 
                 {/* CENTER: Title */}
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap">
-                    <span className="font-sans font-semibold text-2xl md:text-4xl text-white tracking-tight selection:bg-white/20">
+                <div className="flex-1 flex justify-center items-center px-2 md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 whitespace-nowrap overflow-hidden">
+                    <span className="font-sans font-semibold text-xl sm:text-2xl md:text-4xl text-white tracking-tight selection:bg-white/20 truncate">
                         Atur Staf AI mu
                     </span>
                 </div>
 
                 {/* RIGHT: Actions */}
-                <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-3 md:gap-6 shrink-0 z-10">
 
                     {/* Upgrade Plan Link */}
                     {(user?.plan_code === 'GUEST' || user?.plan_code === 'TRIAL') && (

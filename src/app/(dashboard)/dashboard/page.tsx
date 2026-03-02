@@ -422,15 +422,15 @@ export default function DashboardPage() {
                     
                     {/* Setting Section (Still has 3D Flip on Mobile) */}
                     {activeSection === 'setting' && (
-                        <div className="w-full h-full flex-1 flex flex-col [perspective:2000px] relative min-h-[550px]">
+                        <div className="w-full h-full flex-1 flex flex-col [perspective:2000px] [-webkit-perspective:2000px] relative min-h-[550px]">
                             <div className={cn(
-                                "relative w-full h-full transition-all duration-[800ms] ease-[cubic-bezier(0.23,1,0.32,1)] [transform-style:preserve-3d]",
-                                isManualMode ? "[transform:rotateY(180deg)]" : "[transform:rotateY(0deg)]"
+                                "relative w-full h-full transition-all duration-[800ms] ease-[cubic-bezier(0.23,1,0.32,1)] [transform-style:preserve-3d] [-webkit-transform-style:preserve-3d]",
+                                isManualMode ? "[transform:rotateY(180deg)] [-webkit-transform:rotateY(180deg)]" : "[transform:rotateY(0deg)] [-webkit-transform:rotateY(0deg)]"
                             )}>
                                 
                                 <div className={cn(
-                                    "absolute inset-0 [backface-visibility:hidden]",
-                                    isManualMode ? "pointer-events-none" : ""
+                                    "absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:translateZ(0)] [-webkit-transform:translateZ(0)]",
+                                    isManualMode ? "pointer-events-none" : "z-10"
                                 )}>
                                     <ArthurPhone
                                         isActive={isArthurActive}
@@ -445,8 +445,8 @@ export default function DashboardPage() {
                                 </div>
 
                                 <div className={cn(
-                                    "absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)]",
-                                    !isManualMode ? "pointer-events-none" : ""
+                                    "absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(0)] [-webkit-transform:rotateY(180deg)_translateZ(0)]",
+                                    !isManualMode ? "pointer-events-none" : "z-10"
                                 )}>
                                     <div className="h-full rounded-[30px] bg-gradient-to-b from-[#FDFDFE] to-[#F3F6FD] shadow-[0_12px_40px_-10px_rgba(37,99,235,0.25)] border-[2px] border-white/80 flex flex-col overflow-hidden relative">
                                         <div className="w-full h-12 bg-gradient-to-r from-[#4285F4] to-[#2563EB] flex items-center justify-between px-5 shrink-0 relative z-10 shadow-sm border-b border-blue-400">
