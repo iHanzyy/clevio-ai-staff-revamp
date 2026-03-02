@@ -253,13 +253,19 @@ export default function DashboardPage() {
         try {
             const fetched = await agentService.getAgents();
             setAgents(fetched);
-            if (selectedAgent) {
-                // Fetch full details to get auth_required, etc.
-                const fullAgentData = await agentService.getAgent(selectedAgent.id);
-                setSelectedAgent(fullAgentData);
-                // Increment version to trigger simulator session reset
-                setAgentVersion(prev => prev + 1);
-            }
+            
+            // To prevent stale closures, use functional update to check prev state
+            setSelectedAgent(prevSelected => {
+                const targetId = prevSelected?.id || (typeof window !== 'undefined' ? localStorage.getItem('selected_agent_id') : null);
+                if (targetId) {
+                    agentService.getAgent(targetId).then(fullAgentData => {
+                        setSelectedAgent(fullAgentData);
+                        // Increment version to trigger simulator session reset
+                        setAgentVersion(v => v + 1);
+                    }).catch(console.error);
+                }
+                return prevSelected;
+            });
         } catch (error) {
             console.error("Failed to refresh agents", error);
         }
@@ -267,9 +273,7 @@ export default function DashboardPage() {
 
     // Update messages_remaining in selectedAgent (called after chat)
     const handleMessagesRemainingUpdate = (remaining: number) => {
-        if (selectedAgent) {
-            setSelectedAgent(prev => prev ? { ...prev, messages_remaining: remaining } : null);
-        }
+        setSelectedAgent(prev => prev ? { ...prev, messages_remaining: remaining } : null);
     };
 
     if (isLoading) {
