@@ -175,6 +175,13 @@ export default function LoginForm() {
                             Continue with Google
                         </span>
                     </button>
+
+                    {/* Terms & Privacy */}
+                    <div className="w-full text-center mt-6">
+                        <p className="text-[10px] text-gray-500">
+                            By continuing, you agree to our <a href="/terms" className="underline hover:text-gray-800">Terms of Service</a> and <a href="/privacy" className="underline hover:text-gray-800">Privacy Policy</a>.
+                        </p>
+                    </div>
                 </div>
             </StickyNote>
         </div>
