@@ -448,7 +448,7 @@ export default function DashboardPage() {
                                     "absolute inset-0 [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)_translateZ(0)] [-webkit-transform:rotateY(180deg)_translateZ(0)]",
                                     !isManualMode ? "pointer-events-none" : "z-10"
                                 )}>
-                                    <div className="h-full rounded-[30px] bg-gradient-to-b from-[#FDFDFE] to-[#F3F6FD] shadow-[0_12px_40px_-10px_rgba(37,99,235,0.25)] border-[2px] border-white/80 flex flex-col overflow-hidden relative">
+                                    <div className="h-full rounded-[30px] bg-gradient-to-b from-[#FDFDFE] to-[#F3F6FD] shadow-[0_12px_40px_-10px_rgba(37,99,235,0.25)] border-[2px] border-white/80 flex flex-col overflow-hidden relative group">
                                         <div className="w-full h-12 bg-gradient-to-r from-[#4285F4] to-[#2563EB] flex items-center justify-between px-5 shrink-0 relative z-10 shadow-sm border-b border-blue-400">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-200 animate-pulse"></div>
@@ -479,7 +479,6 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     )}
