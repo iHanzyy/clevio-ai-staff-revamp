@@ -43,18 +43,23 @@ export function Navbar({ className }: NavbarProps) {
                     "relative z-50 transition-all duration-300"
                 )}
             >
-                {/* Logo Section */}
-                <div className="flex-shrink-0 ml-1 md:ml-2">
+                {/* Logo & Badge Section */}
+                <div className="flex items-center flex-shrink-0 ml-1 md:ml-2 gap-2 md:gap-3">
                     <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                         <Image
                             src="/clevioLogo.webp"
                             alt="Clevio Logo"
-                            width={32}
-                            height={34}
-                            className="w-auto h-[30px] md:h-[40px] object-contain"
+                            width={40}
+                            height={40}
+                            className="w-auto h-[40px] md:h-[60px] object-contain"
                             priority
                         />
                     </Link>
+                    <div className="flex items-center justify-center px-2 py-0.5 md:px-2.5 md:py-1 bg-blue-50 border border-blue-200 rounded-full shadow-sm">
+                        <span className="text-[10px] md:text-xs font-bold text-blue-700 tracking-wider">
+                            BETA
+                        </span>
+                    </div>
                 </div>
 
                 {/* Desktop Navigation */}
