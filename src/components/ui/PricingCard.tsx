@@ -60,7 +60,7 @@ export default function PricingCard({
                     className="font-bold text-[24px] md:text-[36px] mb-6 md:mb-10"
                     style={{ color: '#02457A' }}
                 >
-                    Mari berdiskusi!
+                    Mari Diskusi!🙂
                 </p>
             ) : (
                 <p className="mb-6 md:mb-10">

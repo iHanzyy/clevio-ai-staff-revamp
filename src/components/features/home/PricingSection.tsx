@@ -54,7 +54,7 @@ const pricingData = [
         id: 4,
         title: "Enterprise",
         subtitle: "Solusi skala besar dengan dukungan khusus dan kustomisasi tanpa batas.",
-        price: "Mari Berdiskusi!",
+        price: "Mari Diskusi!🙂",
         priceLabel: "",
         features: [
             "Agen Kustom Tanpa Batas",

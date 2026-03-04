@@ -292,7 +292,7 @@ export default function PaymentPage() {
                 {/* Card 4: Enterprise */}
                 <PricingCard
                     title="Enterprise"
-                    price="Mari Berdiskusi!"
+                    price="Mari Diskusi!🙂"
                     description="Solusi skala besar dengan dukungan khusus dan kustomisasi tanpa batas."
                     features={enterpriseFeatures}
                     buttonText="Hubungi Kami"
