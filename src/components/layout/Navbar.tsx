@@ -45,13 +45,13 @@ export function Navbar({ className }: NavbarProps) {
             >
                 {/* Logo & Badge Section */}
                 <div className="flex items-center flex-shrink-0 ml-1 md:ml-2 gap-2 md:gap-3">
-                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="-my-4">
                         <Image
                             src="/clevioLogo.webp"
                             alt="Clevio Logo"
-                            width={40}
-                            height={40}
-                            className="w-auto h-[40px] md:h-[60px] object-contain"
+                            width={80}
+                            height={80}
+                            className="w-auto h-[50px] md:h-[80px] object-contain"
                             priority
                         />
                     </Link>
