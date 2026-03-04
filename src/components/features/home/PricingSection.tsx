@@ -8,52 +8,61 @@ const pricingData = [
     {
         id: 1,
         title: "Gratis",
-        subtitle: "Sempurna untuk mencoba staf AI",
-        price: "Rp. 0",
+        subtitle: "Coba buat Staff AI Anda tanpa biaya. Cocok untuk eksplorasi awal.",
+        price: "Rp 0",
+        priceLabel: "/ 2 minggu",
         features: [
-            "1 Staf AI",
-            "100 percakapan/bulan",
-            "Fitur dasar",
-            "Email support",
-            "Dashboard analytics"
+            "Durasi 2 Minggu (14 Days)",
+            "Maksimal 1 Agent"
         ],
         buttonText: "Coba Gratis",
         isEnterprise: false
     },
     {
         id: 2,
-        title: "Pro",
-        subtitle: "Untuk bisnis yang sedang berkembang",
-        price: "Rp. 800.000",
+        title: "Economy",
+        subtitle: "Paket awal untuk individu yang butuh staf pintar sehari-hari.",
+        price: "Rp 200rb",
+        priceLabel: "/ bulan",
         features: [
-            "5 staf AI",
-            "Unlimited percakapan",
-            "Semua fitur premium",
-            "Prioritas support 24/7",
-            "Advanced analytics",
-            "Custom branding",
-            "API acces"
+            "Maksimal 1 Agent",
+            "2000 Percakapan/bulan",
+            "Akses MCP Tools",
+            "Integrasi WhatsApp",
+        ],
+        buttonText: "Coba Sekarang",
+        isEnterprise: false,
+        isPopular: false
+    },
+    {
+        id: 3,
+        title: "Profesional",
+        subtitle: "Power penuh untuk bisnis yang siap bertumbuh. Full akses tools & integrasi.",
+        price: "Rp 880rb",
+        priceLabel: "/ bulan",
+        features: [
+            "Maksimal 1 Agent",
+            "Akses Full MCP Tools",
+            "Integrasi WhatsApp Connect",
+            "Priority Support",
         ],
         buttonText: "Coba Sekarang",
         isEnterprise: false,
         isPopular: true
     },
     {
-        id: 3,
+        id: 4,
         title: "Enterprise",
-        subtitle: "Solusi lengkap untuk perusahaan",
+        subtitle: "Solusi skala besar dengan dukungan khusus dan kustomisasi tanpa batas.",
         price: "",
+        priceLabel: "",
         features: [
-            "Unlimited staf AI",
-            "Unlimited percakapan",
-            "Semua fitur premium",
-            "Dedicated account manager",
-            "Custom integration",
-            "SLA guarantee",
-            "Training & onboarding",
-            "White-label solution"
+            "Agen Kustom Tanpa Batas",
+            "Integrasi API & Tools Kustom",
+            "Manajer Akun Khusus",
+            "SLA & Perjanjian Kustom",
         ],
-        buttonText: "Coba Sekarang",
+        buttonText: "Hubungi Kami",
         isEnterprise: true
     }
 ];
@@ -65,37 +74,27 @@ export default function PricingSection() {
         window.dispatchEvent(new CustomEvent('scrollToArthur'));
     };
 
-    const handleProClick = async () => {
-        // Check if user is already logged in
+    const handleProClick = () => {
         const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
 
         if (token) {
-            // User is logged in, go directly to payment
             router.push('/payment');
         } else {
-            // User not logged in, trigger Google OAuth via proxy to avoid CORS
-            try {
-                const response = await fetch('/api/auth/google-login');
-                const data = await response.json();
-                const authUrl = typeof data === 'string' ? data : data.auth_url;
-
-                if (authUrl) {
-                    // Store intended destination for after login
-                    localStorage.setItem('post_login_redirect', '/payment');
-                    window.location.href = authUrl;
-                }
-            } catch (error) {
-                console.error("Failed to get Google login URL:", error);
-            }
+            // Store destination for after login
+            localStorage.setItem('post_login_redirect', '/payment');
+            router.push('/login');
         }
     };
 
     const getClickHandler = (plan: typeof pricingData[0]) => {
-        if (plan.buttonText === "Coba Gratis") {
+        if (plan.title === "Gratis") {
             return handleScrollToArthur;
         }
-        if (plan.title === "Pro") {
+        if (plan.title === "Economy" || plan.title === "Profesional") {
             return handleProClick;
+        }
+        if (plan.title === "Enterprise") {
+            return () => window.open('https://wa.me/6282221118860', '_blank');
         }
         return undefined;
     };
@@ -116,13 +115,14 @@ export default function PricingSection() {
             </div>
 
             {/* Pricing Cards */}
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12">
+            <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 lg:gap-10">
                 {pricingData.map((plan) => (
                     <PricingCard
                         key={plan.id}
                         title={plan.title}
                         subtitle={plan.subtitle}
                         price={plan.price}
+                        priceLabel={plan.priceLabel}
                         features={plan.features}
                         buttonText={plan.buttonText}
                         isEnterprise={plan.isEnterprise}

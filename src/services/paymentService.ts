@@ -5,7 +5,7 @@ const PAYMENT_WEBHOOK_URL = process.env.NEXT_PUBLIC_PAYMENT_WEBHOOK_URL || '';
 export interface PaymentWebhookPayload {
   user_id: string;
   email: string;
-  plan_code: 'PRO_M';
+  plan_code: 'PRO_M' | 'ECO_M';
   charge: string;
   harga: string;
   order_suffix: string;

@@ -119,6 +119,43 @@ export default function PaymentPage() {
     }, [searchParams, fetchUserInfo, router]);
 
 
+    // Handle Economy Monthly Payment via Midtrans
+    const handleEconomyPayment = async () => {
+        if (!userInfo) {
+            alert('Informasi user tidak ditemukan. Silakan login ulang.');
+            router.push('/login');
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            const payload: PaymentWebhookPayload = {
+                user_id: userInfo.id,
+                email: userInfo.email,
+                plan_code: 'ECO_M',
+                charge: '200000',
+                harga: '200000',
+                order_suffix: paymentService.generateOrderSuffix(),
+                source: 'frontend',
+            };
+
+            const response = await paymentService.notifyPaymentWebhook(payload);
+
+            if (response.payment_url || response.redirect_url) {
+                // Redirect to Midtrans payment page
+                // Note: We don't need to do anything here as the user leaves the page
+                window.location.href = response.payment_url || response.redirect_url || '';
+            } else {
+                alert('Gagal membuat order pembayaran. Silakan coba lagi.');
+                setIsLoading(false);
+            }
+        } catch (error) {
+            alert('Terjadi kesalahan. Silakan coba lagi.');
+            setIsLoading(false);
+        }
+    };
+
     // Handle Pro Monthly Payment via Midtrans
     const handleProPayment = async () => {
         if (!userInfo) {
@@ -159,6 +196,8 @@ export default function PaymentPage() {
     const handleSelect = (plan: string) => {
         if (plan === 'pro') {
             handleProPayment();
+        } else if (plan === 'economy') {
+            handleEconomyPayment();
         } else if (plan === 'trial') {
             // Redirect to landing page
             router.push('/');
@@ -167,6 +206,13 @@ export default function PaymentPage() {
             window.open('https://wa.me/6282221118860', '_blank');
         }
     };
+
+    const economyFeatures: PricingFeature[] = [
+        { text: "Maksimal 1 Agent", included: true },
+        { text: "2000 Percakapan/bulan", included: true },
+        { text: "Akses MCP Tools", included: true },
+        { text: "Integrasi WhatsApp", included: true },
+    ];
 
     const trialFeatures: PricingFeature[] = [
         { text: "Durasi 2 Minggu (14 Days)", included: true },
@@ -183,10 +229,10 @@ export default function PaymentPage() {
     ];
 
     const enterpriseFeatures: PricingFeature[] = [
-        { text: "Unlimited Custom Agents", included: true },
-        { text: "Custom API & Tools Integration", included: true },
-        { text: "Dedicated Account Manager", included: true },
-        { text: "Custom SLA & Agreement", included: true },
+        { text: "Agen Kustom Tanpa Batas", included: true },
+        { text: "Integrasi API & Tools Kustom", included: true },
+        { text: "Manajer Akun Khusus", included: true },
+        { text: "SLA & Perjanjian Kustom", included: true },
     ];
 
     if (isInitializing) {
@@ -206,12 +252,12 @@ export default function PaymentPage() {
             </div>
 
             {/* Pricing Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl w-full items-start justify-items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 lg:gap-10 max-w-[1400px] w-full items-start justify-items-center">
                 {/* Card 1: Gratis / Trial */}
                 <PricingCard
-                    title="Gratis Trial"
+                    title="Gratis"
                     price="Rp 0"
-                    period="/ 14 hari"
+                    period="/ 2 minggu"
                     description="Coba buat Staff AI Anda tanpa biaya. Cocok untuk eksplorasi awal."
                     features={trialFeatures}
                     buttonText="Coba Sekarang"
@@ -219,9 +265,21 @@ export default function PaymentPage() {
                     onButtonClick={() => handleSelect("trial")}
                 />
 
-                {/* Card 2: Bulanan (Pro) */}
+                {/* Card 2: Bulanan (Economy) */}
                 <PricingCard
-                    title="Pro Monthly"
+                    title="Economy"
+                    price="Rp 200rb"
+                    period="/ bulan"
+                    description="Paket awal untuk individu yang butuh staf pintar sehari-hari."
+                    features={economyFeatures}
+                    buttonText="Mulai Sekarang"
+                    isPopular={false}
+                    onButtonClick={() => handleSelect("economy")}
+                />
+
+                {/* Card 3: Bulanan (Pro) */}
+                <PricingCard
+                    title="Profesional"
                     price="Rp 880rb"
                     period="/ bulan"
                     description="Power penuh untuk bisnis yang siap bertumbuh. Full akses tools & integrasi."
@@ -231,10 +289,10 @@ export default function PaymentPage() {
                     onButtonClick={() => handleSelect("pro")}
                 />
 
-                {/* Card 3: Enterprise */}
+                {/* Card 4: Enterprise */}
                 <PricingCard
                     title="Enterprise"
-                    price="Custom"
+                    price="Mari Berdiskusi!"
                     description="Solusi skala besar dengan dukungan khusus dan kustomisasi tanpa batas."
                     features={enterpriseFeatures}
                     buttonText="Hubungi Kami"
