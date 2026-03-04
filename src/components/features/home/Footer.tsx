@@ -23,7 +23,7 @@ export default function Footer() {
                 {/* Logo */}
                 <div className="mb-8">
                     <Image
-                        src="/brandFooter.png"
+                        src="/brandFooter.webp"
                         alt="Clevio AI Staff"
                         width={99}
                         height={66}

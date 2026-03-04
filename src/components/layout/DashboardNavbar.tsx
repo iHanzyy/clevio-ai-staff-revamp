@@ -56,7 +56,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
                 <div className="flex items-center gap-3">
                     <div className="relative w-12 h-12 md:w-16 md:h-16">
                         <Image
-                            src="/clevioLogo_figma.png"
+                            src="/brandFooter.webp"
                             alt="Clevio Logo"
                             fill
                             className="object-contain"
