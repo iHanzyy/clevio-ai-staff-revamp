@@ -51,7 +51,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
 
     return (
         <>
-            <nav className="relative w-full h-20 px-6 md:px-12 flex items-center justify-between bg-[#02457A] text-white">
+            <nav className="relative z-50 w-full h-20 px-6 md:px-12 flex items-center justify-between bg-[#02457A] text-white">
                 {/* LEFT: Logo & Brand */}
                 <div className="flex items-center gap-3">
                     <div className="relative w-12 h-12 md:w-16 md:h-16">
@@ -114,7 +114,7 @@ export default function DashboardNavbar({ showCreateButton = true }: { showCreat
 
                         {/* Dropdown Menu */}
                         {isProfileOpen && (
-                            <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden z-100 animate-fade-in-down origin-top-right text-black">
+                            <div className="absolute right-0 mt-3 w-48 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden z-[100] animate-fade-in-down origin-top-right text-black">
                                 <div className="py-1">
                                     <button
                                         onClick={() => {
