@@ -8,37 +8,37 @@ const featuresData = [
         id: 1,
         icon: "clock",
         title: "Tersedia 24/7",
-        description: "Staf AI Anda tidak pernah tidur dan siap melayani kapan saja"
+        description: "Staf AI Anda tidak pernah tidur dan siap melayani kapan saja tanpa henti."
     },
     {
         id: 2,
         icon: "brain",
         title: "Pembelajaran berkelanjutan",
-        description: "Staf AI Anda tidak pernah tidur dan siap melayani kapan saja"
+        description: "AI Anda terus belajar dari setiap interaksi untuk memberikan respon yang lebih pintar."
     },
     {
         id: 3,
         icon: "bar",
         title: "Analitik real-time",
-        description: "Staf AI Anda tidak pernah tidur dan siap melayani kapan saja"
+        description: "Pantau performa percakapan secara langsung melalui dashboard analitik interaktif."
     },
     {
         id: 4,
         icon: "shield",
         title: "Keamanan terjamin",
-        description: "Staf AI Anda tidak pernah tidur dan siap melayani kapan saja"
+        description: "Dilengkapi perlindungan privasi ketat untuk memastikan data bisnis tetap aman."
     },
     {
         id: 5,
         icon: "thunder",
         title: "Respon instan",
-        description: "Staf AI Anda tidak pernah tidur dan siap melayani kapan saja"
+        description: "Beri jawaban kilat tanpa perlu menunggu, tingkatkan kepuasan dan rasio konversi."
     },
     {
         id: 6,
         icon: "web",
         title: "Multi-bahasa",
-        description: "Staf AI Anda tidak pernah tidur dan siap melayani kapan saja"
+        description: "Bebas berkomunikasi dengan pelanggan seluas dunia menggunakan beragam bahasa."
     },
 ];
 
