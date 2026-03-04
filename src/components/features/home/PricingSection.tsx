@@ -48,13 +48,13 @@ const pricingData = [
         ],
         buttonText: "Coba Sekarang",
         isEnterprise: false,
-        isPopular: true
+        isPopular: false
     },
     {
         id: 4,
         title: "Enterprise",
         subtitle: "Solusi skala besar dengan dukungan khusus dan kustomisasi tanpa batas.",
-        price: "",
+        price: "Mari Berdiskusi!",
         priceLabel: "",
         features: [
             "Agen Kustom Tanpa Batas",
@@ -75,15 +75,11 @@ export default function PricingSection() {
     };
 
     const handleProClick = () => {
-        const token = typeof window !== 'undefined' ? localStorage.getItem('jwt_token') : null;
-
-        if (token) {
-            router.push('/payment');
-        } else {
-            // Store destination for after login
+        // Store destination for after login
+        if (typeof window !== 'undefined') {
             localStorage.setItem('post_login_redirect', '/payment');
-            router.push('/login');
         }
+        router.push('/login');
     };
 
     const getClickHandler = (plan: typeof pricingData[0]) => {
