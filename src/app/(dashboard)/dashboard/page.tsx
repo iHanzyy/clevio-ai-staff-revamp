@@ -283,7 +283,7 @@ export default function DashboardPage() {
     return (
         <div className="w-full h-full flex flex-col bg-[linear-gradient(135deg,#f5f7fa_0%,#e4ecf7_100%)]">
             {/* MOBILE TAB BAR - Fixed at top, only visible < lg */}
-            <div className="lg:hidden sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/50 px-4 py-3 flex gap-3 justify-center shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)]">
+            <div className="lg:hidden sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-white/50 px-4 py-3 flex gap-3 justify-center shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)]">
                 <button
                     onClick={() => setActiveSection('setting')}
                     className={cn(
