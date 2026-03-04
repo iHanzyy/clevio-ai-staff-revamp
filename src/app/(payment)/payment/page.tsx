@@ -209,7 +209,7 @@ export default function PaymentPage() {
 
     const economyFeatures: PricingFeature[] = [
         { text: "Maksimal 1 Agent", included: true },
-        { text: "2000 Percakapan/bulan", included: true },
+        { text: "2.000 Pesan / bulan", included: true },
         { text: "Akses MCP Tools", included: true },
         { text: "Integrasi WhatsApp", included: true },
     ];
@@ -217,12 +217,14 @@ export default function PaymentPage() {
     const trialFeatures: PricingFeature[] = [
         { text: "Durasi 2 Minggu (14 Days)", included: true },
         { text: "Maksimal 1 Agent", included: true },
+        { text: "250 Pesan", included: true },
         { text: "Akses MCP Tools", included: false },
         { text: "Integrasi WhatsApp", included: false },
     ];
 
     const proFeatures: PricingFeature[] = [
         { text: "Maksimal 1 Agent", included: true },
+        { text: "7.500 Pesan / bulan", included: true },
         { text: "Akses Full MCP Tools", included: true },
         { text: "Integrasi WhatsApp Connect", included: true },
         { text: "Priority Support", included: true },

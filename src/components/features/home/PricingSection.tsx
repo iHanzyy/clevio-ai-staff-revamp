@@ -13,7 +13,8 @@ const pricingData = [
         priceLabel: "/ 2 minggu",
         features: [
             "Durasi 2 Minggu (14 Days)",
-            "Maksimal 1 Agent"
+            "Maksimal 1 Agent",
+            "250 Pesan"
         ],
         buttonText: "Coba Gratis",
         isEnterprise: false
@@ -26,7 +27,7 @@ const pricingData = [
         priceLabel: "/ bulan",
         features: [
             "Maksimal 1 Agent",
-            "2000 Percakapan/bulan",
+            "2.000 Pesan / bulan",
             "Akses MCP Tools",
             "Integrasi WhatsApp",
         ],
@@ -42,6 +43,7 @@ const pricingData = [
         priceLabel: "/ bulan",
         features: [
             "Maksimal 1 Agent",
+            "7.500 Pesan / bulan",
             "Akses Full MCP Tools",
             "Integrasi WhatsApp Connect",
             "Priority Support",
