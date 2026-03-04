@@ -281,7 +281,7 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="w-full h-full flex flex-col overflow-hidden bg-[linear-gradient(135deg,#f5f7fa_0%,#e4ecf7_100%)]">
+        <div className="w-full h-full flex flex-col bg-[linear-gradient(135deg,#f5f7fa_0%,#e4ecf7_100%)]">
             {/* MOBILE TAB BAR - Fixed at top, only visible < lg */}
             <div className="lg:hidden sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-white/50 px-4 py-3 flex gap-3 justify-center shadow-[0_4px_20px_-10px_rgba(0,0,0,0.1)]">
                 <button
@@ -309,9 +309,9 @@ export default function DashboardPage() {
             </div>
 
             {/* MAIN CONTENT */}
-            <div className="flex-1 overflow-hidden px-4 pb-4 lg:px-10 lg:pb-10 lg:pt-6">
+            <div className="flex-1 overflow-y-auto scrollbar-apple px-4 pb-4 lg:px-10 lg:pb-10 lg:pt-6">
                 {/* 50:50 DESKTOP GRID */}
-                <div className="hidden lg:grid lg:grid-cols-2 gap-8 xl:gap-14 h-full max-w-[1600px] mx-auto">
+                <div className="hidden lg:grid lg:grid-cols-2 gap-8 xl:gap-14 min-h-[700px] h-[calc(100vh-140px)] max-h-[900px] max-w-[1600px] mx-auto">
                     
                     {/* COLUMN 1: Setting (3D Flip Container) */}
                     <div className="relative w-full h-full [perspective:2500px] flex flex-col">
