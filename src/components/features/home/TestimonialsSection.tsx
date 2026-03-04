@@ -75,7 +75,7 @@ export default function TestimonialsSection() {
             </div>
 
             {/* Main Content */}
-            <div style={{ backgroundColor: '#FFFAF2' }}>
+            <div style={{ backgroundColor: '#EBEFF0' }}>
                 {/* Section Header */}
                 <div className="max-w-4xl mx-auto text-center pt-16 mb-12 px-6 sm:px-8 md:px-12 lg:px-16">
                     <h2 className="font-bold text-[24px] md:text-[40px] text-gray-900">

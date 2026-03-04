@@ -28,7 +28,7 @@ export default function StepCard({ stepNumber, imageSrc, title, description, pri
             <div
                 className="relative w-full overflow-hidden"
                 style={{
-                    background: 'linear-gradient(0deg, #FFFAF2 0%, #C3D2F4 100%)',
+                    background: 'linear-gradient(0deg, #EBEFF0 0%, #C3D2F4 100%)',
                     border: '1px solid rgba(0, 0, 0, 0.2)',
                     borderRadius: '16px'
                 }}

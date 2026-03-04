@@ -30,7 +30,7 @@ export default function HowItWorksSection() {
             {/* Main Content */}
             <div
                 className="pt-16 pb-12 px-6 sm:px-8 md:px-12 lg:px-16"
-                style={{ backgroundColor: '#FFFAF2' }}
+                style={{ backgroundColor: '#EBEFF0' }}
             >
                 {/* Section Header */}
                 <div className="max-w-4xl mx-auto text-center mb-12">

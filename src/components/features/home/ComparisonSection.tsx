@@ -91,7 +91,7 @@ export default function ComparisonSection() {
     return (
         <section
             className="relative w-full py-16 px-6 sm:px-8 md:px-12 lg:px-16 font-google-sans-flex"
-            style={{ backgroundColor: '#FFFAF2' }}
+            style={{ backgroundColor: '#EBEFF0' }}
         >
             {/* Section Header */}
             <div className="max-w-4xl mx-auto text-center mb-8 md:mb-12">

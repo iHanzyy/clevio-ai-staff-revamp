@@ -4,7 +4,7 @@ export default function CtaSection() {
     return (
         <section
             className="relative w-full py-16 px-6 sm:px-8 md:px-12 lg:px-16 font-google-sans-flex"
-            style={{ backgroundColor: '#FFFAF2' }}
+            style={{ backgroundColor: '#EBEFF0' }}
         >
             {/* CTA Card */}
             <div
@@ -13,7 +13,7 @@ export default function CtaSection() {
                 style={{
                     minHeight: '316px',
                     borderRadius: '19px',
-                    background: 'linear-gradient(0deg, #FFFAF2 0%, #C3D2F4 100%)'
+                    background: 'linear-gradient(0deg, #EBEFF0 0%, #C3D2F4 100%)'
                 }}
             >
                 {/* Headline */}

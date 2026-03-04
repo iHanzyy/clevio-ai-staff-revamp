@@ -393,7 +393,7 @@ export default function ArthurSection() {
                     style={{ filter: 'drop-shadow(0 -3px 21.4px rgba(0, 0, 0, 0.25))' }}
                     preserveAspectRatio="none"
                 >
-                    <path d="M0 24.4C62.6661 113.341 390 20.9 390 140C390 260 390 280 390 280H0V24.4Z" fill="#FFFAF2" />
+                    <path d="M0 24.4C62.6661 113.341 390 20.9 390 140C390 260 390 280 390 280H0V24.4Z" fill="#EBEFF0" />
                 </svg>
 
                 {/* Content positioned INSIDE the wave area */}
@@ -437,7 +437,7 @@ export default function ArthurSection() {
             <div
                 className="relative py-8 px-0 sm:px-8 md:px-12 lg:px-16"
                 style={{
-                    background: '#FFFAF2'
+                    background: '#EBEFF0'
                 }}
             >
                 {/* Chat Messages Container - Gradient applied here */}
@@ -445,7 +445,7 @@ export default function ArthurSection() {
                     ref={chatContainerRef}
                     className="max-w-4xl mx-auto mb-4 space-y-4 px-6 sm:px-8 max-h-[50vh] min-h-[300px] overflow-y-auto custom-scrollbar rounded-3xl pt-8 -mt-5"
                     style={{
-                        background: 'linear-gradient(to bottom, #C3D2F4 0%, #FFFAF2 100%)'
+                        background: 'linear-gradient(to bottom, #C3D2F4 0%, #EBEFF0 100%)'
                     }}
                 >
                     {messages.map((msg, idx) => {

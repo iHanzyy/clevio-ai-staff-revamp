@@ -253,7 +253,7 @@ export default function ArthurPhone({
     return (
         <div className={cn(
             "relative w-full h-[800px] md:h-full max-h-[85vh] flex flex-col rounded-[30px] overflow-hidden",
-            "bg-[linear-gradient(0deg,#FFFAF2_0%,#C3D2F4_100%)]",
+            "bg-[linear-gradient(0deg,#EBEFF0_0%,#C3D2F4_100%)]",
             isFocused ? "shadow-[0px_4px_63px_3px_rgba(37,99,235,1)]" : "shadow-none"
         )}>
             {/* HEADER */}

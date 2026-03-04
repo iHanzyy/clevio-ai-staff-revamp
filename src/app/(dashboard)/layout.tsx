@@ -14,7 +14,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <div className="h-screen w-full bg-[linear-gradient(0deg,#FFFAF2_0%,#C3D2F4_100%)] text-white flex flex-col overflow-hidden">
+        <div className="h-screen w-full bg-[linear-gradient(0deg,#EBEFF0_0%,#C3D2F4_100%)] text-white flex flex-col overflow-hidden">
             <GuestTimer />
             <ExpiredPlanPopup />
             {/* Navbar pinned to top */}

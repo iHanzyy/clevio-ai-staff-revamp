@@ -32,7 +32,7 @@ export default function PricingCard({
             style={{
                 borderRadius: '22px',
                 border: isPopular ? '2px solid #2563EB' : '1px solid rgba(0, 0, 0, 0.40)',
-                background: 'linear-gradient(0deg, #FFFAF2 0%, #C3D2F4 100%)',
+                background: 'linear-gradient(0deg, #EBEFF0 0%, #C3D2F4 100%)',
                 boxShadow: isPopular
                     ? '0 8px 30px 0 rgba(37, 99, 235, 0.5)'
                     : '0 4px 11.6px 0 rgba(2, 91, 255, 0.37)'

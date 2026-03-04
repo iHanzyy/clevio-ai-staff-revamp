@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicyPage() {
     return (
-        <div className="w-full bg-[#FFFAF2]">
+        <div className="w-full bg-[#EBEFF0]">
             {/* Header Spacer */}
             <div className="h-24"></div>
 
