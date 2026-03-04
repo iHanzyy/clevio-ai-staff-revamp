@@ -7,7 +7,7 @@ export default function LoginPage() {
             <div className="fixed inset-0 -z-10 w-full h-full bg-[#fffff0]" />
 
             {/* Login Content */}
-            <div className="w-full h-full pt-[80px] flex items-center justify-center">
+            <div className="w-full min-h-screen pt-[120px] md:pt-[140px] pb-10 flex items-center justify-center">
                 <LoginForm />
             </div>
         </>
