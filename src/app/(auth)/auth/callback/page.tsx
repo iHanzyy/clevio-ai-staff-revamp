@@ -26,7 +26,7 @@ export default function AuthCallbackPage() {
 
             // 5. Redirect to intended destination or Dashboard
             setTimeout(() => {
-                window.location.href = 'https://wa.me/6282221118860?text=Sudah';
+                window.location.href = postLoginRedirect || '/dashboard';
             }, 1000); // 1s delay to see the nice loader
         } else {
             // Redirect back to login on error
